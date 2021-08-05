@@ -11,39 +11,77 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class JavaCompareTest {
-    File fileA;
-    File fileA_withComments;
-    File fileA_withExtraWhitespace;
-    File fileB;
-
-    @BeforeEach
-    void init() throws URISyntaxException {
-        fileA = Paths.get(this.getClass().getResource("/fileA.txt").toURI()).toFile();
-        fileB = Paths.get(this.getClass().getResource("/fileB.txt").toURI()).toFile();
-        fileA_withExtraWhitespace = Paths.get(this.getClass().getResource("/fileA_withExtraWhitespace.txt").toURI()).toFile();
-        fileA_withComments = Paths.get(this.getClass().getResource("/fileA_withComments.txt").toURI()).toFile();
-    }
-
     @Test
     void twoExactSameFiles() throws IOException {
+        String fileA = ClassMockFactory
+                .builder()
+                .method(MethodMock.builder().build())
+                .build()
+                .getClassMock();
         Assertions.assertTrue(new JavaCompare(fileA, fileA).pedanticComparison());
         Assertions.assertTrue(new JavaCompare(fileA, fileA).semanticComparison());
     }
 
     @Test
     void oneWithExtraWhitespace() throws IOException {
-        Assertions.assertFalse(new JavaCompare(fileA, fileA_withExtraWhitespace).pedanticComparison());
-        Assertions.assertTrue(new JavaCompare(fileA, fileA_withExtraWhitespace).semanticComparison());
+        String fileA = ClassMockFactory
+                .builder()
+                .method(MethodMock
+                        .builder()
+                        .build())
+                .build()
+                .getClassMock();
+        String fileB = ClassMockFactory
+                .builder()
+                .method(MethodMock
+                        .builder()
+                        .extraWhitespace(true)
+                        .build())
+                .build()
+                .getClassMock();
+        Assertions.assertFalse(new JavaCompare(fileA, fileB).pedanticComparison());
+        Assertions.assertTrue(new JavaCompare(fileA, fileB).semanticComparison());
     }
 
     @Test
-    void oneWithComments() throws IOException {
-        Assertions.assertFalse(new JavaCompare(fileA, fileA_withComments).pedanticComparison());
-        Assertions.assertTrue(new JavaCompare(fileA, fileA_withComments).semanticComparison());
+    void oneWithInlineComments() throws IOException {
+        String fileA = ClassMockFactory
+                .builder()
+                .method(MethodMock
+                        .builder()
+                        .build())
+                .build()
+                .getClassMock();
+        String fileB = ClassMockFactory
+                .builder()
+                .method(MethodMock
+                        .builder()
+                        .inlineComments(true)
+                        .build())
+                .build()
+                .getClassMock();
+        Assertions.assertFalse(new JavaCompare(fileA, fileB).pedanticComparison());
+        Assertions.assertTrue(new JavaCompare(fileA, fileB).semanticComparison());
     }
 
     @Test
     void twoDifferentFiles() throws IOException {
+        String fileA = ClassMockFactory
+                .builder()
+                .method(MethodMock
+                        .builder()
+                        .bodyA(true)
+                        .build())
+                .build()
+                .getClassMock();
+        String fileB = ClassMockFactory
+                .builder()
+                .method(MethodMock
+                        .builder()
+                        .bodyA(false)
+                        .build())
+                .build()
+                .getClassMock();
         Assertions.assertFalse(new JavaCompare(fileA, fileB).pedanticComparison());
         Assertions.assertFalse(new JavaCompare(fileA, fileB).semanticComparison());
     }

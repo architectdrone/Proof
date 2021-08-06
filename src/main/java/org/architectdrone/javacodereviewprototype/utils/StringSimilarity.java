@@ -19,6 +19,6 @@ public class StringSimilarity {
      */
     public float getStringSimilarity(String a, String b, int n)
     {
-        return utils.getNGramsSimilarity(utils.getNGrams(a, n), utils.getNGrams(b, n));
+        return utils.getStringSimilarity(a, b, n);
     }
 }

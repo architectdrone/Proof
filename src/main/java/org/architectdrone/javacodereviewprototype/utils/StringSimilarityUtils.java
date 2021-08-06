@@ -78,4 +78,17 @@ public class StringSimilarityUtils {
         }
         return (float) (2*getIntersection(a, b).size()) / (getUnion(a, b).size());
     }
+
+    /**
+     * Gets string similarity using n-gram method.
+     * Will be 0 <= x <= 2.
+     * @param a The first string
+     * @param b The second string
+     * @param n The "n" in "n-gram"
+     * @return The similarity.
+     */
+    public float getStringSimilarity(String a, String b, int n)
+    {
+        return getNGramsSimilarity(getNGrams(a, n), getNGrams(b, n));
+    }
 }

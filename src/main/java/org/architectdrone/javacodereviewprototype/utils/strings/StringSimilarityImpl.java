@@ -1,4 +1,5 @@
-package org.architectdrone.javacodereviewprototype.utils.strings;/*
+package org.architectdrone.javacodereviewprototype.utils.strings;
+/*
  * Description
  * <p>
  * Copyrights 2021. Cerner Corporation.

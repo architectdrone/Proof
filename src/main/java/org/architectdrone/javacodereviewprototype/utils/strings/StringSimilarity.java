@@ -1,7 +1,5 @@
 package org.architectdrone.javacodereviewprototype.utils.strings;
 
-import com.google.inject.Inject;
-
 public interface StringSimilarity {
     /**
      * Gets string similarity using n-gram method.

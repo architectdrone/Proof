@@ -1,4 +1,4 @@
-package org.architectdrone.javacodereviewprototype.utils;/*
+package org.architectdrone.javacodereviewprototype.utils.strings;/*
  * Description
  * <p>
  * Copyrights 2021. Cerner Corporation.
@@ -15,7 +15,7 @@ import java.util.Set;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class StringSimilarityUtils {
+public class StringSimilarityImpl implements StringSimilarity {
     /**
      * Creates a list of n-grams.
      * IE, "hello", n = 3 -> ["hel","ell","llo"]

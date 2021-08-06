@@ -1,26 +1,24 @@
-package org.architectdrone.JavaCodeReviewPrototype.utils;
+package org.architectdrone.JavaCodeReviewPrototype.utils.strings;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.architectdrone.javacodereviewprototype.utils.StringSimilarity;
-import org.architectdrone.javacodereviewprototype.utils.StringSimilarityUtils;
+import org.architectdrone.javacodereviewprototype.utils.strings.StringSimilarityImpl;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class StringSimilarityTest {
-    StringSimilarityUtils stringSimilarityUtils = new StringSimilarityUtils();
-    StringSimilarity stringSimilarity = new StringSimilarity(stringSimilarityUtils);
+class StringSimilarityImplTest {
+    StringSimilarityImpl stringSimilarity = new StringSimilarityImpl();
     @Nested
     class getNGramsTests
     {
         @Test
         void whenStringSizeIsGreaterThanN_returnsAllNGrams() {
-            Collection<String> nGrams = stringSimilarityUtils.getNGrams("backpack", 3);
+            Collection<String> nGrams = stringSimilarity.getNGrams("backpack", 3);
             assertEquals(6, nGrams.size());
             assertTrue(nGrams.contains("bac"));
             assertTrue(nGrams.contains("ack"));
@@ -32,14 +30,14 @@ class StringSimilarityTest {
 
         @Test
         void whenStringSizeIsLessThanN_returnsString() {
-            Collection<String> nGrams = new StringSimilarityUtils().getNGrams("hi", 3);
+            Collection<String> nGrams = new StringSimilarityImpl().getNGrams("hi", 3);
             assertEquals(1, nGrams.size());
             assertTrue(nGrams.contains("hi"));
         }
 
         @Test
         void whenStringSizeIsEqualToN_returnsString() {
-            Collection<String> nGrams = new StringSimilarityUtils().getNGrams("hey", 3);
+            Collection<String> nGrams = new StringSimilarityImpl().getNGrams("hey", 3);
             assertEquals(1, nGrams.size());
             assertTrue(nGrams.contains("hey"));
         }
@@ -53,7 +51,7 @@ class StringSimilarityTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("c", "d").collect(Collectors.toList());
 
-            Collection<String> union = new StringSimilarityUtils().getUnion(a, b);
+            Collection<String> union = new StringSimilarityImpl().getUnion(a, b);
             assertEquals(4, union.size());
             assertEquals(1, Collections.frequency(union, "a"));
             assertEquals(1, Collections.frequency(union, "b"));
@@ -66,7 +64,7 @@ class StringSimilarityTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("b", "d").collect(Collectors.toList());
 
-            Collection<String> union = new StringSimilarityUtils().getUnion(a, b);
+            Collection<String> union = new StringSimilarityImpl().getUnion(a, b);
             assertEquals(3, union.size());
             assertEquals(1, Collections.frequency(union, "a"));
             assertEquals(1, Collections.frequency(union, "b"));
@@ -82,7 +80,7 @@ class StringSimilarityTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("c", "d").collect(Collectors.toList());
 
-            Collection<String> intersection = new StringSimilarityUtils().getIntersection(a, b);
+            Collection<String> intersection = new StringSimilarityImpl().getIntersection(a, b);
             assertEquals(0, intersection.size());
         }
 
@@ -91,7 +89,7 @@ class StringSimilarityTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("b", "d").collect(Collectors.toList());
 
-            Collection<String> intersection = new StringSimilarityUtils().getIntersection(a, b);
+            Collection<String> intersection = new StringSimilarityImpl().getIntersection(a, b);
             assertEquals(1, intersection.size());
             assertEquals(1, Collections.frequency(intersection, "b"));
         }
@@ -105,7 +103,7 @@ class StringSimilarityTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("a", "b").collect(Collectors.toList());
 
-            assertEquals(2.0, new StringSimilarityUtils().getNGramsSimilarity(a, b));
+            assertEquals(2.0, new StringSimilarityImpl().getNGramsSimilarity(a, b));
         }
 
         @Test
@@ -113,7 +111,7 @@ class StringSimilarityTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("a", "b", "c").collect(Collectors.toList());
 
-            assertEquals(((float) 4/3), new StringSimilarityUtils().getNGramsSimilarity(a, b));
+            assertEquals(((float) 4/3), new StringSimilarityImpl().getNGramsSimilarity(a, b));
         }
 
         @Test
@@ -121,7 +119,7 @@ class StringSimilarityTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("c", "d").collect(Collectors.toList());
 
-            assertEquals(0, new StringSimilarityUtils().getNGramsSimilarity(a, b));
+            assertEquals(0, new StringSimilarityImpl().getNGramsSimilarity(a, b));
         }
 
         @Test
@@ -129,7 +127,7 @@ class StringSimilarityTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Collections.emptyList();
 
-            assertEquals(0, new StringSimilarityUtils().getNGramsSimilarity(a, b));
+            assertEquals(0, new StringSimilarityImpl().getNGramsSimilarity(a, b));
         }
 
         @Test
@@ -137,7 +135,7 @@ class StringSimilarityTest {
             List<String> a = Collections.emptyList();
             List<String> b = Collections.emptyList();
 
-            assertEquals(2, new StringSimilarityUtils().getNGramsSimilarity(a, b));
+            assertEquals(2, new StringSimilarityImpl().getNGramsSimilarity(a, b));
         }
     }
 

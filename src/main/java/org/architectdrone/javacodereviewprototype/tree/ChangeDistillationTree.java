@@ -1,8 +1,11 @@
 package org.architectdrone.javacodereviewprototype.tree;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 /**
@@ -56,6 +59,19 @@ public class ChangeDistillationTree<L> {
         this.isOriginal = isOriginal;
     }
 
+    /**
+     * @param includeLeaves Include leaves?
+     * @return descendants
+     */
+    public List<ChangeDistillationTree<L>> getDescendants(boolean includeLeaves)
+    {
+        List<ChangeDistillationTree<L>> toReturn = new ArrayList<>();
+
+        toReturn.addAll(children.stream().flatMap(c -> c.getDescendants(includeLeaves).stream()).collect(Collectors.toList()));
+        toReturn.addAll(children.stream().filter(c -> !c.getChildren().isEmpty() || includeLeaves).collect(Collectors.toList()));
+        return toReturn;
+    }
+
     public void setMatch(ChangeDistillationTree<L> match)
     {
         assert match.isOriginal() != this.isOriginal(); //We do not allow originals to match with other originals, or vice versa
@@ -64,6 +80,22 @@ public class ChangeDistillationTree<L> {
         if (!match.isMatched)
         {
             match.setMatch(this);
+        }
+    }
+
+    public List<ChangeDistillationTree<L>> getLeaves() {
+        if (children.isEmpty())
+        {
+            return Collections.singletonList(this);
+        }
+        else
+        {
+            List<ChangeDistillationTree<L>> toReturn = new ArrayList<>();
+            for (ChangeDistillationTree<L> child : children)
+            {
+                toReturn.addAll(child.getLeaves());
+            }
+            return toReturn;
         }
     }
 }

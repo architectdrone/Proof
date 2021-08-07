@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.architectdrone.javacodereviewprototype.utils.common.CommonUtilsImpl;
 import org.architectdrone.javacodereviewprototype.utils.strings.StringSimilarityImpl;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StringSimilarityImplTest {
-    StringSimilarityImpl stringSimilarity = new StringSimilarityImpl();
+    StringSimilarityImpl stringSimilarity = new StringSimilarityImpl(new CommonUtilsImpl());
     @Nested
     class getNGramsTests
     {
@@ -30,68 +32,16 @@ class StringSimilarityImplTest {
 
         @Test
         void whenStringSizeIsLessThanN_returnsString() {
-            Collection<String> nGrams = new StringSimilarityImpl().getNGrams("hi", 3);
+            Collection<String> nGrams = stringSimilarity.getNGrams("hi", 3);
             assertEquals(1, nGrams.size());
             assertTrue(nGrams.contains("hi"));
         }
 
         @Test
         void whenStringSizeIsEqualToN_returnsString() {
-            Collection<String> nGrams = new StringSimilarityImpl().getNGrams("hey", 3);
+            Collection<String> nGrams = stringSimilarity.getNGrams("hey", 3);
             assertEquals(1, nGrams.size());
             assertTrue(nGrams.contains("hey"));
-        }
-    }
-
-    @Nested
-    class getUnionTests
-    {
-        @Test
-        void whenListsDontIntersect_unionIsCorrect() {
-            List<String> a = Stream.of("a", "b").collect(Collectors.toList());
-            List<String> b = Stream.of("c", "d").collect(Collectors.toList());
-
-            Collection<String> union = new StringSimilarityImpl().getUnion(a, b);
-            assertEquals(4, union.size());
-            assertEquals(1, Collections.frequency(union, "a"));
-            assertEquals(1, Collections.frequency(union, "b"));
-            assertEquals(1, Collections.frequency(union, "c"));
-            assertEquals(1, Collections.frequency(union, "d"));
-        }
-
-        @Test
-        void whenListsDoIntersect_unionIsCorrect() {
-            List<String> a = Stream.of("a", "b").collect(Collectors.toList());
-            List<String> b = Stream.of("b", "d").collect(Collectors.toList());
-
-            Collection<String> union = new StringSimilarityImpl().getUnion(a, b);
-            assertEquals(3, union.size());
-            assertEquals(1, Collections.frequency(union, "a"));
-            assertEquals(1, Collections.frequency(union, "b"));
-            assertEquals(1, Collections.frequency(union, "d"));
-        }
-    }
-
-    @Nested
-    class getIntersectionTests
-    {
-        @Test
-        void whenListsDontIntersect_intersectionIsCorrect() {
-            List<String> a = Stream.of("a", "b").collect(Collectors.toList());
-            List<String> b = Stream.of("c", "d").collect(Collectors.toList());
-
-            Collection<String> intersection = new StringSimilarityImpl().getIntersection(a, b);
-            assertEquals(0, intersection.size());
-        }
-
-        @Test
-        void whenListsDoIntersect_unionIsCorrect() {
-            List<String> a = Stream.of("a", "b").collect(Collectors.toList());
-            List<String> b = Stream.of("b", "d").collect(Collectors.toList());
-
-            Collection<String> intersection = new StringSimilarityImpl().getIntersection(a, b);
-            assertEquals(1, intersection.size());
-            assertEquals(1, Collections.frequency(intersection, "b"));
         }
     }
 
@@ -103,7 +53,7 @@ class StringSimilarityImplTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("a", "b").collect(Collectors.toList());
 
-            assertEquals(2.0, new StringSimilarityImpl().getNGramsSimilarity(a, b));
+            assertEquals(2.0, stringSimilarity.getNGramsSimilarity(a, b));
         }
 
         @Test
@@ -111,7 +61,7 @@ class StringSimilarityImplTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("a", "b", "c").collect(Collectors.toList());
 
-            assertEquals(((float) 4/3), new StringSimilarityImpl().getNGramsSimilarity(a, b));
+            assertEquals(((float) 4/3), stringSimilarity.getNGramsSimilarity(a, b));
         }
 
         @Test
@@ -119,7 +69,7 @@ class StringSimilarityImplTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Stream.of("c", "d").collect(Collectors.toList());
 
-            assertEquals(0, new StringSimilarityImpl().getNGramsSimilarity(a, b));
+            assertEquals(0, stringSimilarity.getNGramsSimilarity(a, b));
         }
 
         @Test
@@ -127,7 +77,7 @@ class StringSimilarityImplTest {
             List<String> a = Stream.of("a", "b").collect(Collectors.toList());
             List<String> b = Collections.emptyList();
 
-            assertEquals(0, new StringSimilarityImpl().getNGramsSimilarity(a, b));
+            assertEquals(0, stringSimilarity.getNGramsSimilarity(a, b));
         }
 
         @Test
@@ -135,7 +85,7 @@ class StringSimilarityImplTest {
             List<String> a = Collections.emptyList();
             List<String> b = Collections.emptyList();
 
-            assertEquals(2, new StringSimilarityImpl().getNGramsSimilarity(a, b));
+            assertEquals(2, stringSimilarity.getNGramsSimilarity(a, b));
         }
     }
 

@@ -14,9 +14,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.NoArgsConstructor;
+import org.architectdrone.javacodereviewprototype.utils.common.CommonUtils;
 
-@NoArgsConstructor
+import javax.inject.Inject;
+
+
 public class StringSimilarityImpl implements StringSimilarity {
+    CommonUtils commonUtils;
+
+    @Inject
+    public StringSimilarityImpl(CommonUtils commonUtils)
+    {
+        this.commonUtils = commonUtils;
+    }
+
     /**
      * Creates a list of n-grams.
      * IE, "hello", n = 3 -> ["hel","ell","llo"]
@@ -37,33 +48,6 @@ public class StringSimilarityImpl implements StringSimilarity {
     }
 
     /**
-     * Gets the union of two lists
-     * @param a list a
-     * @param b list b
-     * @return The union of a and b
-     */
-    public Collection<String> getUnion(Collection<String> a, Collection<String> b)
-    {
-        Set<String> set = new HashSet<>();
-
-        set.addAll(a);
-        set.addAll(b);
-
-        return set;
-    }
-
-    /**
-     * Gets the intersection of two lists
-     * @param a list a
-     * @param b list b
-     * @return The union of a and b
-     */
-    public Collection<String> getIntersection(Collection<String> a, Collection<String> b)
-    {
-        return Sets.intersection(Sets.newHashSet(a), Sets.newHashSet(b));
-    }
-
-    /**
      * Gets the similarity of two lists of n-grams.
      * Result is in the range 0 <= x <= 2.
      * If a and b are both empty, return 2 (they are the same, after all ;) )
@@ -77,7 +61,7 @@ public class StringSimilarityImpl implements StringSimilarity {
         {
             return 2;
         }
-        return (float) (2*getIntersection(a, b).size()) / (getUnion(a, b).size());
+        return (float) (2*commonUtils.getIntersection(a, b).size()) / (commonUtils.getUnion(a, b).size());
     }
 
     /**

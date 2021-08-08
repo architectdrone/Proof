@@ -1,5 +1,6 @@
 package org.architectdrone.javacodereviewprototype.tree;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,6 +61,7 @@ public class ChangeDistillationTree<L> {
     }
 
     /**
+     * Gets the descendants of the tree.
      * @param includeLeaves Include leaves?
      * @return descendants
      */
@@ -97,5 +99,19 @@ public class ChangeDistillationTree<L> {
             }
             return toReturn;
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(MessageFormat.format("[{0}] {1}:{2} => ", isOriginal ? "O" : "M", label, value));
+        if (!isMatched)
+        {
+            builder.append("NONE ");
+        }
+        else {
+            builder.append(MessageFormat.format("{0}:{1}", match.getLabel(), match.getValue()));
+        }
+        return builder.toString();
     }
 }

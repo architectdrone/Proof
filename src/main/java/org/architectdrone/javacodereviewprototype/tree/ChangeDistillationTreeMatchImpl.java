@@ -84,18 +84,22 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
 
     /**
      * Performs the inner node matching step.
-     * @param innerNodesA The inner nodes of A. (MUST BE POSTORDER!)
-     * @param innerNodesB The inner nodes of B. (MUST BE POSTORDER!)
+     * @param treeA Original Tree.
+     * @param treeB Modified Tree.
      * @param stringSimilarityThreshold See STRING_SIMILARITY_THRESHOLD
      * @param smallSubtreeSize See SMALL_SUBTREE_SIZE
      * @param smallSubtreeSimilarityThreshold See SMALL_SUBTREE_SIMILARITY_THRESHOLD
      * @param largeSubtreeSimilarityThreshold See LARGE_SUBTREE_SIMILARITY_THRESHOLD
      * @param <L> Label type.
      */
-    public <L> void matchInnerNodes(List<ChangeDistillationTree<L>> innerNodesA, List<ChangeDistillationTree<L>> innerNodesB, float stringSimilarityThreshold,
+    public <L> void matchInnerNodes(ChangeDistillationTree<L> treeA,
+                                    ChangeDistillationTree<L> treeB,
+                                    float stringSimilarityThreshold,
                                     int smallSubtreeSize,
                                     float smallSubtreeSimilarityThreshold,
                                     float largeSubtreeSimilarityThreshold) {
+        List<ChangeDistillationTree<L>> innerNodesA = treeA.getDescendants(false);
+        List<ChangeDistillationTree<L>> innerNodesB = treeB.getDescendants(false);
         for (ChangeDistillationTree<L> innerNodeA : innerNodesA)
         {
             if (innerNodeA.isMatched())
@@ -104,9 +108,14 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
             }
             for (ChangeDistillationTree<L> innerNodeB : innerNodesB)
             {
+                if (innerNodeB.isMatched())
+                {
+                    continue;
+                }
                 if (doInnerNodesMatch(innerNodeA, innerNodeB, stringSimilarityThreshold, smallSubtreeSize, smallSubtreeSimilarityThreshold, largeSubtreeSimilarityThreshold))
                 {
                     innerNodeA.setMatch(innerNodeB);
+                    break;
                 }
             }
         }

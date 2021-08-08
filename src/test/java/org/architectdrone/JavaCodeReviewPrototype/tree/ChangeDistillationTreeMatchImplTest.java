@@ -214,7 +214,7 @@ public class ChangeDistillationTreeMatchImplTest {
 
         ChangeDistillationTree<String> getNode(String name, boolean original, List<ChangeDistillationTree<String>> children)
         {
-            return new ChangeDistillationTree<String>(name, name, children, original);
+            return new ChangeDistillationTree<String>("TEST", name, children, original);
         }
 
         /**
@@ -263,7 +263,57 @@ public class ChangeDistillationTreeMatchImplTest {
             b1 = getNode("B1", true, Stream.of(e1, d1).collect(Collectors.toList()));
             a1 = new ChangeDistillationTree<String>(label, "A1", Stream.of(b1, c1).collect(Collectors.toList()), true);
         }
-        
+
+        /**
+         * Looks like:
+         * [A2]
+         *  |
+         * [B2]
+         *  |
+         * [C2]
+         *  |
+         * [D2]
+         *  |
+         * [E2]
+         *  |
+         * [F2]
+         * @param label
+         */
+        void set2Long(String label)
+        {
+            f2 = getNode("F2", false, Collections.emptyList());
+            e2 = getNode("E2", false, Collections.singletonList(f2));
+            d2 = getNode("D2", false, Collections.singletonList(e2));
+            c2 = getNode("C2", false, Collections.singletonList(d2));
+            b2 = getNode("B2", false, Collections.singletonList(c2));
+            a2 = new ChangeDistillationTree<String>(label, "A2", Collections.singletonList(b2), false);
+        }
+
+        /**
+         * Looks like:
+         * [A1]
+         *  |
+         * [B1]
+         *  |
+         * [C1]
+         *  |
+         * [D1]
+         *  |
+         * [E1]
+         *  |
+         * [F1]
+         * @param label
+         */
+        void set1Long(String label)
+        {
+            f1 = getNode("F1", true, Collections.emptyList());
+            e1 = getNode("E1", true, Collections.singletonList(f1));
+            d1 = getNode("D1", true, Collections.singletonList(e1));
+            c1 = getNode("C1", true, Collections.singletonList(d1));
+            b1 = getNode("B1", true, Collections.singletonList(c1));
+            a1 = new ChangeDistillationTree<String>(label, "A1", Collections.singletonList(b1), true);
+        }
+
         void set2Large(String label)
         {
             f2 = getNode("F2", false, Collections.emptyList());
@@ -540,6 +590,104 @@ public class ChangeDistillationTreeMatchImplTest {
 
                 assertEquals(actualDoMatch,
                     doMatch);
+            }
+        }
+
+        @Nested
+        class matchInnerNodes
+        {
+            @Test
+            void whenMultiplePossibleUnmatchedNodesExistInModified_choosesFirst()
+            {
+                set1Large("Foo");
+                set2Long("Foo");
+
+                //In this experiment, we want B1 => B2 and B1 => D2 as possible options.
+                //We can consider just these cases by setting string similarity to only be the same for these nodes
+                //We also set the subtree thresholds to be negative, so as to allow all subtrees to be considered.
+
+                StringSimilarity mockStringSimilarity = StringSimilarityMockFactory
+                        .builder()
+                        .aString(b1.getValue())
+                        .bString(d2.getValue())
+                        .result(1.0f)
+                        .aString(b1.getValue())
+                        .bString(b2.getValue())
+                        .result(1.0f)
+                        .build()
+                        .getMockStringSimilarity();
+
+                changeDistillationTreeMatchImpl = new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils);
+                changeDistillationTreeMatchImpl.matchInnerNodes(
+                        a1,
+                        a2,
+                        0.9f,
+                        4,
+                        -1.0f,
+                        -1.0f
+                );
+
+                assertEquals(d2, b1.getMatch());
+
+                //Sanity checks
+                assertFalse(a1.isMatched());
+                assertFalse(c1.isMatched());
+                assertFalse(d1.isMatched());
+                assertFalse(e1.isMatched());
+                assertFalse(f1.isMatched());
+
+                assertFalse(a2.isMatched());
+                assertFalse(b2.isMatched());
+                assertFalse(c2.isMatched());
+                assertFalse(e2.isMatched());
+                assertFalse(f2.isMatched());
+            }
+
+            @Test
+            void whenMultiplePossibleUnmatchedNodesExistInOriginal_choosesFirst()
+            {
+                set1Long("Foo");
+                set2Large("Foo");
+
+                //In this experiment, we want B1 => B2 and D1 => B2 as possible options.
+                //We can consider just these cases by setting string similarity to only be the same for these nodes
+                //We also set the subtree thresholds to be negative, so as to allow all subtrees to be considered.
+
+                StringSimilarity mockStringSimilarity = StringSimilarityMockFactory
+                        .builder()
+                        .aString(b1.getValue())
+                        .bString(b2.getValue())
+                        .result(1.0f)
+                        .aString(d1.getValue())
+                        .bString(b2.getValue())
+                        .result(1.0f)
+                        .build()
+                        .getMockStringSimilarity();
+
+                changeDistillationTreeMatchImpl = new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils);
+                changeDistillationTreeMatchImpl.matchInnerNodes(
+                        a1,
+                        a2,
+                        0.9f,
+                        4,
+                        -1.0f,
+                        -1.0f
+                );
+
+                assertEquals(d1, b2.getMatch());
+
+                //Sanity checks
+                assertFalse(a1.isMatched());
+                assertFalse(c1.isMatched());
+                assertFalse(b1.isMatched());
+                assertFalse(e1.isMatched());
+                assertFalse(f1.isMatched());
+
+                assertFalse(a2.isMatched());
+                assertFalse(d2.isMatched());
+                assertFalse(c2.isMatched());
+                assertFalse(e2.isMatched());
+                assertFalse(f2.isMatched());
             }
         }
     }

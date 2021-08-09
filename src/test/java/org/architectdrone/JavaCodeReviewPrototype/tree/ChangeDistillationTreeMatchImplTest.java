@@ -195,6 +195,9 @@ public class ChangeDistillationTreeMatchImplTest {
         }
     }
 
+    /**
+     * Abandon all hope, ye who enter here.
+     */
     @Nested
     class innerNodeMatchingTest
     {
@@ -452,6 +455,7 @@ public class ChangeDistillationTreeMatchImplTest {
             int MOCK_SMALL_SUBTREE_SIZE = 4;
             float MOCK_SMALL_SUBTREE_THRESHOLD = 0.4f;
             float MOCK_LARGE_SUBTREE_THRESHOLD = 0.6f;
+            int MOCK_N = 3;
             void setAllDescendantsToMatch()
             {
                 if (f1 != null && f2 != null)
@@ -495,7 +499,8 @@ public class ChangeDistillationTreeMatchImplTest {
                         MOCK_STRING_SIMILARITY_THRESHOLD,
                         MOCK_SMALL_SUBTREE_SIZE,
                         MOCK_SMALL_SUBTREE_THRESHOLD,
-                        MOCK_LARGE_SUBTREE_THRESHOLD));
+                        MOCK_LARGE_SUBTREE_THRESHOLD,
+                        MOCK_N));
             }
 
             @Test
@@ -514,7 +519,8 @@ public class ChangeDistillationTreeMatchImplTest {
                         MOCK_STRING_SIMILARITY_THRESHOLD,
                         MOCK_SMALL_SUBTREE_SIZE,
                         MOCK_SMALL_SUBTREE_THRESHOLD,
-                        MOCK_LARGE_SUBTREE_THRESHOLD));
+                        MOCK_LARGE_SUBTREE_THRESHOLD,
+                        MOCK_N));
             }
 
             @CsvSource({
@@ -586,7 +592,8 @@ public class ChangeDistillationTreeMatchImplTest {
                         MOCK_STRING_SIMILARITY_THRESHOLD,
                         4,
                         mockSmallThreshold,
-                        mockLargeThreshold);
+                        mockLargeThreshold,
+                        MOCK_N);
 
                 assertEquals(actualDoMatch,
                     doMatch);
@@ -624,7 +631,8 @@ public class ChangeDistillationTreeMatchImplTest {
                         0.9f,
                         4,
                         -1.0f,
-                        -1.0f
+                        -1.0f,
+                        3
                 );
 
                 assertEquals(d2, b1.getMatch());
@@ -671,7 +679,8 @@ public class ChangeDistillationTreeMatchImplTest {
                         0.9f,
                         4,
                         -1.0f,
-                        -1.0f
+                        -1.0f,
+                        3
                 );
 
                 assertEquals(d1, b2.getMatch());

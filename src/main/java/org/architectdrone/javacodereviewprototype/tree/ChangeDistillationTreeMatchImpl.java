@@ -16,13 +16,15 @@ import org.architectdrone.javacodereviewprototype.utils.strings.StringSimilarity
  * Methods are kept here so they can be tested without cluttering the API.
  */
 public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMatch {
-    public static int N = 3; //"n" in "n-grams"
-    public static int STRING_SIMILARITY_THRESHOLD = 1; //Strings with a similarity lower than this number will be considered not matching.
-    public static int SMALL_SUBTREE_SIZE = 4; //What size is a "small" subtree. Fluri recommends 4.
-    public static float SMALL_SUBTREE_SIMILARITY_THRESHOLD = (float) 0.4; //Small subtrees with a similarity lower than this are considered not matching. Fluri recommends 0.4.
-    public static float LARGE_SUBTREE_SIMILARITY_THRESHOLD = (float) 0.6; //Small subtrees with a similarity lower than this are considered not matching. Fluri recommends 0.6.
+    private static final int N = 3; //"n" in "n-grams"
+    private static final int STRING_SIMILARITY_THRESHOLD = 1; //Strings with a similarity lower than this number will be considered not matching.
+    private static final int SMALL_SUBTREE_SIZE = 4; //What size is a "small" subtree. Fluri recommends 4.
+    private static final float SMALL_SUBTREE_SIMILARITY_THRESHOLD = (float) 0.4; //Small subtrees with a similarity lower than this are considered not matching. Fluri recommends 0.4.
+    private static final float LARGE_SUBTREE_SIMILARITY_THRESHOLD = (float) 0.6; //Small subtrees with a similarity lower than this are considered not matching. Fluri recommends 0.6.
+
     StringSimilarity stringSimilarity;
     CommonUtils commonUtils;
+
     @Inject
     public ChangeDistillationTreeMatchImpl(StringSimilarity stringSimilarity, CommonUtils commonUtils)
     {
@@ -33,11 +35,76 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
     /**{@inheritDoc} */
     @Override
     public <L> void matchTrees(ChangeDistillationTree<L> treeA, ChangeDistillationTree<L> treeB) {
+        matchLeafNodes(treeA,
+                treeB,
+                STRING_SIMILARITY_THRESHOLD,
+                N);
+
+        matchInnerNodes(treeA,
+                treeB,
+                STRING_SIMILARITY_THRESHOLD,
+                SMALL_SUBTREE_SIZE,
+                SMALL_SUBTREE_SIMILARITY_THRESHOLD,
+                LARGE_SUBTREE_SIMILARITY_THRESHOLD,
+                N);
+    }
+
+    /**
+     * Performs the leaf matching step
+     * @param treeA The original tree.
+     * @param treeB The modified tree
+     * @param stringSimilarityThreshold See STRING_SIMILARITY_THRESHOLD
+     * @param n See N.
+     * @param <L> Label type.
+     */
+    public <L> void matchLeafNodes(ChangeDistillationTree<L> treeA, ChangeDistillationTree<L> treeB, float stringSimilarityThreshold, int n)
+    {
         List<ChangeDistillationTree<L>> leavesA = treeA.getLeaves();
         List<ChangeDistillationTree<L>> leavesB = treeB.getLeaves();
 
-        var scoredPotentialLeafMatches = scorePotentialLeafMatches(leavesA, leavesB, STRING_SIMILARITY_THRESHOLD, N);
+        var scoredPotentialLeafMatches = scorePotentialLeafMatches(leavesA, leavesB, stringSimilarityThreshold, n);
         matchLeafNodes(scoredPotentialLeafMatches);
+    }
+
+    /**
+     * Performs the inner node matching step.
+     * @param treeA Original Tree.
+     * @param treeB Modified Tree.
+     * @param stringSimilarityThreshold See STRING_SIMILARITY_THRESHOLD
+     * @param smallSubtreeSize See SMALL_SUBTREE_SIZE
+     * @param smallSubtreeSimilarityThreshold See SMALL_SUBTREE_SIMILARITY_THRESHOLD
+     * @param largeSubtreeSimilarityThreshold See LARGE_SUBTREE_SIMILARITY_THRESHOLD
+     * @param n See N.
+     * @param <L> Label type.
+     */
+    public <L> void matchInnerNodes(ChangeDistillationTree<L> treeA,
+                                    ChangeDistillationTree<L> treeB,
+                                    float stringSimilarityThreshold,
+                                    int smallSubtreeSize,
+                                    float smallSubtreeSimilarityThreshold,
+                                    float largeSubtreeSimilarityThreshold,
+                                    int n) {
+        List<ChangeDistillationTree<L>> innerNodesA = treeA.getDescendants(false);
+        List<ChangeDistillationTree<L>> innerNodesB = treeB.getDescendants(false);
+        for (ChangeDistillationTree<L> innerNodeA : innerNodesA)
+        {
+            if (innerNodeA.isMatched())
+            {
+                continue;
+            }
+            for (ChangeDistillationTree<L> innerNodeB : innerNodesB)
+            {
+                if (innerNodeB.isMatched())
+                {
+                    continue;
+                }
+                if (doInnerNodesMatch(innerNodeA, innerNodeB, stringSimilarityThreshold, smallSubtreeSize, smallSubtreeSimilarityThreshold, largeSubtreeSimilarityThreshold, n))
+                {
+                    innerNodeA.setMatch(innerNodeB);
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -83,45 +150,6 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
     }
 
     /**
-     * Performs the inner node matching step.
-     * @param treeA Original Tree.
-     * @param treeB Modified Tree.
-     * @param stringSimilarityThreshold See STRING_SIMILARITY_THRESHOLD
-     * @param smallSubtreeSize See SMALL_SUBTREE_SIZE
-     * @param smallSubtreeSimilarityThreshold See SMALL_SUBTREE_SIMILARITY_THRESHOLD
-     * @param largeSubtreeSimilarityThreshold See LARGE_SUBTREE_SIMILARITY_THRESHOLD
-     * @param <L> Label type.
-     */
-    public <L> void matchInnerNodes(ChangeDistillationTree<L> treeA,
-                                    ChangeDistillationTree<L> treeB,
-                                    float stringSimilarityThreshold,
-                                    int smallSubtreeSize,
-                                    float smallSubtreeSimilarityThreshold,
-                                    float largeSubtreeSimilarityThreshold) {
-        List<ChangeDistillationTree<L>> innerNodesA = treeA.getDescendants(false);
-        List<ChangeDistillationTree<L>> innerNodesB = treeB.getDescendants(false);
-        for (ChangeDistillationTree<L> innerNodeA : innerNodesA)
-        {
-            if (innerNodeA.isMatched())
-            {
-                continue;
-            }
-            for (ChangeDistillationTree<L> innerNodeB : innerNodesB)
-            {
-                if (innerNodeB.isMatched())
-                {
-                    continue;
-                }
-                if (doInnerNodesMatch(innerNodeA, innerNodeB, stringSimilarityThreshold, smallSubtreeSize, smallSubtreeSimilarityThreshold, largeSubtreeSimilarityThreshold))
-                {
-                    innerNodeA.setMatch(innerNodeB);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
      * Tells whether two nodes match.
      * @param innerNodeA The original node
      * @param innerNodeB The modified node
@@ -129,6 +157,7 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
      * @param smallSubtreeSize See SMALL_SUBTREE_SIZE
      * @param smallSubtreeSimilarityThreshold See SMALL_SUBTREE_SIMILARITY_THRESHOLD
      * @param largeSubtreeSimilarityThreshold See LARGE_SUBTREE_SIMILARITY_THRESHOLD
+     * @param n See N
      * @param <L> Label type
      * @return Whether the nodes match
      */
@@ -138,13 +167,14 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
             float stringSimilarityThreshold,
             int smallSubtreeSize,
             float smallSubtreeSimilarityThreshold,
-            float largeSubtreeSimilarityThreshold)
+            float largeSubtreeSimilarityThreshold,
+            int n)
     {
         if (!innerNodeA.getLabel().equals(innerNodeB.getLabel()))
         {
             return false;
         }
-        if (stringSimilarity.getStringSimilarity(innerNodeA.getValue(), innerNodeB.getValue(), N) < stringSimilarityThreshold)
+        if (stringSimilarity.getStringSimilarity(innerNodeA.getValue(), innerNodeB.getValue(), n) < stringSimilarityThreshold)
         {
             return false;
         }
@@ -157,7 +187,7 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
     }
 
     /**
-     * Call this when you don't need all the min size
+     * Call this when you don't need the min size
      * @param innerNodeA The original node.
      * @param innerNodeB The modified node
      * @param <L> The label
@@ -170,6 +200,7 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
 
     /**
      * Calculates inner node similarity score and minimum tree size
+     * We do both in this method because calculating minimum tree size and score both depend on the same costly operations.
      * @param innerNodeA The original node.
      * @param innerNodeB The modified node
      * @param <L> The label

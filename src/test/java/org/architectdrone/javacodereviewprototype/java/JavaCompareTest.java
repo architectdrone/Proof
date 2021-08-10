@@ -1,4 +1,4 @@
-package org.architectdrone.JavaCodeReviewPrototype.java;
+package org.architectdrone.javacodereviewprototype.java;
 
 import java.io.IOException;
 

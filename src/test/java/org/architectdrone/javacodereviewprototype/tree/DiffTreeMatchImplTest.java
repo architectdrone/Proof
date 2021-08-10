@@ -1,6 +1,5 @@
-package org.architectdrone.JavaCodeReviewPrototype.tree;
+package org.architectdrone.javacodereviewprototype.tree;
 
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.utils.Pair;
 
 import java.util.*;
@@ -9,11 +8,6 @@ import java.util.stream.Stream;
 
 import lombok.val;
 import lombok.var;
-import org.architectdrone.JavaCodeReviewPrototype.java.ClassMockFactory;
-import org.architectdrone.JavaCodeReviewPrototype.java.MethodMock;
-import org.architectdrone.javacodereviewprototype.java.JavaTree;
-import org.architectdrone.javacodereviewprototype.tree.ChangeDistillationTree;
-import org.architectdrone.javacodereviewprototype.tree.ChangeDistillationTreeMatchImpl;
 import org.architectdrone.javacodereviewprototype.utils.common.CommonUtils;
 import org.architectdrone.javacodereviewprototype.utils.common.CommonUtilsImpl;
 import org.architectdrone.javacodereviewprototype.utils.strings.StringSimilarity;
@@ -21,21 +15,19 @@ import org.architectdrone.javacodereviewprototype.utils.strings.StringSimilarity
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ChangeDistillationTreeMatchImplTest {
+public class DiffTreeMatchImplTest {
     CommonUtils commonUtils = new CommonUtilsImpl();
     StringSimilarity stringSimilarity = new StringSimilarityImpl(commonUtils);
     ChangeDistillationTreeMatchImpl changeDistillationTreeMatchImpl = new ChangeDistillationTreeMatchImpl(stringSimilarity, commonUtils);
 
     @Nested
     class leafMatchingTest {
-        private ChangeDistillationTree<String> getLeaf(String label, String value, boolean isOriginal) {
-            return new ChangeDistillationTree<String>(label, value, Collections.emptyList(), isOriginal);
+        private DiffTree<String> getLeaf(String label, String value, boolean isOriginal) {
+            return new DiffTree<String>(label, value, Collections.emptyList(), isOriginal);
         }
 
         @Nested
@@ -43,13 +35,13 @@ public class ChangeDistillationTreeMatchImplTest {
 
             @Test
             void sameLabelAndValue_areMatched() {
-                ChangeDistillationTree<String> leafA = getLeaf("LABEL", "value_a", true);
-                ChangeDistillationTree<String> leafB = getLeaf("LABEL", "value_a", false);
+                DiffTree<String> leafA = getLeaf("LABEL", "value_a", true);
+                DiffTree<String> leafB = getLeaf("LABEL", "value_a", false);
 
-                List<ChangeDistillationTree<String>> leavesA = Stream.of(
+                List<DiffTree<String>> leavesA = Stream.of(
                         leafA
                 ).collect(Collectors.toList());
-                List<ChangeDistillationTree<String>> leavesB = Stream.of(
+                List<DiffTree<String>> leavesB = Stream.of(
                         leafB
                 ).collect(Collectors.toList());
 
@@ -65,7 +57,7 @@ public class ChangeDistillationTreeMatchImplTest {
                         new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils)
                                 .scorePotentialLeafMatches(leavesA, leavesB, 1.0f, 4);
 
-                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result = resultList
+                Map<Pair<DiffTree<String>, DiffTree<String>>, Float> result = resultList
                         .stream()
                         .collect(Collectors.toMap(p -> p.a, p -> p.b));
 
@@ -75,13 +67,13 @@ public class ChangeDistillationTreeMatchImplTest {
 
             @Test
             void differentLabels_areNotMatched() {
-                ChangeDistillationTree<String> leafA = getLeaf("LABELA", "value_a", true);
-                ChangeDistillationTree<String> leafB = getLeaf("LABELB", "value_a", false);
+                DiffTree<String> leafA = getLeaf("LABELA", "value_a", true);
+                DiffTree<String> leafB = getLeaf("LABELB", "value_a", false);
 
-                List<ChangeDistillationTree<String>> leavesA = Stream.of(
+                List<DiffTree<String>> leavesA = Stream.of(
                         leafA
                 ).collect(Collectors.toList());
-                List<ChangeDistillationTree<String>> leavesB = Stream.of(
+                List<DiffTree<String>> leavesB = Stream.of(
                         leafB
                 ).collect(Collectors.toList());
 
@@ -97,7 +89,7 @@ public class ChangeDistillationTreeMatchImplTest {
                         new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils)
                                 .scorePotentialLeafMatches(leavesA, leavesB, 1.0f, 4);
 
-                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result = resultList
+                Map<Pair<DiffTree<String>, DiffTree<String>>, Float> result = resultList
                         .stream()
                         .collect(Collectors.toMap(p -> p.a, p -> p.b));
 
@@ -106,13 +98,13 @@ public class ChangeDistillationTreeMatchImplTest {
 
             @Test
             void lowSimilarity_areNotMatched() {
-                ChangeDistillationTree<String> leafA = getLeaf("LABEL", "value_a", true);
-                ChangeDistillationTree<String> leafB = getLeaf("LABEL", "value_b", false);
+                DiffTree<String> leafA = getLeaf("LABEL", "value_a", true);
+                DiffTree<String> leafB = getLeaf("LABEL", "value_b", false);
 
-                List<ChangeDistillationTree<String>> leavesA = Stream.of(
+                List<DiffTree<String>> leavesA = Stream.of(
                         leafA
                 ).collect(Collectors.toList());
-                List<ChangeDistillationTree<String>> leavesB = Stream.of(
+                List<DiffTree<String>> leavesB = Stream.of(
                         leafB
                 ).collect(Collectors.toList());
 
@@ -128,7 +120,7 @@ public class ChangeDistillationTreeMatchImplTest {
                         new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils)
                                 .scorePotentialLeafMatches(leavesA, leavesB, 1.0f, 4);
 
-                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result = resultList
+                Map<Pair<DiffTree<String>, DiffTree<String>>, Float> result = resultList
                         .stream()
                         .collect(Collectors.toMap(p -> p.a, p -> p.b));
 
@@ -137,16 +129,16 @@ public class ChangeDistillationTreeMatchImplTest {
 
             @Test
             void multipleChoices_canBeMatched() {
-                ChangeDistillationTree<String> leafA = getLeaf("LABEL", "value_a", true);
-                ChangeDistillationTree<String> leafB = getLeaf("LABEL", "value_b", false);
-                ChangeDistillationTree<String> leafC = getLeaf("LABEL", "value_c", false);
-                ChangeDistillationTree<String> leafD = getLeaf("LABEL", "value_d", false);
+                DiffTree<String> leafA = getLeaf("LABEL", "value_a", true);
+                DiffTree<String> leafB = getLeaf("LABEL", "value_b", false);
+                DiffTree<String> leafC = getLeaf("LABEL", "value_c", false);
+                DiffTree<String> leafD = getLeaf("LABEL", "value_d", false);
 
-                List<ChangeDistillationTree<String>> leavesA = Stream.of(
+                List<DiffTree<String>> leavesA = Stream.of(
                         leafA,
                         leafD
                 ).collect(Collectors.toList());
-                List<ChangeDistillationTree<String>> leavesB = Stream.of(
+                List<DiffTree<String>> leavesB = Stream.of(
                         leafB,
                         leafC
                 ).collect(Collectors.toList());
@@ -172,7 +164,7 @@ public class ChangeDistillationTreeMatchImplTest {
                         new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils)
                                 .scorePotentialLeafMatches(leavesA, leavesB, 1.0f, 4);
 
-                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result = resultList
+                Map<Pair<DiffTree<String>, DiffTree<String>>, Float> result = resultList
                         .stream()
                         .collect(Collectors.toMap(p -> p.a, p -> p.b));
 
@@ -189,12 +181,12 @@ public class ChangeDistillationTreeMatchImplTest {
         class matchLeavesTest {
             @Test
             void makesBestChoice() {
-                ChangeDistillationTree<String> leafA = getLeaf("LABEL", "value_a", true);
-                ChangeDistillationTree<String> leafB = getLeaf("LABEL", "value_b", false);
-                ChangeDistillationTree<String> leafC = getLeaf("LABEL", "value_c", false);
+                DiffTree<String> leafA = getLeaf("LABEL", "value_a", true);
+                DiffTree<String> leafB = getLeaf("LABEL", "value_b", false);
+                DiffTree<String> leafC = getLeaf("LABEL", "value_c", false);
                 val possibleMatchAB = new Pair<>(leafA, leafB);
                 val possibleMatchAC = new Pair<>(leafA, leafC);
-                List<Pair<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float>> scores = new ArrayList<>();
+                List<Pair<Pair<DiffTree<String>, DiffTree<String>>, Float>> scores = new ArrayList<>();
                 scores.add(new Pair<>(possibleMatchAB, (float) 1.2));
                 scores.add(new Pair<>(possibleMatchAC, (float) 1.4));
                 changeDistillationTreeMatchImpl.matchLeafNodes(scores);
@@ -213,22 +205,22 @@ public class ChangeDistillationTreeMatchImplTest {
      */
     @Nested
     class innerNodeMatchingTest {
-        ChangeDistillationTree<String> f1;
-        ChangeDistillationTree<String> e1;
-        ChangeDistillationTree<String> d1;
-        ChangeDistillationTree<String> c1;
-        ChangeDistillationTree<String> b1;
-        ChangeDistillationTree<String> a1;
+        DiffTree<String> f1;
+        DiffTree<String> e1;
+        DiffTree<String> d1;
+        DiffTree<String> c1;
+        DiffTree<String> b1;
+        DiffTree<String> a1;
 
-        ChangeDistillationTree<String> f2;
-        ChangeDistillationTree<String> e2;
-        ChangeDistillationTree<String> d2;
-        ChangeDistillationTree<String> c2;
-        ChangeDistillationTree<String> b2;
-        ChangeDistillationTree<String> a2;
+        DiffTree<String> f2;
+        DiffTree<String> e2;
+        DiffTree<String> d2;
+        DiffTree<String> c2;
+        DiffTree<String> b2;
+        DiffTree<String> a2;
 
-        ChangeDistillationTree<String> getNode(String name, boolean original, List<ChangeDistillationTree<String>> children) {
-            return new ChangeDistillationTree<String>("TEST", name, children, original);
+        DiffTree<String> getNode(String name, boolean original, List<DiffTree<String>> children) {
+            return new DiffTree<String>("TEST", name, children, original);
         }
 
         /**
@@ -263,7 +255,7 @@ public class ChangeDistillationTreeMatchImplTest {
             d1 = getNode("D1", true, Collections.emptyList());
             c1 = getNode("C1", true, Collections.emptyList());
             b1 = getNode("B1", true, Stream.of(e1, d1, f1).collect(Collectors.toList()));
-            a1 = new ChangeDistillationTree<String>(label, "A1", Stream.of(b1, c1).collect(Collectors.toList()), true);
+            a1 = new DiffTree<String>(label, "A1", Stream.of(b1, c1).collect(Collectors.toList()), true);
         }
 
         void set1Small(String label) {
@@ -271,7 +263,7 @@ public class ChangeDistillationTreeMatchImplTest {
             d1 = getNode("D1", true, Collections.emptyList());
             c1 = getNode("C1", true, Collections.emptyList());
             b1 = getNode("B1", true, Stream.of(e1, d1).collect(Collectors.toList()));
-            a1 = new ChangeDistillationTree<String>(label, "A1", Stream.of(b1, c1).collect(Collectors.toList()), true);
+            a1 = new DiffTree<String>(label, "A1", Stream.of(b1, c1).collect(Collectors.toList()), true);
         }
 
         /**
@@ -296,7 +288,7 @@ public class ChangeDistillationTreeMatchImplTest {
             d2 = getNode("D2", false, Collections.singletonList(e2));
             c2 = getNode("C2", false, Collections.singletonList(d2));
             b2 = getNode("B2", false, Collections.singletonList(c2));
-            a2 = new ChangeDistillationTree<String>(label, "A2", Collections.singletonList(b2), false);
+            a2 = new DiffTree<String>(label, "A2", Collections.singletonList(b2), false);
         }
 
         /**
@@ -321,7 +313,7 @@ public class ChangeDistillationTreeMatchImplTest {
             d1 = getNode("D1", true, Collections.singletonList(e1));
             c1 = getNode("C1", true, Collections.singletonList(d1));
             b1 = getNode("B1", true, Collections.singletonList(c1));
-            a1 = new ChangeDistillationTree<String>(label, "A1", Collections.singletonList(b1), true);
+            a1 = new DiffTree<String>(label, "A1", Collections.singletonList(b1), true);
         }
 
         void set2Large(String label) {
@@ -330,7 +322,7 @@ public class ChangeDistillationTreeMatchImplTest {
             d2 = getNode("D2", false, Collections.emptyList());
             c2 = getNode("C2", false, Collections.emptyList());
             b2 = getNode("B2", false, Stream.of(e2, d2, f2).collect(Collectors.toList()));
-            a2 = new ChangeDistillationTree<String>(label, "A2", Stream.of(b2, c2).collect(Collectors.toList()), false);
+            a2 = new DiffTree<String>(label, "A2", Stream.of(b2, c2).collect(Collectors.toList()), false);
         }
 
         void set2Small(String label) {
@@ -338,7 +330,7 @@ public class ChangeDistillationTreeMatchImplTest {
             d2 = getNode("D2", false, Collections.emptyList());
             c2 = getNode("C2", false, Collections.emptyList());
             b2 = getNode("B2", false, Stream.of(e2, d2).collect(Collectors.toList()));
-            a2 = new ChangeDistillationTree<String>(label, "A2", Stream.of(b2, c2).collect(Collectors.toList()), false);
+            a2 = new DiffTree<String>(label, "A2", Stream.of(b2, c2).collect(Collectors.toList()), false);
         }
 
         @Nested

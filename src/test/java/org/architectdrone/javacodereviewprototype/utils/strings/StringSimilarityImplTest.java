@@ -1,4 +1,4 @@
-package org.architectdrone.JavaCodeReviewPrototype.utils.strings;
+package org.architectdrone.javacodereviewprototype.utils.strings;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.architectdrone.javacodereviewprototype.utils.common.CommonUtilsImpl;
-import org.architectdrone.javacodereviewprototype.utils.strings.StringSimilarityImpl;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

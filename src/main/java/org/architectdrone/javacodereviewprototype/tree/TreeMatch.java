@@ -1,11 +1,15 @@
 package org.architectdrone.javacodereviewprototype.tree;
 
-interface ChangeDistillationTreeMatch {
+/**
+ * Tools for matching trees.
+ * That is, for setting the "match" field on {@link DiffTree}s
+ */
+interface TreeMatch {
     /**
      * Matches nodes in one tree to nodes in another tree.
      * @param treeA The original tree
      * @param treeB The modified tree
      * @param <L> Label type
      */
-    public <L> void matchTrees(ChangeDistillationTree<L> treeA, ChangeDistillationTree<L> treeB);
+    <L> void matchTrees(DiffTree<L> treeA, DiffTree<L> treeB);
 }

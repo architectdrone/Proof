@@ -2,7 +2,6 @@ package org.architectdrone.javacodereviewprototype.tree;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -10,12 +9,12 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 
 /**
- * Simple tree data structure with data for the change distillation process.
+ * Simple tree data structure with data for the matching process.
  * @param <L> The label type
  */
-public class ChangeDistillationTree<L> {
+public class DiffTree<L> {
     //Tree data
-    @Getter final List<ChangeDistillationTree<L>> children; //Children of the root node
+    @Getter final List<DiffTree<L>> children; //Children of the root node
 
     //Container data
     @Getter
@@ -27,21 +26,21 @@ public class ChangeDistillationTree<L> {
     @Getter
     private boolean isMatched = false; //Whether or not the root node is matched with a node from the other tree.
     @Getter
-    private ChangeDistillationTree<L> match; //The matching node from the other tree, if it exists.
+    private DiffTree<L> match; //The matching node from the other tree, if it exists.
 
     //Diff data
     @Getter
     final boolean isOriginal;
 
     /**
-     * Constructs a {@link ChangeDistillationTree} from some other tree type.
+     * Constructs a {@link DiffTree} from some other tree type.
      * @param otherTree Root of other tree.
      * @param getChildrenOfTree Function that gets the children of the given tree type.
      * @param getValue Function that gets the value of the tree type
      * @param getLabel Function that gets the label of the tree type
      * @param <N> Other tree type.
      */
-    public <N> ChangeDistillationTree(N otherTree, boolean isOriginal, Function<N, List<N>> getChildrenOfTree, Function<N, String> getValue, Function<N, L> getLabel)
+    public <N> DiffTree(N otherTree, boolean isOriginal, Function<N, List<N>> getChildrenOfTree, Function<N, String> getValue, Function<N, L> getLabel)
     {
         this.isOriginal = isOriginal;
         this.label = getLabel.apply(otherTree);
@@ -49,11 +48,11 @@ public class ChangeDistillationTree<L> {
         this.children = new ArrayList<>();
         for (N child : getChildrenOfTree.apply(otherTree))
         {
-            children.add(new ChangeDistillationTree<L>(child, isOriginal, getChildrenOfTree, getValue, getLabel));
+            children.add(new DiffTree<L>(child, isOriginal, getChildrenOfTree, getValue, getLabel));
         }
     }
 
-    public ChangeDistillationTree(final L label, final String value, final List<ChangeDistillationTree<L>> children, boolean isOriginal) {
+    public DiffTree(final L label, final String value, final List<DiffTree<L>> children, boolean isOriginal) {
         this.label = label;
         this.value = value;
         this.children = children;
@@ -65,16 +64,16 @@ public class ChangeDistillationTree<L> {
      * @param includeLeaves Include leaves?
      * @return descendants
      */
-    public List<ChangeDistillationTree<L>> getDescendants(boolean includeLeaves)
+    public List<DiffTree<L>> getDescendants(boolean includeLeaves)
     {
-        List<ChangeDistillationTree<L>> toReturn = new ArrayList<>();
+        List<DiffTree<L>> toReturn = new ArrayList<>();
 
         toReturn.addAll(children.stream().flatMap(c -> c.getDescendants(includeLeaves).stream()).collect(Collectors.toList()));
         toReturn.addAll(children.stream().filter(c -> !c.getChildren().isEmpty() || includeLeaves).collect(Collectors.toList()));
         return toReturn;
     }
 
-    public void setMatch(ChangeDistillationTree<L> match)
+    public void setMatch(DiffTree<L> match)
     {
         assert match.isOriginal() != this.isOriginal(); //We do not allow originals to match with other originals, or vice versa
         this.match = match;
@@ -85,15 +84,15 @@ public class ChangeDistillationTree<L> {
         }
     }
 
-    public List<ChangeDistillationTree<L>> getLeaves() {
+    public List<DiffTree<L>> getLeaves() {
         if (children.isEmpty())
         {
             return Collections.singletonList(this);
         }
         else
         {
-            List<ChangeDistillationTree<L>> toReturn = new ArrayList<>();
-            for (ChangeDistillationTree<L> child : children)
+            List<DiffTree<L>> toReturn = new ArrayList<>();
+            for (DiffTree<L> child : children)
             {
                 toReturn.addAll(child.getLeaves());
             }
@@ -120,7 +119,7 @@ public class ChangeDistillationTree<L> {
      * @param otherTree The other tree.
      * @return Whether they match or not.
      */
-    public boolean treeEquals(ChangeDistillationTree<L> otherTree)
+    public boolean treeEquals(DiffTree<L> otherTree)
     {
         if (!getLabel().equals(otherTree.getLabel()))
         {
@@ -162,7 +161,7 @@ public class ChangeDistillationTree<L> {
         }
         builder.append(this.toString());
         System.out.println(builder.toString());
-        for (ChangeDistillationTree child : getChildren())
+        for (DiffTree child : getChildren())
         {
             child.printFullReport(indentLevel+1);
         }

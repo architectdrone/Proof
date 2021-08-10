@@ -1,4 +1,4 @@
-package org.architectdrone.JavaCodeReviewPrototype.tree;
+package org.architectdrone.javacodereviewprototype.tree;
 
 import java.util.Collections;
 import java.util.List;
@@ -6,17 +6,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.architectdrone.javacodereviewprototype.tree.ChangeDistillationTree;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ChangeDistillationTreeTest {
-    ChangeDistillationTree<String> a = new ChangeDistillationTree<String>("a_value", "a_label", Collections.emptyList(), true);
-    ChangeDistillationTree<String> b = new ChangeDistillationTree<String>("b_value", "b_label", Collections.emptyList(), true);
-    ChangeDistillationTree<String> c = new ChangeDistillationTree<String>("c_value", "c_label", Stream.of(a, b).collect(Collectors.toList()), true);
-    ChangeDistillationTree<String> d = new ChangeDistillationTree<String>("d_value", "d_label", Collections.singletonList(c), true);
+class DiffTreeTest {
+    DiffTree<String> a = new DiffTree<String>("a_value", "a_label", Collections.emptyList(), true);
+    DiffTree<String> b = new DiffTree<String>("b_value", "b_label", Collections.emptyList(), true);
+    DiffTree<String> c = new DiffTree<String>("c_value", "c_label", Stream.of(a, b).collect(Collectors.toList()), true);
+    DiffTree<String> d = new DiffTree<String>("d_value", "d_label", Collections.singletonList(c), true);
 
     /**
      * Gets a pre-existing tree
@@ -43,25 +42,25 @@ class ChangeDistillationTreeTest {
             //Setup test tree
             TestPreExistingNode tree = getPreExistingTree();
 
-            ChangeDistillationTree<String> expectedD = new ChangeDistillationTree<String>(tree, true, TestPreExistingNode::getChildren, TestPreExistingNode::getValue, TestPreExistingNode::getLabel);
+            DiffTree<String> expectedD = new DiffTree<String>(tree, true, TestPreExistingNode::getChildren, TestPreExistingNode::getValue, TestPreExistingNode::getLabel);
             assertEquals("d_label", expectedD.getLabel());
             assertEquals("d_value", expectedD.getValue());
             assertTrue(expectedD.isOriginal());
             assertEquals(1, expectedD.getChildren().size());
 
-            ChangeDistillationTree<String> expectedC = expectedD.getChildren().get(0);
+            DiffTree<String> expectedC = expectedD.getChildren().get(0);
             assertEquals("c_label", expectedC.getLabel());
             assertEquals("c_value", expectedC.getValue());
             assertTrue(expectedC.isOriginal());
             assertEquals(2, expectedC.getChildren().size());
 
-            ChangeDistillationTree<String> expectedB = expectedC.getChildren().get(1);
+            DiffTree<String> expectedB = expectedC.getChildren().get(1);
             assertEquals("b_label", expectedB.getLabel());
             assertEquals("b_value", expectedB.getValue());
             assertTrue(expectedB.isOriginal());
             assertEquals(0, expectedB.getChildren().size());
 
-            ChangeDistillationTree<String> expectedA = expectedC.getChildren().get(0);
+            DiffTree<String> expectedA = expectedC.getChildren().get(0);
             assertEquals("a_label", expectedA.getLabel());
             assertEquals("a_value", expectedA.getValue());
             assertTrue(expectedA.isOriginal());
@@ -74,8 +73,8 @@ class ChangeDistillationTreeTest {
     {
         @Test
         void worksCorrectly() {
-            ChangeDistillationTree<String> a = new ChangeDistillationTree<String>("foo", "bar", Collections.emptyList(), true);
-            ChangeDistillationTree<String> b = new ChangeDistillationTree<String>("foo", "bar", Collections.emptyList(), false);
+            DiffTree<String> a = new DiffTree<String>("foo", "bar", Collections.emptyList(), true);
+            DiffTree<String> b = new DiffTree<String>("foo", "bar", Collections.emptyList(), false);
             a.setMatch(b);
             assertEquals(a.getMatch(), b);
             assertEquals(b.getMatch(), a);
@@ -85,8 +84,8 @@ class ChangeDistillationTreeTest {
 
         @Test
         void whenBothAreOriginal_fails() {
-            ChangeDistillationTree<String> a = new ChangeDistillationTree<String>("foo", "bar", Collections.emptyList(), true);
-            ChangeDistillationTree<String> b = new ChangeDistillationTree<String>("foo", "bar", Collections.emptyList(), true);
+            DiffTree<String> a = new DiffTree<String>("foo", "bar", Collections.emptyList(), true);
+            DiffTree<String> b = new DiffTree<String>("foo", "bar", Collections.emptyList(), true);
             assertThrows(AssertionError.class, () -> a.setMatch(b));
         }
     }
@@ -110,7 +109,7 @@ class ChangeDistillationTreeTest {
         @Test
         void whenGettingLeaves_works()
         {
-            List<ChangeDistillationTree<String>> descendants = d.getDescendants(true);
+            List<DiffTree<String>> descendants = d.getDescendants(true);
             assertEquals(3, descendants.size());
             assertTrue(descendants.contains(a));
             assertTrue(descendants.contains(b));
@@ -122,7 +121,7 @@ class ChangeDistillationTreeTest {
         @Test
         void whenNotGettingLeaves_works()
         {
-            List<ChangeDistillationTree<String>> descendants = d.getDescendants(false);
+            List<DiffTree<String>> descendants = d.getDescendants(false);
             assertEquals(1, descendants.size());
             assertTrue(descendants.contains(c));
         }

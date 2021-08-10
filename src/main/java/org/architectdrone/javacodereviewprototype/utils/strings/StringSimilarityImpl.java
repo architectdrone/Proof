@@ -6,14 +6,10 @@ package org.architectdrone.javacodereviewprototype.utils.strings;
  * @author Pharmacy Outpatient
  */
 
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import lombok.NoArgsConstructor;
 import org.architectdrone.javacodereviewprototype.utils.common.CommonUtils;
 
 import javax.inject.Inject;
@@ -35,7 +31,7 @@ public class StringSimilarityImpl implements StringSimilarity {
      * @param n the "n" in "n-gram"
      * @return List of nGrams
      */
-    public Collection<String> getNGrams(String string, int n) {
+    Collection<String> getNGrams(String string, int n) {
         List<String> toReturn = new ArrayList<>();
         if (string.length() < n)
         {
@@ -55,7 +51,7 @@ public class StringSimilarityImpl implements StringSimilarity {
      * @param b The second n-gram
      * @return The similarity score
      */
-    public float getNGramsSimilarity(Collection<String> a, Collection<String> b)
+    float getNGramsSimilarity(Collection<String> a, Collection<String> b)
     {
         if (a.isEmpty() && b.isEmpty())
         {
@@ -72,6 +68,7 @@ public class StringSimilarityImpl implements StringSimilarity {
      * @param n The "n" in "n-gram"
      * @return The similarity.
      */
+    @Override
     public float getStringSimilarity(String a, String b, int n)
     {
         return getNGramsSimilarity(getNGrams(a, n), getNGrams(b, n));

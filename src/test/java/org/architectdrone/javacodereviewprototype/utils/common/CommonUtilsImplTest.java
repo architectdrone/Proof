@@ -1,7 +1,5 @@
-package org.architectdrone.JavaCodeReviewPrototype.utils.common;
+package org.architectdrone.javacodereviewprototype.utils.common;
 
-import org.architectdrone.javacodereviewprototype.utils.common.CommonUtils;
-import org.architectdrone.javacodereviewprototype.utils.common.CommonUtilsImpl;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

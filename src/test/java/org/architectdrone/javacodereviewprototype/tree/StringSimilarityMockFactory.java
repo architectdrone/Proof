@@ -1,4 +1,4 @@
-package org.architectdrone.JavaCodeReviewPrototype.tree;/*
+package org.architectdrone.javacodereviewprototype.tree;/*
  * Description
  * <p>
  * Copyrights 2021. Cerner Corporation.
@@ -6,7 +6,6 @@ package org.architectdrone.JavaCodeReviewPrototype.tree;/*
  */
 
 import java.util.List;
-import java.util.Map;
 import lombok.Builder;
 import lombok.Singular;
 import org.architectdrone.javacodereviewprototype.utils.strings.StringSimilarity;

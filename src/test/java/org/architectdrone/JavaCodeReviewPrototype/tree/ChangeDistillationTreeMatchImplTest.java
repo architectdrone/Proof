@@ -1,16 +1,17 @@
 package org.architectdrone.JavaCodeReviewPrototype.tree;
 
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.utils.Pair;
 
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.val;
+import lombok.var;
+import org.architectdrone.JavaCodeReviewPrototype.java.ClassMockFactory;
+import org.architectdrone.JavaCodeReviewPrototype.java.MethodMock;
+import org.architectdrone.javacodereviewprototype.java.JavaTree;
 import org.architectdrone.javacodereviewprototype.tree.ChangeDistillationTree;
 import org.architectdrone.javacodereviewprototype.tree.ChangeDistillationTreeMatchImpl;
 import org.architectdrone.javacodereviewprototype.utils.common.CommonUtils;
@@ -20,7 +21,9 @@ import org.architectdrone.javacodereviewprototype.utils.strings.StringSimilarity
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,10 +33,8 @@ public class ChangeDistillationTreeMatchImplTest {
     ChangeDistillationTreeMatchImpl changeDistillationTreeMatchImpl = new ChangeDistillationTreeMatchImpl(stringSimilarity, commonUtils);
 
     @Nested
-    class leafMatchingTest
-    {
-        private ChangeDistillationTree<String> getLeaf(String label, String value, boolean isOriginal)
-        {
+    class leafMatchingTest {
+        private ChangeDistillationTree<String> getLeaf(String label, String value, boolean isOriginal) {
             return new ChangeDistillationTree<String>(label, value, Collections.emptyList(), isOriginal);
         }
 
@@ -41,8 +42,7 @@ public class ChangeDistillationTreeMatchImplTest {
         class scorePotentialLeafMatchesTest {
 
             @Test
-            void sameLabelAndValue_areMatched()
-            {
+            void sameLabelAndValue_areMatched() {
                 ChangeDistillationTree<String> leafA = getLeaf("LABEL", "value_a", true);
                 ChangeDistillationTree<String> leafB = getLeaf("LABEL", "value_a", false);
 
@@ -61,17 +61,20 @@ public class ChangeDistillationTreeMatchImplTest {
                         .build()
                         .getMockStringSimilarity();
 
-                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result =
+                var resultList =
                         new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils)
                                 .scorePotentialLeafMatches(leavesA, leavesB, 1.0f, 4);
+
+                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result = resultList
+                        .stream()
+                        .collect(Collectors.toMap(p -> p.a, p -> p.b));
 
                 assertTrue(result.containsKey(new Pair<>(leafA, leafB)));
                 assertEquals(1.2f, result.get(new Pair<>(leafA, leafB)));
             }
 
             @Test
-            void differentLabels_areNotMatched()
-            {
+            void differentLabels_areNotMatched() {
                 ChangeDistillationTree<String> leafA = getLeaf("LABELA", "value_a", true);
                 ChangeDistillationTree<String> leafB = getLeaf("LABELB", "value_a", false);
 
@@ -90,16 +93,19 @@ public class ChangeDistillationTreeMatchImplTest {
                         .build()
                         .getMockStringSimilarity();
 
-                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result =
+                var resultList =
                         new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils)
                                 .scorePotentialLeafMatches(leavesA, leavesB, 1.0f, 4);
+
+                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result = resultList
+                        .stream()
+                        .collect(Collectors.toMap(p -> p.a, p -> p.b));
 
                 assertFalse(result.containsKey(new Pair<>(leafA, leafB)));
             }
 
             @Test
-            void lowSimilarity_areNotMatched()
-            {
+            void lowSimilarity_areNotMatched() {
                 ChangeDistillationTree<String> leafA = getLeaf("LABEL", "value_a", true);
                 ChangeDistillationTree<String> leafB = getLeaf("LABEL", "value_b", false);
 
@@ -118,16 +124,19 @@ public class ChangeDistillationTreeMatchImplTest {
                         .build()
                         .getMockStringSimilarity();
 
-                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result =
+                var resultList =
                         new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils)
                                 .scorePotentialLeafMatches(leavesA, leavesB, 1.0f, 4);
+
+                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result = resultList
+                        .stream()
+                        .collect(Collectors.toMap(p -> p.a, p -> p.b));
 
                 assertFalse(result.containsKey(new Pair<>(leafA, leafB)));
             }
 
             @Test
-            void multipleChoices_canBeMatched()
-            {
+            void multipleChoices_canBeMatched() {
                 ChangeDistillationTree<String> leafA = getLeaf("LABEL", "value_a", true);
                 ChangeDistillationTree<String> leafB = getLeaf("LABEL", "value_b", false);
                 ChangeDistillationTree<String> leafC = getLeaf("LABEL", "value_c", false);
@@ -159,9 +168,13 @@ public class ChangeDistillationTreeMatchImplTest {
                         .build()
                         .getMockStringSimilarity();
 
-                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result =
+                var resultList =
                         new ChangeDistillationTreeMatchImpl(mockStringSimilarity, commonUtils)
                                 .scorePotentialLeafMatches(leavesA, leavesB, 1.0f, 4);
+
+                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> result = resultList
+                        .stream()
+                        .collect(Collectors.toMap(p -> p.a, p -> p.b));
 
                 assertTrue(result.containsKey(new Pair<>(leafA, leafB)));
                 assertTrue(result.containsKey(new Pair<>(leafA, leafC)));
@@ -181,9 +194,9 @@ public class ChangeDistillationTreeMatchImplTest {
                 ChangeDistillationTree<String> leafC = getLeaf("LABEL", "value_c", false);
                 val possibleMatchAB = new Pair<>(leafA, leafB);
                 val possibleMatchAC = new Pair<>(leafA, leafC);
-                Map<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float> scores = new HashMap<>();
-                scores.put(possibleMatchAB, (float) 1.2);
-                scores.put(possibleMatchAC, (float) 1.4);
+                List<Pair<Pair<ChangeDistillationTree<String>, ChangeDistillationTree<String>>, Float>> scores = new ArrayList<>();
+                scores.add(new Pair<>(possibleMatchAB, (float) 1.2));
+                scores.add(new Pair<>(possibleMatchAC, (float) 1.4));
                 changeDistillationTreeMatchImpl.matchLeafNodes(scores);
 
                 assertEquals(leafC, leafA.getMatch());
@@ -199,8 +212,7 @@ public class ChangeDistillationTreeMatchImplTest {
      * Abandon all hope, ye who enter here.
      */
     @Nested
-    class innerNodeMatchingTest
-    {
+    class innerNodeMatchingTest {
         ChangeDistillationTree<String> f1;
         ChangeDistillationTree<String> e1;
         ChangeDistillationTree<String> d1;
@@ -215,41 +227,37 @@ public class ChangeDistillationTreeMatchImplTest {
         ChangeDistillationTree<String> b2;
         ChangeDistillationTree<String> a2;
 
-        ChangeDistillationTree<String> getNode(String name, boolean original, List<ChangeDistillationTree<String>> children)
-        {
+        ChangeDistillationTree<String> getNode(String name, boolean original, List<ChangeDistillationTree<String>> children) {
             return new ChangeDistillationTree<String>("TEST", name, children, original);
         }
 
         /**
          * Construct 122-122 test trees. The structure is:
-         *           [A1]               [A2]
-         *          /   \              /   \
-         *      [B1]     [C1]      [B2]     [C2]
-         *     /    \             /    \
+         * [A1]               [A2]
+         * /   \              /   \
+         * [B1]     [C1]      [B2]     [C2]
+         * /    \             /    \
          * [D1]      [E1]     [D2]      [E2]
          */
-        void setup122To122Tree()
-        {
+        void setup122To122Tree() {
             set1Small("FOO");
             set2Small("FOO");
         }
 
         /**
          * Construct 122-123 test trees. The structure is:
-         *           [A1]               [A2]
-         *          /   \              /   \
-         *      [B1]     [C1]      [B2]     [C2]
-         *     /    \             /  |  \
+         * [A1]               [A2]
+         * /   \              /   \
+         * [B1]     [C1]      [B2]     [C2]
+         * /    \             /  |  \
          * [D1]      [E1]     [D2] [E2] [F2]
          */
-        void setup122To123Tree()
-        {
-             set1Small("FOO");
-             set2Large("FOO");
+        void setup122To123Tree() {
+            set1Small("FOO");
+            set2Large("FOO");
         }
 
-        void set1Large(String label)
-        {
+        void set1Large(String label) {
             f1 = getNode("F1", true, Collections.emptyList());
             e1 = getNode("E1", true, Collections.emptyList());
             d1 = getNode("D1", true, Collections.emptyList());
@@ -258,8 +266,7 @@ public class ChangeDistillationTreeMatchImplTest {
             a1 = new ChangeDistillationTree<String>(label, "A1", Stream.of(b1, c1).collect(Collectors.toList()), true);
         }
 
-        void set1Small(String label)
-        {
+        void set1Small(String label) {
             e1 = getNode("E1", true, Collections.emptyList());
             d1 = getNode("D1", true, Collections.emptyList());
             c1 = getNode("C1", true, Collections.emptyList());
@@ -270,20 +277,20 @@ public class ChangeDistillationTreeMatchImplTest {
         /**
          * Looks like:
          * [A2]
-         *  |
+         * |
          * [B2]
-         *  |
+         * |
          * [C2]
-         *  |
+         * |
          * [D2]
-         *  |
+         * |
          * [E2]
-         *  |
+         * |
          * [F2]
+         *
          * @param label
          */
-        void set2Long(String label)
-        {
+        void set2Long(String label) {
             f2 = getNode("F2", false, Collections.emptyList());
             e2 = getNode("E2", false, Collections.singletonList(f2));
             d2 = getNode("D2", false, Collections.singletonList(e2));
@@ -295,20 +302,20 @@ public class ChangeDistillationTreeMatchImplTest {
         /**
          * Looks like:
          * [A1]
-         *  |
+         * |
          * [B1]
-         *  |
+         * |
          * [C1]
-         *  |
+         * |
          * [D1]
-         *  |
+         * |
          * [E1]
-         *  |
+         * |
          * [F1]
+         *
          * @param label
          */
-        void set1Long(String label)
-        {
+        void set1Long(String label) {
             f1 = getNode("F1", true, Collections.emptyList());
             e1 = getNode("E1", true, Collections.singletonList(f1));
             d1 = getNode("D1", true, Collections.singletonList(e1));
@@ -317,8 +324,7 @@ public class ChangeDistillationTreeMatchImplTest {
             a1 = new ChangeDistillationTree<String>(label, "A1", Collections.singletonList(b1), true);
         }
 
-        void set2Large(String label)
-        {
+        void set2Large(String label) {
             f2 = getNode("F2", false, Collections.emptyList());
             e2 = getNode("E2", false, Collections.emptyList());
             d2 = getNode("D2", false, Collections.emptyList());
@@ -327,8 +333,7 @@ public class ChangeDistillationTreeMatchImplTest {
             a2 = new ChangeDistillationTree<String>(label, "A2", Stream.of(b2, c2).collect(Collectors.toList()), false);
         }
 
-        void set2Small(String label)
-        {
+        void set2Small(String label) {
             e2 = getNode("E2", false, Collections.emptyList());
             d2 = getNode("D2", false, Collections.emptyList());
             c2 = getNode("C2", false, Collections.emptyList());
@@ -337,11 +342,9 @@ public class ChangeDistillationTreeMatchImplTest {
         }
 
         @Nested
-        class innerNodeSimilarityScoreTest
-        {
+        class innerNodeSimilarityScoreTest {
             @Test
-            void whenSomeMatch()
-            {
+            void whenSomeMatch() {
                 setup122To122Tree();
 
                 /*
@@ -360,12 +363,11 @@ public class ChangeDistillationTreeMatchImplTest {
                  * Max nodes under trees = 2
                  * Score = 1/2
                  */
-                assertEquals((float) 1/2, score);
+                assertEquals((float) 1 / 2, score);
             }
 
             @Test
-            void whenAllMatch()
-            {
+            void whenAllMatch() {
                 setup122To122Tree();
 
                 /*
@@ -388,8 +390,7 @@ public class ChangeDistillationTreeMatchImplTest {
             }
 
             @Test
-            void whenSomeMatchOutside()
-            {
+            void whenSomeMatchOutside() {
                 setup122To122Tree();
 
                 /*
@@ -410,8 +411,7 @@ public class ChangeDistillationTreeMatchImplTest {
             }
 
             @Test
-            void whenSubtreeSizeMismatch()
-            {
+            void whenSubtreeSizeMismatch() {
                 setup122To123Tree();
 
                 /*
@@ -428,12 +428,11 @@ public class ChangeDistillationTreeMatchImplTest {
                  * Max nodes under trees = 3
                  * Score = 1/3
                  */
-                assertEquals((float) 1/3, score);
+                assertEquals((float) 1 / 3, score);
             }
 
             @Test
-            void whenNoneMatch()
-            {
+            void whenNoneMatch() {
                 setup122To122Tree();
 
                 float score = changeDistillationTreeMatchImpl.innerNodeSimilarityScore(b1, b2);
@@ -449,17 +448,15 @@ public class ChangeDistillationTreeMatchImplTest {
         }
 
         @Nested
-        class doInnerNodesMatchTest
-        {
+        class doInnerNodesMatchTest {
             float MOCK_STRING_SIMILARITY_THRESHOLD = 1.0f;
             int MOCK_SMALL_SUBTREE_SIZE = 4;
             float MOCK_SMALL_SUBTREE_THRESHOLD = 0.4f;
             float MOCK_LARGE_SUBTREE_THRESHOLD = 0.6f;
             int MOCK_N = 3;
-            void setAllDescendantsToMatch()
-            {
-                if (f1 != null && f2 != null)
-                {
+
+            void setAllDescendantsToMatch() {
+                if (f1 != null && f2 != null) {
                     f1.setMatch(f2);
                 }
                 e1.setMatch(e2);
@@ -470,22 +467,21 @@ public class ChangeDistillationTreeMatchImplTest {
 
             /**
              * Creates a mock string similarity with the given difference from the mock threshold
+             *
              * @param difference difference from the threshold
              */
-            StringSimilarity getStringSimilarity(float difference)
-            {
+            StringSimilarity getStringSimilarity(float difference) {
                 return StringSimilarityMockFactory
                         .builder()
                         .aString(a1.getValue())
                         .bString(a2.getValue())
-                        .result(difference+ MOCK_STRING_SIMILARITY_THRESHOLD)
+                        .result(difference + MOCK_STRING_SIMILARITY_THRESHOLD)
                         .build()
                         .getMockStringSimilarity();
             }
 
             @Test
-            void whenLabelsDoNotMatch_NodesDoNotMatch()
-            {
+            void whenLabelsDoNotMatch_NodesDoNotMatch() {
                 set1Small("LABEL");
                 set2Large("OTHER LABEL");
                 setAllDescendantsToMatch();
@@ -504,8 +500,7 @@ public class ChangeDistillationTreeMatchImplTest {
             }
 
             @Test
-            void whenValuesDoNotMatch_NodesDoNotMatch()
-            {
+            void whenValuesDoNotMatch_NodesDoNotMatch() {
                 set1Small("LABEL");
                 set2Large("LABEL");
                 setAllDescendantsToMatch();
@@ -539,25 +534,18 @@ public class ChangeDistillationTreeMatchImplTest {
 
             })
             @ParameterizedTest
-            void similarityTests(boolean small1, boolean small2, boolean aboveSmallThreshold, boolean aboveLargeThreshold)
-            {
+            void similarityTests(boolean small1, boolean small2, boolean aboveSmallThreshold, boolean aboveLargeThreshold) {
                 boolean mustBeAboveLarge = !small1 && !small2;
                 boolean doMatch = (mustBeAboveLarge && aboveLargeThreshold) || (!mustBeAboveLarge && aboveSmallThreshold);
-                if (small1)
-                {
+                if (small1) {
                     set1Small("LABEL");
-                }
-                else
-                {
+                } else {
                     set1Large("LABEL");
                 }
 
-                if (small2)
-                {
+                if (small2) {
                     set2Small("LABEL");
-                }
-                else
-                {
+                } else {
                     set2Large("LABEL");
                 }
 
@@ -565,20 +553,14 @@ public class ChangeDistillationTreeMatchImplTest {
                 float score = changeDistillationTreeMatchImpl.innerNodeSimilarityScore(a1, a2);
                 float mockSmallThreshold = 0f;
                 float mockLargeThreshold = 0f;
-                if (aboveSmallThreshold)
-                {
+                if (aboveSmallThreshold) {
                     mockSmallThreshold = score - 0.2f;
-                    if (aboveLargeThreshold)
-                    {
+                    if (aboveLargeThreshold) {
                         mockLargeThreshold = score - 0.1f;
-                    }
-                    else
-                    {
+                    } else {
                         mockLargeThreshold = score + 0.1f;
                     }
-                }
-                else
-                {
+                } else {
                     mockSmallThreshold = score + 0.1f;
                     mockLargeThreshold = score + 0.2f;
                 }
@@ -596,16 +578,14 @@ public class ChangeDistillationTreeMatchImplTest {
                         MOCK_N);
 
                 assertEquals(actualDoMatch,
-                    doMatch);
+                        doMatch);
             }
         }
 
         @Nested
-        class matchInnerNodes
-        {
+        class matchInnerNodes {
             @Test
-            void whenMultiplePossibleUnmatchedNodesExistInModified_choosesFirst()
-            {
+            void whenMultiplePossibleUnmatchedNodesExistInModified_choosesFirst() {
                 set1Large("Foo");
                 set2Long("Foo");
 
@@ -652,8 +632,7 @@ public class ChangeDistillationTreeMatchImplTest {
             }
 
             @Test
-            void whenMultiplePossibleUnmatchedNodesExistInOriginal_choosesFirst()
-            {
+            void whenMultiplePossibleUnmatchedNodesExistInOriginal_choosesFirst() {
                 set1Long("Foo");
                 set2Large("Foo");
 

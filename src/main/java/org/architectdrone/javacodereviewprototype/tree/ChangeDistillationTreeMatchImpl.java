@@ -1,5 +1,7 @@
 package org.architectdrone.javacodereviewprototype.tree;
 
+import com.github.javaparser.ast.expr.UnaryExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.utils.Pair;
 import com.google.inject.Inject;
 
@@ -22,8 +24,8 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
     private static final float SMALL_SUBTREE_SIMILARITY_THRESHOLD = (float) 0.4; //Small subtrees with a similarity lower than this are considered not matching. Fluri recommends 0.4.
     private static final float LARGE_SUBTREE_SIMILARITY_THRESHOLD = (float) 0.6; //Small subtrees with a similarity lower than this are considered not matching. Fluri recommends 0.6.
 
-    StringSimilarity stringSimilarity;
-    CommonUtils commonUtils;
+    final StringSimilarity stringSimilarity;
+    final CommonUtils commonUtils;
 
     @Inject
     public ChangeDistillationTreeMatchImpl(StringSimilarity stringSimilarity, CommonUtils commonUtils)
@@ -35,18 +37,39 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
     /**{@inheritDoc} */
     @Override
     public <L> void matchTrees(ChangeDistillationTree<L> treeA, ChangeDistillationTree<L> treeB) {
-        matchLeafNodes(treeA,
-                treeB,
-                STRING_SIMILARITY_THRESHOLD,
-                N);
-
-        matchInnerNodes(treeA,
+        matchTrees(
+                treeA,
                 treeB,
                 STRING_SIMILARITY_THRESHOLD,
                 SMALL_SUBTREE_SIZE,
                 SMALL_SUBTREE_SIMILARITY_THRESHOLD,
                 LARGE_SUBTREE_SIMILARITY_THRESHOLD,
-                N);
+                N
+        );
+    }
+
+    public <L> void matchTrees(
+            ChangeDistillationTree<L> treeA,
+            ChangeDistillationTree<L> treeB,
+            float stringSimilarityThreshold,
+            int smallSubtreeSize,
+            float smallSubtreeThreshold,
+            float largeSubtreeThreshold,
+            int n)
+    {
+        treeA.setMatch(treeB);
+        matchLeafNodes(treeA,
+                treeB,
+                stringSimilarityThreshold,
+                n);
+
+        matchInnerNodes(treeA,
+                treeB,
+                stringSimilarityThreshold,
+                smallSubtreeSize,
+                smallSubtreeThreshold,
+                largeSubtreeThreshold,
+                n);
     }
 
     /**
@@ -62,7 +85,7 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
         List<ChangeDistillationTree<L>> leavesA = treeA.getLeaves();
         List<ChangeDistillationTree<L>> leavesB = treeB.getLeaves();
 
-        var scoredPotentialLeafMatches = scorePotentialLeafMatches(leavesA, leavesB, stringSimilarityThreshold, n);
+        List<Pair<Pair<ChangeDistillationTree<L>, ChangeDistillationTree<L>>, Float>> scoredPotentialLeafMatches = scorePotentialLeafMatches(leavesA, leavesB, stringSimilarityThreshold, n);
         matchLeafNodes(scoredPotentialLeafMatches);
     }
 
@@ -86,8 +109,13 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
                                     int n) {
         List<ChangeDistillationTree<L>> innerNodesA = treeA.getDescendants(false);
         List<ChangeDistillationTree<L>> innerNodesB = treeB.getDescendants(false);
+
         for (ChangeDistillationTree<L> innerNodeA : innerNodesA)
         {
+            if (innerNodeA.getLabel().equals(UnaryExpr.class))
+            {
+                System.out.println("Fellas can I get a yeehaw in the chat?");
+            }
             if (innerNodeA.isMatched())
             {
                 continue;
@@ -112,13 +140,12 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
      * @param scoredPotentialMatches A list of potential matches with a corresponding score.
      * @param <L> Label type
      */
-    public <L> void matchLeafNodes(Map<Pair<ChangeDistillationTree<L>, ChangeDistillationTree<L>>, Float> scoredPotentialMatches)
+    public <L> void matchLeafNodes(List<Pair<Pair<ChangeDistillationTree<L>, ChangeDistillationTree<L>>, Float>> scoredPotentialMatches)
     {
         scoredPotentialMatches
-                .entrySet()
                 .stream()
-                .sorted((m1, m2) -> Float.compare(m2.getValue(), m1.getValue()))
-                .map(Map.Entry::getKey)
+                .sorted((m1, m2) -> Float.compare(m2.b, m1.b))
+                .map(p -> p.a)
                 .filter(potentialMatch -> !potentialMatch.a.isMatched())
                 .filter(potentialMatch -> !potentialMatch.b.isMatched())
                 .forEach(match -> match.a.setMatch(match.b));
@@ -133,7 +160,7 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
      * @param <L> Label type
      * @return A list of scored potential matches.
      */
-    public <L> Map<Pair<ChangeDistillationTree<L>, ChangeDistillationTree<L>>, Float> scorePotentialLeafMatches(
+    public <L> List<Pair<Pair<ChangeDistillationTree<L>, ChangeDistillationTree<L>>, Float>> scorePotentialLeafMatches(
             List<ChangeDistillationTree<L>> leavesA,
             List<ChangeDistillationTree<L>> leavesB,
             float minimumSimilarity,
@@ -146,7 +173,7 @@ public class ChangeDistillationTreeMatchImpl implements ChangeDistillationTreeMa
                 .filter(p -> p.a.getLabel().equals(p.b.getLabel()))
                 .map(p -> new Pair<>(p, stringSimilarity.getStringSimilarity(p.a.getValue(), p.b.getValue(), n)))
                 .filter(p -> p.b > minimumSimilarity)
-                .collect(Collectors.toMap(p -> p.a, p -> p.b));
+                .collect(Collectors.toList());
     }
 
     /**

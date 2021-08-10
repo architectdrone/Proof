@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import org.apache.commons.io.FileUtils;
+import org.architectdrone.javacodereviewprototype.java.JavaTree;
+import org.architectdrone.javacodereviewprototype.tree.ChangeDistillationTreeMatchImpl;
 
 @AllArgsConstructor
 public class JavaCompare {
@@ -22,46 +24,9 @@ public class JavaCompare {
     String fileB;
 
     public boolean semanticComparison() {
-        CompilationUnit treeA = StaticJavaParser.parse(fileA);
-        CompilationUnit treeB = StaticJavaParser.parse(fileB);
-        return treeCompare(treeA, treeB);
-    }
-
-    public boolean treeCompare(Node nodeA, Node nodeB) {
-        if (nodeA.getAllContainedComments().size() == 0 && nodeB.getAllContainedComments().size() == 0) {
-            return nodeA.toString().equals(nodeB.toString());
-        }
-
-        if (nodeA.getClass() != nodeB.getClass())
-        {
-            return false;
-        }
-        List<Node> nodeAChildren = nodeA.getChildNodes().stream().filter(c -> !(c instanceof LineComment)).collect(Collectors.toList());
-        List<Node> nodeBChildren = nodeB.getChildNodes().stream().filter(c -> !(c instanceof LineComment)).collect(Collectors.toList());
-
-        if (nodeAChildren.size() != nodeBChildren.size())
-        {
-            return false;
-        }
-        if (nodeAChildren.size() == 0 && (nodeBChildren.size() == 0) && !getText(nodeA).equals(getText(nodeB)))
-        {
-            return false;
-        }
-
-        for (int i = 0; i < nodeA.getChildNodes().size(); i++) {
-            Node nodeAChild = nodeA.getChildNodes().get(i);
-            Node nodeBChild = nodeB.getChildNodes().get(i);
-            if (!treeCompare(nodeAChild, nodeBChild))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public String getText(Node node) {
-        return node.getTokenRange().get().toString();
+        JavaTree treeA = new JavaTree(StaticJavaParser.parse(fileA), true);
+        JavaTree treeB = new JavaTree(StaticJavaParser.parse(fileB), false);
+        return treeA.treeEquals(treeB);
     }
 
     public boolean pedanticComparison() {

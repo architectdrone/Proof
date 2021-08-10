@@ -114,4 +114,57 @@ public class ChangeDistillationTree<L> {
         }
         return builder.toString();
     }
+
+    /**
+     * Compares two trees, using labels, values, and children
+     * @param otherTree The other tree.
+     * @return Whether they match or not.
+     */
+    public boolean treeEquals(ChangeDistillationTree<L> otherTree)
+    {
+        if (!getLabel().equals(otherTree.getLabel()))
+        {
+            return false;
+        }
+        else if (!getValue().equals(otherTree.getValue()))
+        {
+            return false;
+        }
+        if (getChildren().size() == 0)
+        {
+            return true;
+        }
+
+        if (getChildren().size() != otherTree.getChildren().size())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < getChildren().size(); i++) {
+            if (!getChildren().get(i).treeEquals(otherTree.getChildren().get(i)))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void printFullReport()
+    {
+        printFullReport(0);
+    }
+
+    private void printFullReport(int indentLevel)
+    {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < indentLevel; i++) {
+            builder.append("\t");
+        }
+        builder.append(this.toString());
+        System.out.println(builder.toString());
+        for (ChangeDistillationTree child : getChildren())
+        {
+            child.printFullReport(indentLevel+1);
+        }
+    }
 }

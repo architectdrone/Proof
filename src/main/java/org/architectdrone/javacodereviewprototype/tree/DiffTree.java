@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Simple tree data structure with data for the matching process.
@@ -31,6 +32,12 @@ public class DiffTree<L> {
     //Diff data
     @Getter
     final boolean isOriginal;
+    @Getter @Setter
+    DiffTree<L> referenceLocation;
+    @Getter @Setter
+    ReferenceType referenceType;
+    @Getter @Setter
+    String oldValue;
 
     /**
      * Constructs a {@link DiffTree} from some other tree type.

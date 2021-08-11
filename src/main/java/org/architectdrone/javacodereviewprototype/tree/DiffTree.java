@@ -17,6 +17,11 @@ public class DiffTree<L> {
     //Tree data
     @Getter final List<DiffTree<L>> children; //Children of the root node
 
+    //Advanced tree data
+    private DiffTree<L> parent;
+    private int childNumber;
+    private boolean hasAdvancedDataBeenPopulated;
+
     //Container data
     @Getter
     final L label; //The label of the root node
@@ -172,5 +177,67 @@ public class DiffTree<L> {
         {
             child.printFullReport(indentLevel+1);
         }
+    }
+
+    /**
+     * @return The parent of the node. Null if it has no parent.
+     */
+    public DiffTree<L> getParent()
+    {
+        if (!hasAdvancedDataBeenPopulated)
+        {
+            throw new RuntimeException("Advanced tree data has not been populated yet.");
+        }
+        return parent;
+    }
+
+    /**
+     * @return The child number.
+     */
+    public int getChildNumber()
+    {
+        if (!hasAdvancedDataBeenPopulated)
+        {
+            throw new RuntimeException("Advanced tree data has not been populated yet.");
+        }
+        return childNumber;
+    }
+
+    /**
+     * Sets the child number.
+     * @param childNumber New child number
+     */
+    protected void setChildNumber(int childNumber)
+    {
+        this.childNumber = childNumber;
+    }
+
+    /**
+     * Sets the parent.
+     * @param parent New parent.
+     */
+    protected void setParent(DiffTree<L> parent)
+    {
+        this.parent = parent;
+    }
+
+    /**
+     * Populates advanced data (child number and parent)
+     */
+    public void populateAdvancedData()
+    {
+        if (hasAdvancedDataBeenPopulated)
+        {
+            throw new RuntimeException("Advanced tree data has already been populated.");
+        }
+
+        for (int i = 0; i < getChildren().size(); i++) {
+            DiffTree<L> child = getChildren().get(i);
+            child.setChildNumber(i);
+            child.setParent(this);
+            child.populateAdvancedData();
+        }
+
+        this.hasAdvancedDataBeenPopulated = true;
     }
 }

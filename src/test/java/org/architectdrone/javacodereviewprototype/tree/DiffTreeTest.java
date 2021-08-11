@@ -126,6 +126,30 @@ class DiffTreeTest {
             assertTrue(descendants.contains(c));
         }
     }
+
+    @Nested
+    class advancedTreeDataTests
+    {
+        @Test
+        void getParent_works()
+        {
+            d.populateAdvancedData();
+            assertEquals(d.getParent(), null);
+            assertEquals(c.getParent(), d);
+            assertEquals(b.getParent(), c);
+            assertEquals(a.getParent(), c);
+        }
+
+        @Test
+        void getChildNumber_works()
+        {
+            d.populateAdvancedData();
+            assertEquals(d.getChildNumber(), 0);
+            assertEquals(c.getChildNumber(), 0);
+            assertEquals(b.getChildNumber(), 1);
+            assertEquals(a.getChildNumber(), 0);
+        }
+    }
 }
 
 @AllArgsConstructor

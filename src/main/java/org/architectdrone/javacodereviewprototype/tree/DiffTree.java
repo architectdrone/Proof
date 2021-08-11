@@ -240,4 +240,26 @@ public class DiffTree<L> {
 
         this.hasAdvancedDataBeenPopulated = true;
     }
+
+    /**
+     * Gets all nodes on a given level of the tree.
+     * @param level The level to get
+     * @return
+     */
+    public List<DiffTree<L>> getLevel(int level)
+    {
+        if (level == 0)
+        {
+            return Collections.singletonList(this);
+        }
+        else
+        {
+            List<DiffTree<L>> toReturn = new ArrayList<>();
+            for (DiffTree<L> child : getChildren())
+            {
+                toReturn.addAll(child.getLevel(level-1));
+            }
+            return toReturn;
+        }
+    }
 }

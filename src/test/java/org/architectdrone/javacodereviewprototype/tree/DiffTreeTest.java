@@ -150,6 +150,22 @@ class DiffTreeTest {
             assertEquals(a.getChildNumber(), 0);
         }
     }
+
+    @Nested
+    class getLevelTests
+    {
+        @Test
+        void works()
+        {
+            assertFalse(d.getLevel(1).contains(a));
+            assertFalse(d.getLevel(1).contains(b));
+            assertTrue(d.getLevel(1).contains(c));
+
+            assertTrue(d.getLevel(2).contains(a));
+            assertTrue(d.getLevel(2).contains(b));
+            assertFalse(d.getLevel(2).contains(c));
+        }
+    }
 }
 
 @AllArgsConstructor

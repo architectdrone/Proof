@@ -2,8 +2,10 @@ package org.architectdrone.javacodereviewprototype.tree;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -37,6 +39,8 @@ public class DiffTree<L> {
     //Diff data
     @Getter
     final boolean isOriginal;
+    @Getter @Setter
+    boolean considered;
     @Getter @Setter
     DiffTree<L> referenceLocation;
     @Getter @Setter
@@ -261,5 +265,14 @@ public class DiffTree<L> {
             }
             return toReturn;
         }
+    }
+
+
+    public List<DiffTree<L>> getChild(int childNumber)
+    {
+        return getChildren()
+                .stream()
+                .filter(t -> t.getChildNumber() == childNumber)
+                .collect(Collectors.toList());
     }
 }

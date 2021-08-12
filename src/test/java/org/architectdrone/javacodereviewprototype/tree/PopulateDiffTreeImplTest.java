@@ -28,6 +28,40 @@ class PopulateDiffTreeImplTest {
             assertEquals(1, potentialChildren.size());
             return potentialChildren.get(0);
         }
+
+        static void assertDeleted(DiffTree<String> node)
+        {
+            assertEquals(ReferenceType.DELETE, node.getReferenceType());
+            assertFalse(node.isMatched());
+        }
+
+        static void assertCreated(DiffTree<String> node)
+        {
+            assertEquals(ReferenceType.CREATE, node.getReferenceType());
+            assertTrue(node.isMatched());
+        }
+
+        static void assertNone(DiffTree<String> node)
+        {
+            assertEquals(ReferenceType.NONE, node.getReferenceType());
+            assertTrue(node.isMatched());
+        }
+
+        static void assertMatch(DiffTree<String> a, DiffTree<String> b)
+        {
+            assertEquals(b, a.getMatch());
+        }
+
+        static void assertCorrectName(DiffTree<String> node, String name)
+        {
+            assertEquals(name, node.getLabel());
+            assertEquals(name, node.getValue());
+        }
+
+        static void assertNumberOfChildren(DiffTree<String> node, int number)
+        {
+            assertEquals(number, node.getChildren().size());
+        }
     }
 
     /**
@@ -76,7 +110,7 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeWithNoChildren_andSiblingBefore_resultsInCreationInOriginal_atCorrectPosition()
         {
             //Setup trees
-            DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+            DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
             DiffTree<String> a1 = Utils.createNode("A1", Collections.singletonList(b1), true);
 
             DiffTree<String> c2 = Utils.createNode("C2", Collections.emptyList(), false);
@@ -105,7 +139,7 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeWithNoChildren_andSiblingAfter_resultsInCreationInOriginal_atCorrectPosition()
         {
             //Setup trees
-            DiffTree<String> c1 = Utils.createNode("c1", Collections.emptyList(), true);
+            DiffTree<String> c1 = Utils.createNode("C1", Collections.emptyList(), true);
             DiffTree<String> a1 = Utils.createNode("A1", Collections.singletonList(c1), true);
 
             DiffTree<String> c2 = Utils.createNode("C2", Collections.emptyList(), false);
@@ -122,8 +156,8 @@ class PopulateDiffTreeImplTest {
 
             DiffTree<String> createdNode = Utils.getSingleChild(a1, 0);
             assertEquals(ReferenceType.CREATE, createdNode.getReferenceType());
-            assertEquals("C2", createdNode.getLabel());
-            assertEquals("C2", createdNode.getValue());
+            assertEquals("B2", createdNode.getLabel());
+            assertEquals("B2", createdNode.getValue());
             assertEquals(b2, createdNode.getMatch());
         }
 
@@ -135,8 +169,8 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeWithNoChildren_andSiblingBeforeAndAfter_resultsInCreationInOriginal_atCorrectPosition()
         {
             //Setup trees
-            DiffTree<String> d1 = Utils.createNode("d1", Collections.emptyList(), true);
-            DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+            DiffTree<String> d1 = Utils.createNode("D1", Collections.emptyList(), true);
+            DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
             DiffTree<String> a1 = Utils.createNode("A1", Arrays.asList(b1, d1), true);
 
             DiffTree<String> d2 = Utils.createNode("D2", Collections.emptyList(), false);
@@ -161,7 +195,7 @@ class PopulateDiffTreeImplTest {
 
             assertEquals(0, b1.getChildNumber());
             assertEquals(1, c1.getChildNumber());
-            assertEquals(2, c2.getChildNumber());
+            assertEquals(2, d1.getChildNumber());
         }
 
         /**
@@ -221,7 +255,7 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeInOriginal_resultsInNodeDeleted()
         {
             //Setup trees
-            DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+            DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
             DiffTree<String> a1 = Utils.createNode("A1", Collections.singletonList(b1), true);
 
             DiffTree<String> a2 = Utils.createNode("A2", Collections.emptyList(), false);
@@ -245,13 +279,14 @@ class PopulateDiffTreeImplTest {
          * In the original tree, we have root (A1) and two children (B1 and C1).
          * In the modified tree, we have root (A2) and one child (B1).
          * C1 should be deleted.
+         * C1 and B1 should both have CN of 0.
          */
         @Test
         void unmatchedNodeInOriginal_andSiblingBefore_resultsInNodeDeleted()
         {
             //Setup trees
-            DiffTree<String> c1 = Utils.createNode("c1", Collections.emptyList(), true);
-            DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+            DiffTree<String> c1 = Utils.createNode("C1", Collections.emptyList(), true);
+            DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
             DiffTree<String> a1 = Utils.createNode("A1", Arrays.asList(b1, c1), true);
 
             DiffTree<String> b2 = Utils.createNode("B2", Collections.emptyList(), false);
@@ -262,6 +297,7 @@ class PopulateDiffTreeImplTest {
             b1.setMatch(b2);
 
             populateDiffTree.populateDiffTree(a1, a2);
+            assertEquals(0, b1.getChildNumber());
 
             assertEquals(2, a1.getChildren().size());
 
@@ -269,7 +305,7 @@ class PopulateDiffTreeImplTest {
             assertEquals("C1", c1.getLabel());
             assertEquals("C1", c1.getValue());
             assertFalse(c1.isMatched());
-            assertEquals(1, c1.getChildNumber());
+            assertEquals(0, c1.getChildNumber());
         }
 
         /**
@@ -282,8 +318,8 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeInOriginal_andSiblingAfter_resultsInNodeDeleted()
         {
             //Setup trees
-            DiffTree<String> c1 = Utils.createNode("c1", Collections.emptyList(), true);
-            DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+            DiffTree<String> c1 = Utils.createNode("C1", Collections.emptyList(), true);
+            DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
             DiffTree<String> a1 = Utils.createNode("A1", Arrays.asList(b1, c1), true);
 
             DiffTree<String> c2 = Utils.createNode("C2", Collections.emptyList(), false);
@@ -308,17 +344,19 @@ class PopulateDiffTreeImplTest {
 
         /**
          * In this test, the unmatched node has a matching sibling after it.
-         * In the original tree, we have root (A1) and two children (B1, C1, and D1).
-         * In the modified tree, we have root (A2) and one child (C1).
-         * C1 should be deleted. A1 should have a child number of 0, and B1 should have child number of 1.
+         * In the original tree, we have root (A1) and three children (B1, C1, and D1).
+         * In the modified tree, we have root (A2) and two children (B1, D1).
+         * C1 should be deleted.
+         * B1 and C1 should have a child number of 0
+         * D1 should have child number of 1.
          */
         @Test
         void unmatchedNodeInOriginal_andSiblingBeforeAndAfter_resultsInNodeDeleted()
         {
             //Setup trees
-            DiffTree<String> d1 = Utils.createNode("d1", Collections.emptyList(), true);
-            DiffTree<String> c1 = Utils.createNode("c1", Collections.emptyList(), true);
-            DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+            DiffTree<String> d1 = Utils.createNode("D1", Collections.emptyList(), true);
+            DiffTree<String> c1 = Utils.createNode("C1", Collections.emptyList(), true);
+            DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
             DiffTree<String> a1 = Utils.createNode("A1", Arrays.asList(b1, c1, d1), true);
 
             DiffTree<String> d2 = Utils.createNode("D2", Collections.emptyList(), false);
@@ -338,10 +376,10 @@ class PopulateDiffTreeImplTest {
             assertEquals("C1", c1.getLabel());
             assertEquals("C1", c1.getValue());
             assertFalse(c1.isMatched());
-            assertEquals(1, c1.getChildNumber());
+            assertEquals(0, c1.getChildNumber());
 
-            assertEquals(0, a1.getChildNumber());
-            assertEquals(1, b1.getChildNumber());
+            assertEquals(0, b1.getChildNumber());
+            assertEquals(1, d1.getChildNumber());
         }
 
         /**
@@ -354,7 +392,7 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeInOriginal_withChildren_resultsInAllNodesDeleted()
         {
             //Setup trees
-            DiffTree<String> c1 = Utils.createNode("c1", Collections.emptyList(), true);
+            DiffTree<String> c1 = Utils.createNode("C1", Collections.emptyList(), true);
             DiffTree<String> b1 = Utils.createNode("B1", Collections.singletonList(c1), true);
             DiffTree<String> a1 = Utils.createNode("A1", Collections.singletonList(b1), true);
             
@@ -399,7 +437,7 @@ class PopulateDiffTreeImplTest {
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+                DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
                 DiffTree<String> a1 = Utils.createNode("A1", Collections.singletonList(b1), true);
 
                 DiffTree<String> c2 = Utils.createNode("C2", Collections.emptyList(), false);
@@ -447,8 +485,8 @@ class PopulateDiffTreeImplTest {
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_andMatchedNodeBefore_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> c1 = Utils.createNode("c1", Collections.emptyList(), true);
-                DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+                DiffTree<String> c1 = Utils.createNode("C1", Collections.emptyList(), true);
+                DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
                 DiffTree<String> a1 = Utils.createNode("A1", Arrays.asList(b1, c1), true);
 
                 DiffTree<String> d2 = Utils.createNode("D2", Collections.emptyList(), false);
@@ -472,7 +510,7 @@ class PopulateDiffTreeImplTest {
                 assertEquals("C1", c1.getLabel());
                 assertEquals("C1", c1.getValue());
                 assertFalse(c1.isMatched());
-                assertEquals(0, c1.getChildNumber());
+                assertEquals(1, c1.getChildNumber());
 
                 DiffTree<String> d1 = allNodesAt1
                         .stream()
@@ -486,7 +524,7 @@ class PopulateDiffTreeImplTest {
                 assertEquals("D2", d1.getValue());
                 assertTrue(d1.isMatched());
                 assertEquals(d2, d1.getMatch());
-                assertEquals(0, d1.getChildNumber());
+                assertEquals(1, d1.getChildNumber());
             }
 
             /**
@@ -501,8 +539,8 @@ class PopulateDiffTreeImplTest {
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_andMatchedNodeAfter_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> c1 = Utils.createNode("c1", Collections.emptyList(), true);
-                DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+                DiffTree<String> c1 = Utils.createNode("C1", Collections.emptyList(), true);
+                DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
                 DiffTree<String> a1 = Utils.createNode("A1", Arrays.asList(c1, b1), true);
 
                 DiffTree<String> d2 = Utils.createNode("D2", Collections.emptyList(), false);
@@ -519,7 +557,7 @@ class PopulateDiffTreeImplTest {
 
                 assertEquals(1, b1.getChildNumber());
 
-                List<DiffTree<String>> allNodesAt1 = a1.getChild(1);
+                List<DiffTree<String>> allNodesAt1 = a1.getChild(0);
                 assertTrue(allNodesAt1.contains(c1));
 
                 assertEquals(ReferenceType.DELETE, c1.getReferenceType());
@@ -546,15 +584,16 @@ class PopulateDiffTreeImplTest {
              * In the original tree, we have a root (A1) with two children (C1, B1).
              * In the modified tree, we have a root (A2) with two children (B2, D2).
              * We expect C1 to be DELETE, and a new node, D1, to be CREATE.
-             * We also expect both B1 and C1 to be 0.
-             * We also expect D1 to be 1.
+             * We expect C1 to be 0.
+             * We expect B1 to be 1.
+             * We expect D1 to be 2.
              */
             @Test
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_andMatchedNodeBetween_originalFirst_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> c1 = Utils.createNode("c1", Collections.emptyList(), true);
-                DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+                DiffTree<String> c1 = Utils.createNode("C1", Collections.emptyList(), true);
+                DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
                 DiffTree<String> a1 = Utils.createNode("A1", Arrays.asList(c1, b1), true);
 
                 DiffTree<String> d2 = Utils.createNode("D2", Collections.emptyList(), false);
@@ -569,18 +608,15 @@ class PopulateDiffTreeImplTest {
 
                 assertEquals(3, a1.getChildren().size());
 
-                assertEquals(0, b1.getChildNumber());
-
-                List<DiffTree<String>> allNodesAt0 = a1.getChild(0);
-                assertTrue(allNodesAt0.contains(c1));
-                assertTrue(allNodesAt0.contains(b1));
+                assertEquals(0, c1.getChildNumber());
+                assertEquals(1, b1.getChildNumber());
+                DiffTree<String> d1 = Utils.getSingleChild(a1, 2);
+                assertEquals(2, d1.getChildNumber());
 
                 assertEquals(ReferenceType.DELETE, c1.getReferenceType());
                 assertEquals("C1", c1.getLabel());
                 assertEquals("C1", c1.getValue());
                 assertFalse(c1.isMatched());
-
-                DiffTree<String> d1 = Utils.getSingleChild(a1, 1);
 
                 assertEquals(ReferenceType.CREATE, d1.getReferenceType());
                 assertEquals("D2", d1.getLabel());
@@ -596,14 +632,14 @@ class PopulateDiffTreeImplTest {
              * We expect C1 to be DELETE, and a new node, D1, to be CREATE.
              * We expect D1 to be 0.
              * We expect B1 to be 1.
-             * We expect C1 to also be 1.
+             * We expect C1 to be 2.
              */
             @Test
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_andMatchedNodeBetween_originalLast_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> c1 = Utils.createNode("c1", Collections.emptyList(), true);
-                DiffTree<String> b1 = Utils.createNode("b1", Collections.emptyList(), true);
+                DiffTree<String> c1 = Utils.createNode("C1", Collections.emptyList(), true);
+                DiffTree<String> b1 = Utils.createNode("B1", Collections.emptyList(), true);
                 DiffTree<String> a1 = Utils.createNode("A1", Arrays.asList(b1, c1), true);
 
                 DiffTree<String> d2 = Utils.createNode("D2", Collections.emptyList(), false);
@@ -619,10 +655,7 @@ class PopulateDiffTreeImplTest {
                 assertEquals(3, a1.getChildren().size());
 
                 assertEquals(1, b1.getChildNumber());
-
-                List<DiffTree<String>> allNodesAt1 = a1.getChild(1);
-                assertTrue(allNodesAt1.contains(c1));
-                assertTrue(allNodesAt1.contains(b1));
+                assertEquals(2, c1.getChildNumber());
 
                 assertEquals(ReferenceType.DELETE, c1.getReferenceType());
                 assertEquals("C1", c1.getLabel());

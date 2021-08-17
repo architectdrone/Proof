@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.omg.PortableInterceptor.NON_EXISTENT;
 
 /**
  * Simple tree data structure with data for the matching process.
@@ -311,20 +312,33 @@ public class DiffTree<L> {
     public void rectifyNodes()
     {
         children.sort(Comparator.comparingInt(DiffTree::getChildNumber));
-        ReferenceType previousReferenceType = ReferenceType.NONE;
         int numberOfDeletes = 0;
+        DiffTree<L> previousChild = null;
         for (DiffTree<L> child : children)
         {
-            ReferenceType currentReferenceType = child.getReferenceType();
-            if (!((currentReferenceType == ReferenceType.CREATE) && (previousReferenceType == ReferenceType.DELETE)))
+            if (previousChild == null)
             {
-                child.setChildNumber(child.getChildNumber()+numberOfDeletes);
+                child.setChildNumber(0);
+                previousChild = child;
+                continue;
             }
-            if (currentReferenceType == ReferenceType.DELETE)
+
+            child.setChildNumber(child.getChildNumber()+numberOfDeletes);
+            //Collapsing
+            if ((child.getChildNumber() != previousChild.getChildNumber()) && (child.getReferenceType() != ReferenceType.NONE && previousChild.getReferenceType() != ReferenceType.NONE))
             {
-                numberOfDeletes+=1;
+                    numberOfDeletes -= 1;
+                    child.setChildNumber(child.getChildNumber()-1);
             }
-            previousReferenceType = currentReferenceType;
+            //Uncollapsing
+            if ((child.getChildNumber() == previousChild.getChildNumber()) && (child.getReferenceType() == ReferenceType.NONE || previousChild.getReferenceType() == ReferenceType.NONE))
+            {
+                    numberOfDeletes += 1;
+                    child.setChildNumber(child.getChildNumber()+1);
+            }
+
+            previousChild = child;
+            child.rectifyNodes();
         }
     }
 }

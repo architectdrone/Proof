@@ -1,5 +1,12 @@
 package org.architectdrone.javacodereviewprototype.tree;
 
+import com.github.javaparser.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * The algorithm used here is of my own creation.
  *
@@ -50,6 +57,57 @@ package org.architectdrone.javacodereviewprototype.tree;
 public class PopulateDiffTreeImpl implements PopulateDiffTree {
     @Override
     public <L> void populateDiffTree(final DiffTree<L> treeA, final DiffTree<L> treeB) {
+        assert treeA.getMatch() == treeB;
+        treeA.populateAdvancedData();
+        treeB.populateAdvancedData();
+        int level = 0;
+        while (true)
+        {
+            level++;
+            List<DiffTree<L>> originalNodes = treeA.getLevel(level);
+            List<DiffTree<L>> modifiedNodes = treeB.getLevel(level);
+            if (originalNodes.isEmpty() && modifiedNodes.isEmpty())
+            {
+                break;
+            }
+            List<DiffTree<L>> nodesToCreate = modifiedNodes
+                    .stream()
+                    .filter(a -> !a.isMatched())
+                    .collect(Collectors.toList());
+            List<DiffTree<L>> nodesToDelete = originalNodes
+                    .stream()
+                    .filter(a -> !a.isMatched())
+                    .collect(Collectors.toList());
 
+            for (DiffTree<L> nodeToDelete : nodesToDelete)
+            {
+                nodeToDelete.setReferenceType(ReferenceType.DELETE);
+                DiffTree<L> deletedNodeParent = nodeToDelete.getParent();
+                int childNumber = nodeToDelete.getChildNumber();
+                nodeToDelete.getParent().shiftDownAfterChild(nodeToDelete.getChildNumber());
+            }
+            for (DiffTree<L> createdNodeMatch : nodesToCreate)
+            {
+                DiffTree<L> createdNode = new DiffTree<>(
+                        createdNodeMatch.getLabel(),
+                        createdNodeMatch.getValue(),
+                        Collections.emptyList(),
+                        true
+                );
+
+                DiffTree<L> createdNodeParent = createdNodeMatch.getParent().getMatch();
+
+                createdNode.setChildNumber(createdNodeMatch.getChildNumber());
+                createdNode.setParent(createdNodeParent);
+                createdNode.setHasAdvancedDataBeenPopulated(true);
+
+                createdNode.setMatch(createdNodeMatch);
+                createdNode.setReferenceType(ReferenceType.CREATE);
+
+                createdNodeParent.insertAndShiftUp(createdNode);
+            }
+
+        }
+        treeA.rectifyNodes();
     }
 }

@@ -4,10 +4,12 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,12 +19,13 @@ import lombok.Setter;
  */
 public class DiffTree<L> {
     //Tree data
-    @Getter final List<DiffTree<L>> children; //Children of the root node
+    @Getter
+    List<DiffTree<L>> children; //Children of the root node
 
     //Advanced tree data
     private DiffTree<L> parent;
     private int childNumber;
-    private boolean hasAdvancedDataBeenPopulated;
+    @Setter private boolean hasAdvancedDataBeenPopulated;
 
     //Container data
     @Getter
@@ -43,8 +46,8 @@ public class DiffTree<L> {
     boolean considered;
     @Getter @Setter
     DiffTree<L> referenceLocation;
-    @Getter @Setter
-    ReferenceType referenceType;
+    @Getter @Setter @Builder.Default
+    ReferenceType referenceType = ReferenceType.NONE;
     @Getter @Setter
     String oldValue;
 
@@ -267,12 +270,61 @@ public class DiffTree<L> {
         }
     }
 
-
+    /**
+     * Gets all nodes with the given child number. This may be >1 due to coinciding nodes.
+     * @param childNumber The child number
+     * @return List of nodes with the child number.
+     */
     public List<DiffTree<L>> getChild(int childNumber)
     {
         return getChildren()
                 .stream()
                 .filter(t -> t.getChildNumber() == childNumber)
                 .collect(Collectors.toList());
+    }
+
+    public void shiftDownAfterChild(int childNumber)
+    {
+        getChildren()
+                .stream()
+                .filter(c -> c.getChildNumber() >= childNumber)
+                .filter(c -> c.getChildNumber() > 0)
+                .forEach(c -> c.setChildNumber(c.getChildNumber()-1));
+    }
+
+    /**
+     * Inserts a node, and shifts subsequent nodes up to account for the new node.
+     * @param toInsert The node to insert.
+     */
+    public void insertAndShiftUp(DiffTree<L> toInsert)
+    {
+        getChildren()
+                .stream()
+                .filter(c -> c.getChildNumber() >= toInsert.getChildNumber())
+                .forEach(c -> c.setChildNumber(c.getChildNumber()+1));
+        //TODO: find a better way to do this!
+        ArrayList<DiffTree<L>> temp = new ArrayList<>(getChildren());
+        temp.add(toInsert);
+        children = temp;
+    }
+
+    public void rectifyNodes()
+    {
+        children.sort(Comparator.comparingInt(DiffTree::getChildNumber));
+        ReferenceType previousReferenceType = ReferenceType.NONE;
+        int numberOfDeletes = 0;
+        for (DiffTree<L> child : children)
+        {
+            ReferenceType currentReferenceType = child.getReferenceType();
+            if (!((currentReferenceType == ReferenceType.CREATE) && (previousReferenceType == ReferenceType.DELETE)))
+            {
+                child.setChildNumber(child.getChildNumber()+numberOfDeletes);
+            }
+            if (currentReferenceType == ReferenceType.DELETE)
+            {
+                numberOfDeletes+=1;
+            }
+            previousReferenceType = currentReferenceType;
+        }
     }
 }

@@ -1,8 +1,10 @@
 package org.architectdrone.javacodereviewprototype.tree;
 
+import com.github.javaparser.utils.Pair;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +19,24 @@ class PopulateDiffTreeImplTest {
 
     static class Utils
     {
+        enum TreeNames
+        {
+            A("A"),
+            B("B"),
+            C("C"),
+            D("D"),
+            E("E"),
+            F("F"),
+            G("G");
+
+            String name;
+
+            TreeNames(String name)
+            {
+                this.name = name;
+            }
+        }
+
         static DiffTree<String> createNode(String name, List<DiffTree<String>> children, boolean isOriginal)
         {
             return new DiffTree<>(name, name, children, isOriginal);
@@ -51,6 +71,32 @@ class PopulateDiffTreeImplTest {
         {
             return createNode("F", Arrays.asList(children), isOriginal);
         }
+
+        static DiffTree<String> createGNode(boolean isOriginal, DiffTree<String>... children )
+        {
+            return createNode("G", Arrays.asList(children), isOriginal);
+        }
+
+//        static DiffTree<String> createModifiedSingleLevelTree(DiffTree<String> originalSingleLevelTree, TreeNames... treeNames)
+//        {
+//            DiffTree<String> newTree = createSingleLevelTree(false, treeNames);
+//            Pair<DiffTree<String>, DiffTree<String>>
+//        }
+//
+//        static DiffTree<String> createOriginalSingleLevelTree(TreeNames... treeNames) {
+//            return createSingleLevelTree(true, treeNames);
+//        }
+//
+//        static DiffTree<String> createSingleLevelTree(boolean isOriginal, TreeNames... treeNames)
+//        {
+//            return createNode(
+//                "A",
+//                Arrays.stream(treeNames)
+//                    .map(treeName -> treeName.name)
+//                    .map(name -> createNode(name, Collections.emptyList(), isOriginal))
+//                    .collect(Collectors.toList()),
+//                isOriginal);
+//        }
 
         static DiffTree<String> getSingleChild(DiffTree<String> parent, int childNumber)
         {
@@ -98,6 +144,11 @@ class PopulateDiffTreeImplTest {
         {
             assertEquals(name, node.getLabel());
             assertEquals(name, node.getValue());
+        }
+
+        static void assertParent(DiffTree<String> child, DiffTree<String> parent)
+        {
+            assertEquals(parent, child.getParent());
         }
 
         static void assertNumberOfChildren(DiffTree<String> node, int number)
@@ -1609,10 +1660,6 @@ class PopulateDiffTreeImplTest {
                         }
                     }
 
-                    /**
-                     * I'm not going to write deletion and creation tests at this time
-                     * >.<
-                     */
                     @Nested
                     class Upward
                     {
@@ -1762,7 +1809,700 @@ class PopulateDiffTreeImplTest {
 
                             assertPointsAt(d1_mf, d1_mt);
                         }
+
+                        @Nested
+                        class Creation
+                        {
+                            /**
+                             * 1: C, D, E
+                             * 2: B, E, C, D
+                             * Bc, Ef, Cn, Dn, Et
+                             */
+                            @Test
+                            void withOneCreatedBefore()
+                            {
+                                //Setup trees
+                                DiffTree<String> e1 = createENode(true);
+                                DiffTree<String> d1 = createDNode(true);
+                                DiffTree<String> c1 = createCNode(true);
+                                DiffTree<String> a1 = createANode(true, c1, d1, e1);
+
+                                DiffTree<String> e2 = createENode(false);
+                                DiffTree<String> d2 = createDNode(false);
+                                DiffTree<String> c2 = createCNode(false);
+                                DiffTree<String> b2 = createBNode(false);
+                                DiffTree<String> a2 = createANode(false, b2, e2, c2, d2);
+
+                                //Match trees
+                                a1.setMatch(a2);
+                                c1.setMatch(c2);
+                                d1.setMatch(d2);
+                                e1.setMatch(e2);
+
+                                populateDiffTree.populateDiffTree(a1, a2);
+                                DiffTree<String> e1_mf = e1;
+                                DiffTree<String> e1_mt = getSingleChild(a1, 4);
+                                DiffTree<String> b1 = getSingleChild(a1, 0);
+
+                                assertChildNumber(b1, 0);
+                                assertChildNumber(e1_mf, 1);
+                                assertChildNumber(c1, 2);
+                                assertChildNumber(d1, 3);
+                                assertChildNumber(e1_mt, 4);
+
+                                assertCreated(b1);
+                                assertMovedFrom(e1_mf);
+                                assertNone(c1);
+                                assertNone(d1);
+                                assertMovedTo(e1_mt);
+                            }
+
+                            /**
+                             * 1: C, D, E
+                             * 2: E, C, D, B
+                             * Ef, Cn, Dn, Et, Bc
+                             */
+                            @Test
+                            void withOneCreatedAfter()
+                            {
+                                //Setup trees
+                                DiffTree<String> e1 = createENode(true);
+                                DiffTree<String> d1 = createDNode(true);
+                                DiffTree<String> c1 = createCNode(true);
+                                DiffTree<String> a1 = createANode(true, c1, d1, e1);
+
+                                DiffTree<String> e2 = createENode(false);
+                                DiffTree<String> d2 = createDNode(false);
+                                DiffTree<String> c2 = createCNode(false);
+                                DiffTree<String> b2 = createBNode(false);
+                                DiffTree<String> a2 = createANode(false, e2, c2, d2, b2);
+
+                                //Match trees
+                                a1.setMatch(a2);
+                                c1.setMatch(c2);
+                                d1.setMatch(d2);
+                                e1.setMatch(e2);
+
+                                populateDiffTree.populateDiffTree(a1, a2);
+                                DiffTree<String> e1_mf = e1;
+                                DiffTree<String> e1_mt = getSingleChild(a1, 3);
+                                DiffTree<String> b1 = getSingleChild(a1, 4);
+
+                                assertChildNumber(e1_mf, 0);
+                                assertChildNumber(c1, 1);
+                                assertChildNumber(d1, 2);
+                                assertChildNumber(e1_mt, 3);
+                                assertChildNumber(b1, 4);
+
+                                assertMovedFrom(e1_mf);
+                                assertNone(c1);
+                                assertNone(d1);
+                                assertMovedTo(e1_mt);
+                                assertCreated(b1);
+                            }
+
+                            /**
+                             * 1: C, D, E
+                             * 2: E, C, B, D
+                             * Ef, Cn, Bc, Dn, Et,
+                             */
+                            @Test
+                            void withOneCreatedInsideCriticalRegion()
+                            {
+                                //Setup trees
+                                DiffTree<String> e1 = createENode(true);
+                                DiffTree<String> d1 = createDNode(true);
+                                DiffTree<String> c1 = createCNode(true);
+                                DiffTree<String> a1 = createANode(true, c1, d1, e1);
+
+                                DiffTree<String> e2 = createENode(false);
+                                DiffTree<String> d2 = createDNode(false);
+                                DiffTree<String> c2 = createCNode(false);
+                                DiffTree<String> b2 = createBNode(false);
+                                DiffTree<String> a2 = createANode(false, e2, c2, b2, d2);
+
+                                //Match trees
+                                a1.setMatch(a2);
+                                c1.setMatch(c2);
+                                d1.setMatch(d2);
+                                e1.setMatch(e2);
+
+                                populateDiffTree.populateDiffTree(a1, a2);
+                                DiffTree<String> e1_mf = e1;
+                                DiffTree<String> e1_mt = getSingleChild(a1, 4);
+                                DiffTree<String> b1 = getSingleChild(a1, 2);
+
+                                assertChildNumber(e1_mf, 0);
+                                assertChildNumber(c1, 1);
+                                assertChildNumber(b1, 2);
+                                assertChildNumber(d1, 3);
+                                assertChildNumber(e1_mt, 4);
+
+                                assertMovedFrom(e1_mf);
+                                assertNone(c1);
+                                assertCreated(b1);
+                                assertNone(d1);
+                                assertMovedTo(e1_mt);
+                            }
+                        }
+
+                        @Nested
+                        class Deletion
+                        {
+                            /**
+                             * 1: B, C, D, E
+                             * 2: E, C, D
+                             * Bd, Ef, Cn, Dn, Et
+                             */
+                            @Test
+                            void withOneCreatedBefore()
+                            {
+                                //Setup trees
+                                DiffTree<String> e1 = createENode(true);
+                                DiffTree<String> d1 = createDNode(true);
+                                DiffTree<String> c1 = createCNode(true);
+                                DiffTree<String> b1 = createCNode(true);
+                                DiffTree<String> a1 = createANode(true, b1, c1, d1, e1);
+
+                                DiffTree<String> e2 = createENode(false);
+                                DiffTree<String> d2 = createDNode(false);
+                                DiffTree<String> c2 = createCNode(false);
+                                DiffTree<String> a2 = createANode(false, e2, c2, d2);
+
+                                //Match trees
+                                a1.setMatch(a2);
+                                c1.setMatch(c2);
+                                d1.setMatch(d2);
+                                e1.setMatch(e2);
+
+                                populateDiffTree.populateDiffTree(a1, a2);
+                                DiffTree<String> e1_mf = e1;
+                                DiffTree<String> e1_mt = getSingleChild(a1, 4);
+
+                                assertChildNumber(b1, 0);
+                                assertChildNumber(e1_mf, 1);
+                                assertChildNumber(c1, 2);
+                                assertChildNumber(d1, 3);
+                                assertChildNumber(e1_mt, 4);
+
+                                assertDeleted(b1);
+                                assertMovedFrom(e1_mf);
+                                assertNone(c1);
+                                assertNone(d1);
+                                assertMovedTo(e1_mt);
+                            }
+
+                            /**
+                             * 1: C, D, E, B
+                             * 2: E, C, D
+                             * Ef, Cn, Dn, Et, Bd
+                             */
+                            @Test
+                            void withOneCreatedAfter()
+                            {
+                                //Setup trees
+                                DiffTree<String> e1 = createENode(true);
+                                DiffTree<String> d1 = createDNode(true);
+                                DiffTree<String> c1 = createCNode(true);
+                                DiffTree<String> b1 = createBNode(true);
+                                DiffTree<String> a1 = createANode(true, c1, d1, e1, b1);
+
+                                DiffTree<String> e2 = createENode(false);
+                                DiffTree<String> d2 = createDNode(false);
+                                DiffTree<String> c2 = createCNode(false);
+                                DiffTree<String> b2 = createBNode(false);
+                                DiffTree<String> a2 = createANode(false, e2, c2, d2);
+
+                                //Match trees
+                                a1.setMatch(a2);
+                                c1.setMatch(c2);
+                                d1.setMatch(d2);
+                                e1.setMatch(e2);
+
+                                populateDiffTree.populateDiffTree(a1, a2);
+                                DiffTree<String> e1_mf = e1;
+                                DiffTree<String> e1_mt = getSingleChild(a1, 3);
+
+                                assertChildNumber(e1_mf, 0);
+                                assertChildNumber(c1, 1);
+                                assertChildNumber(d1, 2);
+                                assertChildNumber(e1_mt, 3);
+                                assertChildNumber(b1, 4);
+
+                                assertMovedFrom(e1_mf);
+                                assertNone(c1);
+                                assertNone(d1);
+                                assertMovedTo(e1_mt);
+                                assertDeleted(b1);
+                            }
+
+                            /**
+                             * 1: C, B, D, E
+                             * 2: E, C, D
+                             * Ef, Cn, Bc, Dn, Et,
+                             */
+                            @Test
+                            void withOneCreatedInsideCriticalRegion()
+                            {
+                                //Setup trees
+                                DiffTree<String> e1 = createENode(true);
+                                DiffTree<String> d1 = createDNode(true);
+                                DiffTree<String> c1 = createCNode(true);
+                                DiffTree<String> b1 = createBNode(true);
+                                DiffTree<String> a1 = createANode(true, c1, b1, d1, e1);
+
+                                DiffTree<String> e2 = createENode(false);
+                                DiffTree<String> d2 = createDNode(false);
+                                DiffTree<String> c2 = createCNode(false);
+                                DiffTree<String> a2 = createANode(false, e2, c2, d2);
+
+                                //Match trees
+                                a1.setMatch(a2);
+                                c1.setMatch(c2);
+                                d1.setMatch(d2);
+                                e1.setMatch(e2);
+
+                                populateDiffTree.populateDiffTree(a1, a2);
+                                DiffTree<String> e1_mf = e1;
+                                DiffTree<String> e1_mt = getSingleChild(a1, 4);
+
+                                assertChildNumber(e1_mf, 0);
+                                assertChildNumber(c1, 1);
+                                assertChildNumber(b1, 2);
+                                assertChildNumber(d1, 3);
+                                assertChildNumber(e1_mt, 4);
+
+                                assertMovedFrom(e1_mf);
+                                assertNone(c1);
+                                assertDeleted(b1);
+                                assertNone(d1);
+                                assertMovedTo(e1_mt);
+                            }
+                        }
                     }
+                }
+
+                /**
+                 * Where more than one node is reordered.
+                 * We are just going to be covering three reorders
+                 */
+                @Nested
+                class MultipleReorder {
+                    /**
+                     * A donut reordering is where there is a reordering with both the endpoint and startpoint in the critical region of another reordering
+                     * 1: B, C, D, E, F, G
+                     * 2: C, E, F, D, G, B
+                     * Bt, Cn, Dt, En, Fn, Df, Gn, Bf
+                     */
+                    @Test
+                    void donutReordering() {
+                        //Setup trees
+                        DiffTree<String> g1 = createGNode(true);
+                        DiffTree<String> f1 = createFNode(true);
+                        DiffTree<String> e1 = createENode(true);
+                        DiffTree<String> d1 = createDNode(true);
+                        DiffTree<String> c1 = createCNode(true);
+                        DiffTree<String> b1 = createBNode(true);
+                        DiffTree<String> a1 = createANode(true, b1, c1, d1, e1, f1, g1);
+
+                        DiffTree<String> g2 = createGNode(false);
+                        DiffTree<String> f2 = createFNode(false);
+                        DiffTree<String> e2 = createENode(false);
+                        DiffTree<String> d2 = createDNode(false);
+                        DiffTree<String> c2 = createCNode(false);
+                        DiffTree<String> b2 = createBNode(false);
+                        DiffTree<String> a2 = createANode(false, c2, e2, f2, d2, g2, b2);
+
+                        //Match trees
+                        a1.setMatch(a2);
+                        b1.setMatch(b2);
+                        c1.setMatch(c2);
+                        d1.setMatch(d2);
+                        e1.setMatch(e2);
+                        f1.setMatch(f2);
+                        g1.setMatch(g2);
+
+                        populateDiffTree.populateDiffTree(a1, a2);
+                        DiffTree<String> b1_mt = b1;
+                        DiffTree<String> b1_mf = getSingleChild(a1, 7);
+                        DiffTree<String> d1_mt = d1;
+                        DiffTree<String> d1_mf = getSingleChild(a1, 5);
+
+                        assertChildNumber(b1_mt, 0);
+                        assertChildNumber(c1, 1);
+                        assertChildNumber(d1_mt, 2);
+                        assertChildNumber(e1, 3);
+                        assertChildNumber(f1, 4);
+                        assertChildNumber(d1_mf, 5);
+                        assertChildNumber(g1, 6);
+                        assertChildNumber(b1_mf, 7);
+
+                        assertMovedFrom(b1_mf);
+                        assertMovedTo(b1_mt);
+                        assertMovedFrom(d1_mf);
+                        assertMovedTo(d1_mt);
+                        assertNone(c1);
+                        assertNone(e1);
+                        assertNone(f1);
+                        assertNone(g1);
+
+                        assertPointsAt(b1_mf, b1_mt);
+                        assertPointsAt(d1_mf, d1_mt);
+                    }
+
+                    /**
+                     * A chainlink reordering is where either the start point or end point of some reordering is in the critical region of some other reordering
+                     * 1: B, C, D, E, F, G
+                     * 2: C, E, F, B, G, D
+                     * Bt, Cn, Dt, En, Fn, Bf, Gn, Df
+                     */
+                    @Test
+                    void chainlinkReordering() {
+                        //Setup trees
+                        DiffTree<String> g1 = createGNode(true);
+                        DiffTree<String> f1 = createFNode(true);
+                        DiffTree<String> e1 = createENode(true);
+                        DiffTree<String> d1 = createDNode(true);
+                        DiffTree<String> c1 = createCNode(true);
+                        DiffTree<String> b1 = createBNode(true);
+                        DiffTree<String> a1 = createANode(true, b1, c1, d1, e1, f1, g1);
+
+                        DiffTree<String> g2 = createGNode(false);
+                        DiffTree<String> f2 = createFNode(false);
+                        DiffTree<String> e2 = createENode(false);
+                        DiffTree<String> d2 = createDNode(false);
+                        DiffTree<String> c2 = createCNode(false);
+                        DiffTree<String> b2 = createBNode(false);
+                        DiffTree<String> a2 = createANode(false, c2, e2, f2, b2, g2, d2);
+
+                        //Match trees
+                        a1.setMatch(a2);
+                        b1.setMatch(b2);
+                        c1.setMatch(c2);
+                        d1.setMatch(d2);
+                        e1.setMatch(e2);
+                        f1.setMatch(f2);
+                        g1.setMatch(g2);
+
+                        populateDiffTree.populateDiffTree(a1, a2);
+                        DiffTree<String> b1_mt = b1;
+                        DiffTree<String> b1_mf = getSingleChild(a1, 5);
+                        DiffTree<String> d1_mt = d1;
+                        DiffTree<String> d1_mf = getSingleChild(a1, 7);
+
+                        assertChildNumber(b1_mt, 0);
+                        assertChildNumber(c1, 1);
+                        assertChildNumber(d1_mt, 2);
+                        assertChildNumber(e1, 3);
+                        assertChildNumber(f1, 4);
+                        assertChildNumber(b1_mf, 5);
+                        assertChildNumber(g1, 6);
+                        assertChildNumber(d1_mf, 7);
+
+                        assertMovedFrom(b1_mf);
+                        assertMovedTo(b1_mt);
+                        assertMovedFrom(d1_mf);
+                        assertMovedTo(d1_mt);
+                        assertNone(c1);
+                        assertNone(e1);
+                        assertNone(f1);
+                        assertNone(g1);
+
+                        assertPointsAt(b1_mf, b1_mt);
+                        assertPointsAt(d1_mf, d1_mt);
+                    }
+
+                    /**
+                     * A twin reordering is where there are two reorderings with distinct critical regions
+                     * 1: B, C, D, E, F, G
+                     * 2: C, D, B, F, G, E
+                     * Bt, Cn, Dn, Bf, Et, Fn, Gn, Ef
+                     */
+                    @Test
+                    void twinReordering() {
+                        //Setup trees
+                        DiffTree<String> g1 = createGNode(true);
+                        DiffTree<String> f1 = createFNode(true);
+                        DiffTree<String> e1 = createENode(true);
+                        DiffTree<String> d1 = createDNode(true);
+                        DiffTree<String> c1 = createCNode(true);
+                        DiffTree<String> b1 = createBNode(true);
+                        DiffTree<String> a1 = createANode(true, b1, c1, d1, e1, f1, g1);
+
+                        DiffTree<String> g2 = createGNode(false);
+                        DiffTree<String> f2 = createFNode(false);
+                        DiffTree<String> e2 = createENode(false);
+                        DiffTree<String> d2 = createDNode(false);
+                        DiffTree<String> c2 = createCNode(false);
+                        DiffTree<String> b2 = createBNode(false);
+                        DiffTree<String> a2 = createANode(false, c2, d2, b2, f2, g2, e2);
+
+                        //Match trees
+                        a1.setMatch(a2);
+                        b1.setMatch(b2);
+                        c1.setMatch(c2);
+                        d1.setMatch(d2);
+                        e1.setMatch(e2);
+                        f1.setMatch(f2);
+                        g1.setMatch(g2);
+
+                        populateDiffTree.populateDiffTree(a1, a2);
+                        DiffTree<String> b1_mt = b1;
+                        DiffTree<String> b1_mf = getSingleChild(a1, 3);
+                        DiffTree<String> e1_mt = e1;
+                        DiffTree<String> e1_mf = getSingleChild(a1, 7);
+
+                        assertChildNumber(b1_mt, 0);
+                        assertChildNumber(c1, 1);
+                        assertChildNumber(d1, 2);
+                        assertChildNumber(b1_mf, 3);
+                        assertChildNumber(e1_mt, 4);
+                        assertChildNumber(f1, 5);
+                        assertChildNumber(g1, 6);
+                        assertChildNumber(e1_mf, 7);
+
+                        assertMovedFrom(b1_mf);
+                        assertMovedTo(b1_mt);
+                        assertMovedFrom(e1_mf);
+                        assertMovedTo(e1_mt);
+                        assertNone(c1);
+                        assertNone(e1);
+                        assertNone(f1);
+                        assertNone(g1);
+
+                        assertPointsAt(b1_mf, b1_mt);
+                        assertPointsAt(e1_mf, e1_mt);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Tests where the nodes have different parents.
+         */
+        @Nested
+        class DifferentParents
+        {
+            /**
+             * In A1, we have B1 and C1. In B1, we have D1. In C1, we have E1.
+             * In A2, we have B2 and C2. C2 has E2 and D2.
+             * We expect D1 to be moved from B1 to C1, to the correct location (after E1).
+             * Everything else should be in the same location, with type NONE.
+             */
+            @Test
+            void movingInSameLevel()
+            {
+                //Setup trees
+                DiffTree<String> e1 = createNode("E1", Collections.emptyList(), true);
+                DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
+                DiffTree<String> c1 = createNode("C1", Arrays.asList(e1), true);
+                DiffTree<String> b1 = createNode("B1", Arrays.asList(d1), true);
+                DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1), true);
+
+                DiffTree<String> e2 = createNode("E2", Collections.emptyList(), false);
+                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
+                DiffTree<String> c2 = createNode("C2", Arrays.asList(e2, d2), false);
+                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
+                DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, c2), false);
+
+                //Match trees
+                a1.setMatch(a2);
+                b1.setMatch(b2);
+                c1.setMatch(c2);
+                d1.setMatch(d2);
+                e1.setMatch(e2);
+
+                populateDiffTree.populateDiffTree(a1, a2);
+                DiffTree<String> d1_mt = d1;
+                DiffTree<String> d1_mf = getSingleChild(c1, 1);
+
+                assertParent(b1, a1);
+                assertParent(c1, a1);
+                assertChildNumber(b1, 0);
+                assertChildNumber(c1, 1);
+                assertParent(d1_mt, b1);
+                assertChildNumber(d1_mt, 0);
+                assertParent(e1, c1);
+                assertParent(d1_mf, c1);
+                assertChildNumber(e1, 0);
+                assertChildNumber(d1_mf, 1);
+
+                assertNone(a1);
+                assertNone(b1);
+                assertNone(c1);
+                assertNone(e1);
+                assertMovedFrom(d1_mf);
+                assertMovedTo(d1_mt);
+
+                assertPointsAt(d1_mf, d1_mt);
+            }
+
+            /**
+             * In A1, we have B1. In B1, we have D1.
+             * In A2, we have B2 and D2.
+             * We expect D1 to be moved from B1 to A1, to the correct location (after B1).
+             * Everything else should be in the same location, with type NONE.
+             */
+            @Test
+            void movingToUpperLevel()
+            {
+                //Setup trees
+                DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
+                DiffTree<String> b1 = createNode("B1", Arrays.asList(d1), true);
+                DiffTree<String> a1 = createNode("A1", Arrays.asList(b1), true);
+
+                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
+                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
+                DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, d2), false);
+
+                //Match trees
+                a1.setMatch(a2);
+                b1.setMatch(b2);
+                d1.setMatch(d2);
+
+                populateDiffTree.populateDiffTree(a1, a2);
+                DiffTree<String> d1_mt = d1;
+                DiffTree<String> d1_mf = getSingleChild(a1, 1);
+
+                assertParent(b1, a1);
+                assertParent(d1_mf, a1);
+                assertChildNumber(b1, 0);
+                assertChildNumber(d1_mf, 1);
+                assertParent(d1_mt, b1);
+                assertChildNumber(d1_mt, 0);
+
+                assertNone(a1);
+                assertNone(b1);
+                assertMovedFrom(d1_mf);
+                assertMovedTo(d1_mt);
+
+                assertPointsAt(d1_mf, d1_mt);
+            }
+
+            /**
+             * In A1, we have D1 and C1. In C1, we have E1.
+             * In A2, we have C2. C2 has E2 and D2.
+             * We expect D1 to be moved from A1 to C1, to the correct location (after E1).
+             * Everything else should be in the same location, with type NONE.
+             */
+            @Test
+            void movingToLowerLevel()
+            {
+                //Setup trees
+                DiffTree<String> e1 = createNode("E1", Collections.emptyList(), true);
+                DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
+                DiffTree<String> c1 = createNode("C1", Arrays.asList(e1), true);
+                DiffTree<String> a1 = createNode("A1", Arrays.asList(d1, c1), true);
+
+                DiffTree<String> e2 = createNode("E2", Collections.emptyList(), false);
+                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
+                DiffTree<String> c2 = createNode("C2", Arrays.asList(e2, d2), false);
+                DiffTree<String> a2 = createNode("A2", Arrays.asList(c2), false);
+
+                //Match trees
+                a1.setMatch(a2);
+                c1.setMatch(c2);
+                d1.setMatch(d2);
+                e1.setMatch(e2);
+
+                populateDiffTree.populateDiffTree(a1, a2);
+                DiffTree<String> d1_mt = d1;
+                DiffTree<String> d1_mf = getSingleChild(c1, 1);
+
+                assertParent(d1_mt, a1);
+                assertParent(c1, a1);
+                assertChildNumber(d1_mt, 0);
+                assertChildNumber(c1, 1);
+                assertParent(e1, c1);
+                assertParent(d1_mf, c1);
+                assertChildNumber(e1, 0);
+                assertChildNumber(d1_mf, 1);
+
+                assertNone(a1);
+                assertNone(c1);
+                assertNone(e1);
+                assertMovedFrom(d1_mf);
+                assertMovedTo(d1_mt);
+
+                assertPointsAt(d1_mf, d1_mt);
+            }
+
+            @Nested
+            class Creation
+            {
+                /**
+                 * In A1, we have B1.
+                 * In A2, we have C2. C2 has B2.
+                 * We expect B1 to move from A1 into C1.
+                 */
+                @Test
+                void movingIntoCreatedNode()
+                {
+                    //Setup trees
+                    DiffTree<String> b1 = createBNode(true);
+                    DiffTree<String> a1 = createANode(true, b1);
+
+                    DiffTree<String> b2 = createBNode(false);
+                    DiffTree<String> c2 = createCNode(false, b2);
+                    DiffTree<String> a2 = createCNode(false, c2);
+
+                    //Match trees
+                    a1.setMatch(a2);
+                    b1.setMatch(b2);
+
+                    populateDiffTree.populateDiffTree(a1, a2);
+                    DiffTree<String> c1 = getSingleChild(a1, 1);
+                    DiffTree<String> b1_mt = b1;
+                    DiffTree<String> b1_mf = getSingleChild(c1, 0);
+
+                    assertParent(b1_mt, a1);
+                    assertParent(c1, a1);
+                    assertChildNumber(b1_mt, 0);
+                    assertChildNumber(c1, 1);
+                    assertParent(b1_mf, c1);
+
+                    assertMovedFrom(b1_mf);
+                    assertMovedTo(b1_mt);
+                    assertCreated(c1);
+                }
+            }
+
+            @Nested
+            class Deletion
+            {
+                /**
+                 * In A1, we have C1. C1 has B1.
+                 * In A2, we have B2.
+                 * We expect B1 to move from C1 into A1.
+                 */
+                @Test
+                void movingOutOfDeletedNode()
+                {
+                    //Setup trees
+                    DiffTree<String> b1 = createBNode(true);
+                    DiffTree<String> c1 = createCNode(true, b1);
+                    DiffTree<String> a1 = createANode(true, c1);
+
+                    DiffTree<String> b2 = createBNode(false);
+                    DiffTree<String> a2 = createCNode(false, b2);
+
+                    //Match trees
+                    a1.setMatch(a2);
+                    b1.setMatch(b2);
+
+                    populateDiffTree.populateDiffTree(a1, a2);
+                    DiffTree<String> b1_mt = b1;
+                    DiffTree<String> b1_mf = getSingleChild(a1, 0);
+
+                    assertParent(b1_mf, a1);
+                    assertParent(c1, a1);
+                    assertChildNumber(b1_mf, 0);
+                    assertChildNumber(c1, 1);
+                    assertParent(b1_mt, c1);
+
+                    assertMovedFrom(b1_mf);
+                    assertMovedTo(b1_mt);
+                    assertDeleted(c1);
                 }
             }
         }

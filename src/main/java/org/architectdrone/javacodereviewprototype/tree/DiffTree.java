@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -123,7 +124,7 @@ public class DiffTree<L> {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(MessageFormat.format("[{0}] {1}:{2} => ", isOriginal ? "O" : "M", label, value));
+        builder.append(MessageFormat.format("[{0}] [{3}] [#{4}]{1}:{2} => ", isOriginal ? "O" : "M", label, value, getReferenceType(), childNumber));
         if (!isMatched)
         {
             builder.append("NONE ");
@@ -311,6 +312,7 @@ public class DiffTree<L> {
 
     public void rectifyNodes()
     {
+        EnumSet<ReferenceType> collapsableTypes = EnumSet.of(ReferenceType.CREATE, ReferenceType.DELETE, ReferenceType.MOVE_FROM);
         children.sort(Comparator.comparingInt(DiffTree::getChildNumber));
         int numberOfDeletes = 0;
         DiffTree<L> previousChild = null;
@@ -324,14 +326,15 @@ public class DiffTree<L> {
             }
 
             child.setChildNumber(child.getChildNumber()+numberOfDeletes);
+            int changeVector = child.getReferenceType().linesCreated + previousChild.getReferenceType().linesCreated;
             //Collapsing
-            if ((child.getChildNumber() != previousChild.getChildNumber()) && (child.getReferenceType() != ReferenceType.NONE && previousChild.getReferenceType() != ReferenceType.NONE))
+            if ((child.getChildNumber() != previousChild.getChildNumber()) && (changeVector == 0) && child.getReferenceType().linesCreated != 0)
             {
                     numberOfDeletes -= 1;
                     child.setChildNumber(child.getChildNumber()-1);
             }
             //Uncollapsing
-            if ((child.getChildNumber() == previousChild.getChildNumber()) && (child.getReferenceType() == ReferenceType.NONE || previousChild.getReferenceType() == ReferenceType.NONE))
+            if ((child.getChildNumber() == previousChild.getChildNumber()) && (changeVector != 0))
             {
                     numberOfDeletes += 1;
                     child.setChildNumber(child.getChildNumber()+1);

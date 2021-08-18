@@ -1,10 +1,11 @@
 package org.architectdrone.javacodereviewprototype.tree;
 
-import com.github.javaparser.utils.Pair;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -107,6 +108,50 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                 createdNodeParent.insertAndShiftUp(createdNode);
             }
 
+            List<DiffTree<L>> allMisMatchedNodes = originalNodes
+                    .stream()
+                    .filter(DiffTree::isMatched)
+                    .filter(a -> a.getParent() == a.getMatch().getParent().getMatch())
+                    .filter(a -> a.getChildNumber() != a.getMatch().getChildNumber())
+                    .collect(Collectors.toList());
+            Map<DiffTree<L>, List<DiffTree<L>>> parentToMismatchedNodes = new HashMap<>();
+            for (DiffTree<L> node : allMisMatchedNodes)
+            {
+                parentToMismatchedNodes.compute(node.getParent(), (k, v) -> {
+                    if (v == null)
+                    {
+                        v = new ArrayList<>();
+                    }
+                    v.add(node);
+                    return v;
+                });
+            }
+            for (Map.Entry<DiffTree<L>, List<DiffTree<L>>> parentAndMisMatchedChildren : parentToMismatchedNodes.entrySet())
+            {
+                List<DiffTree<L>> sortedMismatchedNodes = parentAndMisMatchedChildren
+                        .getValue()
+                        .stream()
+                        .sorted(Comparator.comparingInt(a -> -1*Math.abs(a.getChildNumber() - a.getMatch().getChildNumber())))
+                        .collect(Collectors.toList());
+                for (DiffTree<L> mismatchedNode : sortedMismatchedNodes)
+                {
+                    if (mismatchedNode.getChildNumber() != mismatchedNode.getMatch().getChildNumber())
+                    {
+                        mismatchedNode.setReferenceType(ReferenceType.MOVE_TO);
+                        mismatchedNode.getParent().shiftDownAfterChild(mismatchedNode.getChildNumber());
+
+                        DiffTree<L> moveFromNode = new DiffTree<L>(mismatchedNode.getLabel(), mismatchedNode.getValue(), Collections.emptyList(), true);
+                        mismatchedNode.setReferenceLocation(moveFromNode);
+
+                        moveFromNode.setChildNumber(mismatchedNode.getMatch().getChildNumber());
+                        moveFromNode.setParent(mismatchedNode.getParent());
+                        moveFromNode.setHasAdvancedDataBeenPopulated(true);
+                        moveFromNode.setReferenceType(ReferenceType.MOVE_FROM);
+                        mismatchedNode.getParent().insertAndShiftUp(moveFromNode);
+
+                    }
+                }
+            }
         }
         treeA.rectifyNodes();
     }

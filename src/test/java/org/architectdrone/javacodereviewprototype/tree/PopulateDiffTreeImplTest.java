@@ -1056,7 +1056,7 @@ class PopulateDiffTreeImplTest {
                      * At 0, we want B1, MF.
                      * At 1, we want D1, NONE.
                      * At 2, we want B1, MT.
-                     * At 3, we want C1, CREATE.
+                     * At 2, we want C1, CREATE.
                      */
                     @Test
                     void perfectSwap_andNodeAfter_works()
@@ -1078,13 +1078,13 @@ class PopulateDiffTreeImplTest {
 
                         populateDiffTree.populateDiffTree(a1, a2);
                         DiffTree<String> b1_mt = b1;
-                        DiffTree<String> b1_mf = getSingleChild(a1, 2);
-                        DiffTree<String> c1 = getSingleChild(a1, 3);
+                        DiffTree<String> b1_mf = getSingleChild(a1, 0);
+                        DiffTree<String> c1 = getNodeWithType(a1, ReferenceType.CREATE);
 
-                        assertChildNumber(b1_mt, 0);
+                        assertChildNumber(b1_mf, 0);
                         assertChildNumber(d1, 1);
-                        assertChildNumber(b1_mf, 2);
-                        assertChildNumber(c1, 3);
+                        assertChildNumber(b1_mt, 2);
+                        assertChildNumber(c1, 2);
 
                         assertMovedFrom(b1_mf);
                         assertNone(d1);

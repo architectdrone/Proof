@@ -29,6 +29,10 @@ public class DiffTree<L> {
     private int childNumber;
     @Setter private boolean hasAdvancedDataBeenPopulated;
 
+    @Getter @Setter private DiffTree<L> next;
+    @Getter @Setter private DiffTree<L> previous;
+    @Getter @Setter private DiffTree<L> first;
+
     //Container data
     @Getter
     final L label; //The label of the root node
@@ -76,7 +80,7 @@ public class DiffTree<L> {
     public DiffTree(final L label, final String value, final List<DiffTree<L>> children, boolean isOriginal) {
         this.label = label;
         this.value = value;
-        this.children = children;
+        this.children = new ArrayList<>(children);
         this.isOriginal = isOriginal;
     }
 
@@ -103,6 +107,11 @@ public class DiffTree<L> {
         {
             match.setMatch(this);
         }
+    }
+
+    public void unmatch()
+    {
+        this.match = null;
     }
 
     public List<DiffTree<L>> getLeaves() {
@@ -240,8 +249,23 @@ public class DiffTree<L> {
             throw new RuntimeException("Advanced tree data has already been populated.");
         }
 
+        if (getChildren().size() != 0)
+        {
+            first = getChildren().get(0);
+        }
+
         for (int i = 0; i < getChildren().size(); i++) {
             DiffTree<L> child = getChildren().get(i);
+            if (i != 0)
+            {
+                child.setPrevious(getChildren().get(i-1));
+            }
+
+            if (i != getChildren().size()-1)
+            {
+                child.setNext(getChildren().get(i+1));
+            }
+
             child.setChildNumber(i);
             child.setParent(this);
             child.populateAdvancedData();
@@ -312,36 +336,136 @@ public class DiffTree<L> {
 
     public void rectifyNodes()
     {
-        EnumSet<ReferenceType> collapsableTypes = EnumSet.of(ReferenceType.CREATE, ReferenceType.DELETE, ReferenceType.MOVE_FROM);
-        children.sort(Comparator.comparingInt(DiffTree::getChildNumber));
-        int numberOfDeletes = 0;
-        DiffTree<L> previousChild = null;
-        for (DiffTree<L> child : children)
+        DiffTree<L> current = getFirst();
+        int childNumber = -1;
+        while (true)
         {
-            if (previousChild == null)
+            if (current == null)
             {
-                child.setChildNumber(0);
-                previousChild = child;
-                continue;
+                break;
+            }
+            if (current.getPrevious() == null || current.getPrevious() != null && current.getReferenceType().linesCreated + current.getPrevious()
+                    .getReferenceType().linesCreated != 0 || current.getReferenceType() == ReferenceType.NONE) {
+                        childNumber++;
+                    }
+            current.setChildNumber(childNumber);
+            current.rectifyNodes();
+            current = current.getNext();
+        }
+    }
+
+    /**
+     * Inserts a node after some other node.
+     * Should be called on the parent of before
+     * @param before The node before the new node
+     * @param newNode The new node
+     */
+    public void insertNodeAfter(DiffTree<L> before, DiffTree<L> newNode)
+    {
+        if (before == null)
+        {
+            newNode.setNext(getFirst());
+            if (getFirst() != null)
+            {
+                getFirst().setPrevious(newNode);
+            }
+            setFirst(newNode);
+        }
+        else
+        {
+            DiffTree<L> oldAfter = before.getNext();
+            before.setNext(newNode);
+            newNode.setNext(oldAfter);
+            newNode.setPrevious(before);
+            if (oldAfter != null)
+            {
+                oldAfter.setPrevious(newNode);
+            }
+        }
+
+        children.add(newNode);
+    }
+
+    public DiffTree<L> getNextMatched()
+    {
+        DiffTree<L> toReturn = this.getNext();
+        while (true)
+        {
+            if (toReturn == null)
+            {
+                return null;
+            }
+            if (toReturn.isMatched && toReturn.getParent() == getParent())
+            {
+                return toReturn;
+            }
+            toReturn = toReturn.getNext();
+        }
+    }
+
+    public DiffTree<L> getPreviousMatched()
+    {
+        DiffTree<L> toReturn = this.getPrevious();
+        while (true)
+        {
+            if (toReturn == null)
+            {
+                return null;
+            }
+            if (toReturn.isMatched && toReturn.getParent() == getParent())
+            {
+                return toReturn;
+            }
+            toReturn = toReturn.getPrevious();
+        }
+    }
+
+    public int getMisalignmentSize(DiffTree<L> a, DiffTree<L> b)
+    {
+        boolean bIsNextOfA = b.getNextMatched() == a;
+
+        DiffTree<L> bNextMatch = b.getMatch().getNextMatched();
+        DiffTree<L> bPrevMatch = b.getMatch().getPreviousMatched();
+
+        int misalignmentSize = 1;
+        boolean misaligned = false;
+        boolean isNext = true;
+        while (true)
+        {
+            if (bNextMatch == a.getMatch() && bIsNextOfA)
+            {
+                misaligned = !bIsNextOfA;
+                isNext = true;
+                break;
+            }
+            else if (bPrevMatch == a.getMatch() && !bIsNextOfA)
+            {
+                misaligned = bIsNextOfA;
+                isNext = false;
+                break;
+            }
+            else {
+                bNextMatch = bNextMatch.getNextMatched();
+                bPrevMatch = bPrevMatch.getPreviousMatched();
+                misalignmentSize++;
             }
 
-            child.setChildNumber(child.getChildNumber()+numberOfDeletes);
-            int changeVector = child.getReferenceType().linesCreated + previousChild.getReferenceType().linesCreated;
-            //Collapsing
-            if ((child.getChildNumber() != previousChild.getChildNumber()) && (changeVector == 0) && child.getReferenceType().linesCreated != 0)
-            {
-                    numberOfDeletes -= 1;
-                    child.setChildNumber(child.getChildNumber()-1);
-            }
-            //Uncollapsing
-            if ((child.getChildNumber() == previousChild.getChildNumber()) && (changeVector != 0))
-            {
-                    numberOfDeletes += 1;
-                    child.setChildNumber(child.getChildNumber()+1);
-            }
+        }
 
-            previousChild = child;
-            child.rectifyNodes();
+        if (misaligned)
+        {
+            if (!isNext)
+            {
+
+                return -1*misalignmentSize;
+            }
+            else {
+                return misalignmentSize;
+            }
+        }
+        else
+        {
+            return 0;
         }
     }
 }

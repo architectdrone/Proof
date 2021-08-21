@@ -9,6 +9,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
@@ -389,36 +390,38 @@ public class DiffTree<L> {
 
     public DiffTree<L> getNextMatched()
     {
-        DiffTree<L> toReturn = this.getNext();
-        while (true)
-        {
-            if (toReturn == null)
-            {
-                return null;
-            }
-            if (toReturn.isMatched && toReturn.getParent() == getParent())
-            {
-                return toReturn;
-            }
-            toReturn = toReturn.getNext();
-        }
+        return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent());
+//        DiffTree<L> toReturn = this.getNext();
+//        while (true)
+//        {
+//            if (toReturn == null)
+//            {
+//                return null;
+//            }
+//            if (toReturn.isMatched && toReturn.getParent() == getParent())
+//            {
+//                return toReturn;
+//            }
+//            toReturn = toReturn.getNext();
+//        }
     }
 
     public DiffTree<L> getPreviousMatched()
     {
-        DiffTree<L> toReturn = this.getPrevious();
-        while (true)
-        {
-            if (toReturn == null)
-            {
-                return null;
-            }
-            if (toReturn.isMatched && toReturn.getParent() == getParent())
-            {
-                return toReturn;
-            }
-            toReturn = toReturn.getPrevious();
-        }
+        return DiffTree.getNodeGeneric(this.getPrevious(), 0, DiffTree::getPrevious, a -> a.isMatched && a.getParent() == this.getParent());
+//        DiffTree<L> toReturn = this.getPrevious();
+//        while (true)
+//        {
+//            if (toReturn == null)
+//            {
+//                return null;
+//            }
+//            if (toReturn.isMatched && toReturn.getParent() == getParent())
+//            {
+//                return toReturn;
+//            }
+//            toReturn = toReturn.getPrevious();
+//        }
     }
 
     public int getMisalignmentSize(DiffTree<L> a, DiffTree<L> b)
@@ -467,6 +470,28 @@ public class DiffTree<L> {
         else
         {
             return 0;
+        }
+    }
+
+    public static <L> DiffTree<L> getNodeGeneric(DiffTree<L> start,  int index, Function<DiffTree<L>, DiffTree<L>> iterator, Predicate<DiffTree<L>> discriminator)
+    {
+        int currentIndex = 0;
+        DiffTree<L> current = start;
+        while (true)
+        {
+            if (current == null)
+            {
+                return null;
+            }
+            if (discriminator.test(current))
+            {
+                if (currentIndex == index)
+                {
+                    return current;
+                }
+                currentIndex++;
+            }
+            current = iterator.apply(current);
         }
     }
 }

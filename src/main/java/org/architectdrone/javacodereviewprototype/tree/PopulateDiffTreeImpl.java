@@ -8,6 +8,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.architectdrone.javacodereviewprototype.tree.DiffTree.getNodeGeneric;
+
 /**
  * The algorithm used here is of my own creation.
  *
@@ -307,27 +309,5 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
 //            }
         }
         treeA.rectifyNodes();
-    }
-
-    private <L> DiffTree<L> getNodeGeneric(DiffTree<L> start,  int index, Function<DiffTree<L>, DiffTree<L>> iterator, Predicate<DiffTree<L>> discriminator)
-    {
-        int currentIndex = 0;
-        DiffTree<L> current = start;
-        while (true)
-        {
-            if (current == null)
-            {
-                return null;
-            }
-            if (discriminator.test(current))
-            {
-                if (currentIndex == index)
-                {
-                    return current;
-                }
-                currentIndex++;
-            }
-            current = iterator.apply(current);
-        }
     }
 }

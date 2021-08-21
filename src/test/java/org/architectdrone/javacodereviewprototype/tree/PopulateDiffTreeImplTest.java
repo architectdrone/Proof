@@ -127,13 +127,13 @@ class PopulateDiffTreeImplTest {
         static void assertMovedTo(DiffTree<String> node)
         {
             assertEquals(ReferenceType.MOVE_TO, node.getReferenceType());
-            assertTrue(node.isMatched());
+            assertFalse(node.isMatched());
         }
 
         static void assertMovedFrom(DiffTree<String> node)
         {
             assertEquals(ReferenceType.MOVE_FROM, node.getReferenceType());
-            assertFalse(node.isMatched());
+            assertTrue(node.isMatched());
         }
 
         static void assertNone(DiffTree<String> node)
@@ -1053,10 +1053,10 @@ class PopulateDiffTreeImplTest {
                      * In the original tree, we have B1, D1.
                      * In the modified tree, we have D2, B2, C2.
                      *
-                     * At 0, we want B1, MF.
+                     * At 0, we want B1, MT.
                      * At 1, we want D1, NONE.
-                     * At 2, we want B1, MT.
-                     * At 2, we want C1, CREATE.
+                     * At 2, we want B1, MF.
+                     * At 3, we want C1, CREATE.
                      */
                     @Test
                     void perfectSwap_andNodeAfter_works()
@@ -1078,13 +1078,13 @@ class PopulateDiffTreeImplTest {
 
                         populateDiffTree.populateDiffTree(a1, a2);
                         DiffTree<String> b1_mt = b1;
-                        DiffTree<String> b1_mf = getSingleChild(a1, 0);
+                        DiffTree<String> b1_mf = getSingleChild(a1, 2);
                         DiffTree<String> c1 = getNodeWithType(a1, ReferenceType.CREATE);
 
-                        assertChildNumber(b1_mf, 0);
+                        assertChildNumber(b1_mt, 0);
                         assertChildNumber(d1, 1);
-                        assertChildNumber(b1_mt, 2);
-                        assertChildNumber(c1, 2);
+                        assertChildNumber(b1_mf, 2);
+                        assertChildNumber(c1, 3);
 
                         assertMovedFrom(b1_mf);
                         assertNone(d1);
@@ -1406,7 +1406,7 @@ class PopulateDiffTreeImplTest {
                                 assertCreated(f1);
                                 assertMovedTo(b1_mt);
 
-                                assertPointsAt(b1_mf, b1_mt);
+                                assertPointsAt(b1_mt, b1_mf);
                             }
 
                             /**
@@ -2402,6 +2402,7 @@ class PopulateDiffTreeImplTest {
             @Test
             void movingToLowerLevel()
             {
+                fail("Fix: This one has an inifinite loop somewhere!");
                 //Setup trees
                 DiffTree<String> e1 = createNode("E1", Collections.emptyList(), true);
                 DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);

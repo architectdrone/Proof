@@ -112,6 +112,7 @@ public class DiffTree<L> {
     public void unmatch()
     {
         this.match = null;
+        this.isMatched = false;
     }
 
     public List<DiffTree<L>> getLeaves() {
@@ -428,25 +429,25 @@ public class DiffTree<L> {
         DiffTree<L> bPrevMatch = b.getMatch().getPreviousMatched();
 
         int misalignmentSize = 1;
-        boolean misaligned = false;
-        boolean isNext = true;
+        boolean misaligned;
+        boolean isNext;
         while (true)
         {
-            if (bNextMatch == a.getMatch() && bIsNextOfA)
-            {
-                misaligned = !bIsNextOfA;
-                isNext = true;
-                break;
-            }
-            else if (bPrevMatch == a.getMatch() && !bIsNextOfA)
+            if (bPrevMatch == a.getMatch())
             {
                 misaligned = bIsNextOfA;
                 isNext = false;
                 break;
             }
+            else if (bNextMatch == a.getMatch())
+            {
+                misaligned = !bIsNextOfA;
+                isNext = true;
+                break;
+            }
             else {
-                bNextMatch = bNextMatch.getNextMatched();
-                bPrevMatch = bPrevMatch.getPreviousMatched();
+                bNextMatch = bNextMatch != null ? bNextMatch.getNextMatched() : null;
+                bPrevMatch = bPrevMatch != null ? bPrevMatch.getPreviousMatched() : null;
                 misalignmentSize++;
             }
 

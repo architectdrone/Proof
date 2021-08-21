@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -81,20 +83,10 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                     Integer maximumMisalignment = 0;
 
                     //Populate misalignment map
-                    DiffTree<L> current = parent.getFirst();
+                    DiffTree<L> current = getNodeGeneric(parent.getFirst(), 0, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE && a.isMatched());
                     while (true)
                     {
-                        if (current == null)
-                        {
-                            break;
-                        }
-                        if (!current.isMatched())
-                        {
-                            current = current.getNextMatched();
-                            break;
-                        }
-                        DiffTree<L> nextMatched = current.getNextMatched();
-
+                        DiffTree<L> nextMatched = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
                         if (nextMatched == null)
                         {
                             break;
@@ -113,17 +105,14 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                         break;
                     }
 
-                    DiffTree<L> beforeNewNode = maximumMisalignedNode;
-                    for (int i = 0; i < Math.abs(maximumMisalignment); i++) {
-                        assert beforeNewNode != null;
-                        if (maximumMisalignment < 0)
-                        {
-                            beforeNewNode = beforeNewNode.getPrevious();
-                        }
-                        else
-                        {
-                            beforeNewNode = beforeNewNode.getNext();
-                        }
+                    DiffTree<L> beforeNewNode;
+                    if (maximumMisalignment < 0)
+                    {
+                        beforeNewNode = getNodeGeneric(maximumMisalignedNode, -1*maximumMisalignment, DiffTree::getPreviousMatched, a -> true);
+                    }
+                    else
+                    {
+                        beforeNewNode = getNodeGeneric(maximumMisalignedNode, maximumMisalignment, DiffTree::getNextMatched, a -> true);
                     }
 
                     maximumMisalignedNode.setReferenceType(ReferenceType.MOVE_TO);
@@ -137,6 +126,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                     moveFromNode.setReferenceType(ReferenceType.MOVE_FROM);
 
                     parent.insertNodeAfter(beforeNewNode, moveFromNode);
+                    maximumMisalignedNode.getMatch().unmatch();
                     moveFromNode.setMatch(maximumMisalignedNode.getMatch());
                     maximumMisalignedNode.unmatch();
                 }
@@ -176,7 +166,11 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                             createdNode.setMatch(current);
                             createdNode.setReferenceType(ReferenceType.CREATE);
 
-                            DiffTree<L> previous = current.getPrevious();
+                            /*
+                             * We want to place the new node after the node before's match
+                             * Unless the node before's match is a MOVE_FROM, in which case we want to move it to the node before
+                             */
+                            DiffTree<L> previous = getNodeGeneric(current, 1, DiffTree::getPreviousMatched, a -> true);
                             DiffTree<L> previousMatch = previous != null ? previous.getMatch() : null;
                             parent.insertNodeAfter(previousMatch, createdNode);
                         }
@@ -215,12 +209,12 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                     {
                         break;
                     }
-                    else if (!current.isMatched())
+                    else if (!current.isMatched() && (current.getReferenceType() == ReferenceType.NONE))
                     {
                         //Delete
                         current.setReferenceType(ReferenceType.DELETE);
                     }
-                    else if (current.getParent() != current.getMatch().getParent().getMatch())
+                    else if ((current.getReferenceType() == ReferenceType.NONE) && current.getParent() != current.getMatch().getParent().getMatch())
                     {
                         current.setReferenceType(ReferenceType.MOVE_TO);
                         current.setReferenceLocation(current.getMatch());
@@ -313,5 +307,27 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
 //            }
         }
         treeA.rectifyNodes();
+    }
+
+    private <L> DiffTree<L> getNodeGeneric(DiffTree<L> start,  int index, Function<DiffTree<L>, DiffTree<L>> iterator, Predicate<DiffTree<L>> discriminator)
+    {
+        int currentIndex = 0;
+        DiffTree<L> current = start;
+        while (true)
+        {
+            if (current == null)
+            {
+                return null;
+            }
+            if (discriminator.test(current))
+            {
+                if (currentIndex == index)
+                {
+                    return current;
+                }
+                currentIndex++;
+            }
+            current = iterator.apply(current);
+        }
     }
 }

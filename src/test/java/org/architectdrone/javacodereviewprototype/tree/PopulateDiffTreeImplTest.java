@@ -19,24 +19,6 @@ class PopulateDiffTreeImplTest {
 
     static class Utils
     {
-        enum TreeNames
-        {
-            A("A"),
-            B("B"),
-            C("C"),
-            D("D"),
-            E("E"),
-            F("F"),
-            G("G");
-
-            String name;
-
-            TreeNames(String name)
-            {
-                this.name = name;
-            }
-        }
-
         static DiffTree<String> createNode(String name, List<DiffTree<String>> children, boolean isOriginal)
         {
             return new DiffTree<>(name, name, children, isOriginal);
@@ -76,27 +58,6 @@ class PopulateDiffTreeImplTest {
         {
             return createNode("G", Arrays.asList(children), isOriginal);
         }
-
-//        static DiffTree<String> createModifiedSingleLevelTree(DiffTree<String> originalSingleLevelTree, TreeNames... treeNames)
-//        {
-//            DiffTree<String> newTree = createSingleLevelTree(false, treeNames);
-//            Pair<DiffTree<String>, DiffTree<String>>
-//        }
-//
-//        static DiffTree<String> createOriginalSingleLevelTree(TreeNames... treeNames) {
-//            return createSingleLevelTree(true, treeNames);
-//        }
-//
-//        static DiffTree<String> createSingleLevelTree(boolean isOriginal, TreeNames... treeNames)
-//        {
-//            return createNode(
-//                "A",
-//                Arrays.stream(treeNames)
-//                    .map(treeName -> treeName.name)
-//                    .map(name -> createNode(name, Collections.emptyList(), isOriginal))
-//                    .collect(Collectors.toList()),
-//                isOriginal);
-//        }
 
         static DiffTree<String> getSingleChild(DiffTree<String> parent, int childNumber)
         {

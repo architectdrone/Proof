@@ -2,19 +2,15 @@ package org.architectdrone.javacodereviewprototype.tree;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.omg.PortableInterceptor.NON_EXISTENT;
 
 /**
  * Simple tree data structure with data for the matching process.
@@ -391,66 +387,40 @@ public class DiffTree<L> {
     public DiffTree<L> getNextMatched()
     {
         return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent());
-//        DiffTree<L> toReturn = this.getNext();
-//        while (true)
-//        {
-//            if (toReturn == null)
-//            {
-//                return null;
-//            }
-//            if (toReturn.isMatched && toReturn.getParent() == getParent())
-//            {
-//                return toReturn;
-//            }
-//            toReturn = toReturn.getNext();
-//        }
     }
 
     public DiffTree<L> getPreviousMatched()
     {
         return DiffTree.getNodeGeneric(this.getPrevious(), 0, DiffTree::getPrevious, a -> a.isMatched && a.getParent() == this.getParent());
-//        DiffTree<L> toReturn = this.getPrevious();
-//        while (true)
-//        {
-//            if (toReturn == null)
-//            {
-//                return null;
-//            }
-//            if (toReturn.isMatched && toReturn.getParent() == getParent())
-//            {
-//                return toReturn;
-//            }
-//            toReturn = toReturn.getPrevious();
-//        }
     }
 
-    public int getMisalignmentSize(DiffTree<L> a, DiffTree<L> b)
+    public int getMisalignmentSize(DiffTree<L> x, DiffTree<L> y)
     {
-        boolean bIsNextOfA = b.getNextMatched() == a;
+        boolean yIsNextOfX = y.getNextMatched() == x;
 
-        DiffTree<L> bNextMatch = b.getMatch().getNextMatched();
-        DiffTree<L> bPrevMatch = b.getMatch().getPreviousMatched();
+        DiffTree<L> yNextMatch = y.getMatch().getNextMatched();
+        DiffTree<L> yPrevMatch = y.getMatch().getPreviousMatched();
 
         int misalignmentSize = 1;
         boolean misaligned;
         boolean isNext;
         while (true)
         {
-            if (bPrevMatch == a.getMatch())
+            if (yPrevMatch == x.getMatch())
             {
-                misaligned = bIsNextOfA;
+                misaligned = yIsNextOfX;
                 isNext = false;
                 break;
             }
-            else if (bNextMatch == a.getMatch())
+            else if (yNextMatch == x.getMatch())
             {
-                misaligned = !bIsNextOfA;
+                misaligned = !yIsNextOfX;
                 isNext = true;
                 break;
             }
             else {
-                bNextMatch = bNextMatch != null ? bNextMatch.getNextMatched() : null;
-                bPrevMatch = bPrevMatch != null ? bPrevMatch.getPreviousMatched() : null;
+                yNextMatch = yNextMatch != null ? yNextMatch.getNextMatched() : null;
+                yPrevMatch = yPrevMatch != null ? yPrevMatch.getPreviousMatched() : null;
                 misalignmentSize++;
             }
 
@@ -460,7 +430,6 @@ public class DiffTree<L> {
         {
             if (!isNext)
             {
-
                 return -1*misalignmentSize;
             }
             else {
@@ -473,7 +442,7 @@ public class DiffTree<L> {
         }
     }
 
-    public static <L> DiffTree<L> getNodeGeneric(DiffTree<L> start,  int index, Function<DiffTree<L>, DiffTree<L>> iterator, Predicate<DiffTree<L>> discriminator)
+    public static <L> DiffTree<L> getNodeGeneric(DiffTree<L> start,  int index, UnaryOperator<DiffTree<L>> iterator, Predicate<DiffTree<L>> discriminator)
     {
         int currentIndex = 0;
         DiffTree<L> current = start;

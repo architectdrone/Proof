@@ -93,7 +93,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                         {
                             break;
                         }
-                        int misalignmentSize = parent.getMisalignmentSize(current, nextMatched);
+                        int misalignmentSize = parent.getMisalignmentSize(nextMatched, current);
                         if (Math.abs(misalignmentSize) > Math.abs(maximumMisalignment))
                         {
                             maximumMisalignment = misalignmentSize;

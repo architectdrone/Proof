@@ -396,34 +396,33 @@ public class DiffTree<L> {
 
     public int getMisalignmentSize(DiffTree<L> x, DiffTree<L> y)
     {
-        boolean yIsNextOfX = y.getNextMatched() == x;
+        boolean xIsNextOfY = x.getNextMatched() == y;
 
-        DiffTree<L> yNextMatch = y.getMatch().getNextMatched();
-        DiffTree<L> yPrevMatch = y.getMatch().getPreviousMatched();
+        DiffTree<L> xNextMatch = x.getMatch().getNextMatched();
+        DiffTree<L> xPrevMatch = x.getMatch().getPreviousMatched();
 
         int misalignmentSize = 1;
         boolean misaligned;
         boolean isNext;
         while (true)
         {
-            if (yPrevMatch == x.getMatch())
+            if (xPrevMatch == y.getMatch())
             {
-                misaligned = yIsNextOfX;
+                misaligned = xIsNextOfY;
                 isNext = false;
                 break;
             }
-            else if (yNextMatch == x.getMatch())
+            else if (xNextMatch == y.getMatch())
             {
-                misaligned = !yIsNextOfX;
+                misaligned = !xIsNextOfY;
                 isNext = true;
                 break;
             }
             else {
-                yNextMatch = yNextMatch != null ? yNextMatch.getNextMatched() : null;
-                yPrevMatch = yPrevMatch != null ? yPrevMatch.getPreviousMatched() : null;
+                xNextMatch = xNextMatch != null ? xNextMatch.getNextMatched() : null;
+                xPrevMatch = xPrevMatch != null ? xPrevMatch.getPreviousMatched() : null;
                 misalignmentSize++;
             }
-
         }
 
         if (misaligned)

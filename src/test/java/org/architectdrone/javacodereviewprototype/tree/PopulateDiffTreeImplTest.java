@@ -1929,7 +1929,7 @@ class PopulateDiffTreeImplTest {
                                 DiffTree<String> e1 = createENode(true);
                                 DiffTree<String> d1 = createDNode(true);
                                 DiffTree<String> c1 = createCNode(true);
-                                DiffTree<String> b1 = createCNode(true);
+                                DiffTree<String> b1 = createBNode(true);
                                 DiffTree<String> a1 = createANode(true, b1, c1, d1, e1);
 
                                 DiffTree<String> e2 = createENode(false);
@@ -1944,7 +1944,7 @@ class PopulateDiffTreeImplTest {
                                 e1.setMatch(e2);
 
                                 populateDiffTree.populateDiffTree(a1, a2);
-                                DiffTree<String> e1_mf = getNodeWithLabel(a1, "E");
+                                DiffTree<String> e1_mf = getNodeWithType(a1, ReferenceType.MOVE_FROM);
                                 DiffTree<String> e1_mt = e1;
 
                                 assertChildNumber(b1, 0);
@@ -2176,8 +2176,8 @@ class PopulateDiffTreeImplTest {
                         assertNone(f1);
                         assertNone(g1);
 
-                        assertPointsAt(b1_mf, b1_mt);
-                        assertPointsAt(d1_mf, d1_mt);
+                        assertPointsAt(b1_mt, b1_mf);
+                        assertPointsAt(d1_mt, d1_mf);
                     }
 
                     /**
@@ -2188,6 +2188,7 @@ class PopulateDiffTreeImplTest {
                      */
                     @Test
                     void twinReordering() {
+                        //fail("Infinte loop");
                         //Setup trees
                         DiffTree<String> g1 = createGNode(true);
                         DiffTree<String> f1 = createFNode(true);

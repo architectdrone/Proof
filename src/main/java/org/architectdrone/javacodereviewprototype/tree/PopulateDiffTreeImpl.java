@@ -4,10 +4,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
+import static org.architectdrone.javacodereviewprototype.tree.DiffTree.areNodesMisaligned;
+import static org.architectdrone.javacodereviewprototype.tree.DiffTree.getMisalignedDual;
 import static org.architectdrone.javacodereviewprototype.tree.DiffTree.getNodeGeneric;
 
 /**
@@ -82,24 +81,41 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                 while (true)
                 {
                     DiffTree<L> maximumMisalignedNode = null;
-                    Integer maximumMisalignment = 0;
+                    int maximumMisalignment = 0;
 
                     //Populate misalignment map
                     DiffTree<L> current = getNodeGeneric(parent.getFirst(), 0, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE && a.isMatched());
                     while (true)
                     {
-                        DiffTree<L> nextMatched = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
-                        if (nextMatched == null)
+                        DiffTree<L> next = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
+                        if (next == null)
                         {
                             break;
                         }
-                        int misalignmentSize = parent.getMisalignmentSize(nextMatched, current);
-                        if (Math.abs(misalignmentSize) > Math.abs(maximumMisalignment))
+                        if (areNodesMisaligned(current, next))
                         {
-                            maximumMisalignment = misalignmentSize;
-                            maximumMisalignedNode = current;
+                            DiffTree<L> currentMisalignedDual = getMisalignedDual(current);
+                            DiffTree<L> nextMisalignedDual = getMisalignedDual(next);
+                            assert !((currentMisalignedDual == null) && (nextMisalignedDual == null));
+                            DiffTree<L> beforeNewNode = currentMisalignedDual != null ? currentMisalignedDual.getMatch() : nextMisalignedDual.getMatch().getPrevious();
+                            maximumMisalignedNode = currentMisalignedDual != null ? current : next;
+
+                            maximumMisalignedNode.setReferenceType(ReferenceType.MOVE_TO);
+
+                            DiffTree<L> moveFromNode = new DiffTree<L>(maximumMisalignedNode.getLabel(), maximumMisalignedNode.getValue(), Collections.emptyList(), true);
+                            maximumMisalignedNode.setReferenceLocation(moveFromNode);
+
+                            moveFromNode.setChildNumber(maximumMisalignedNode.getMatch().getChildNumber());
+                            moveFromNode.setParent(maximumMisalignedNode.getParent());
+                            moveFromNode.setHasAdvancedDataBeenPopulated(true);
+                            moveFromNode.setReferenceType(ReferenceType.MOVE_FROM);
+
+                            parent.insertNodeAfter(beforeNewNode, moveFromNode);
+                            maximumMisalignedNode.getMatch().unmatch();
+                            moveFromNode.setMatch(maximumMisalignedNode.getMatch());
+                            maximumMisalignedNode.unmatch();
                         }
-                        current = nextMatched;
+                        current = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
                     }
 
                     if (maximumMisalignment == 0)
@@ -107,30 +123,30 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                         break;
                     }
 
-                    DiffTree<L> beforeNewNode;
-                    if (maximumMisalignment < 0)
-                    {
-                        beforeNewNode = getNodeGeneric(maximumMisalignedNode, -1*maximumMisalignment, DiffTree::getPreviousMatched, a -> true);
-                    }
-                    else
-                    {
-                        beforeNewNode = getNodeGeneric(maximumMisalignedNode, maximumMisalignment, DiffTree::getNextMatched, a -> true);
-                    }
-
-                    maximumMisalignedNode.setReferenceType(ReferenceType.MOVE_TO);
-
-                    DiffTree<L> moveFromNode = new DiffTree<L>(maximumMisalignedNode.getLabel(), maximumMisalignedNode.getValue(), Collections.emptyList(), true);
-                    maximumMisalignedNode.setReferenceLocation(moveFromNode);
-
-                    moveFromNode.setChildNumber(maximumMisalignedNode.getMatch().getChildNumber());
-                    moveFromNode.setParent(maximumMisalignedNode.getParent());
-                    moveFromNode.setHasAdvancedDataBeenPopulated(true);
-                    moveFromNode.setReferenceType(ReferenceType.MOVE_FROM);
-
-                    parent.insertNodeAfter(beforeNewNode, moveFromNode);
-                    maximumMisalignedNode.getMatch().unmatch();
-                    moveFromNode.setMatch(maximumMisalignedNode.getMatch());
-                    maximumMisalignedNode.unmatch();
+//                    DiffTree<L> beforeNewNode;
+//                    if (maximumMisalignment < 0)
+//                    {
+//                        beforeNewNode = getNodeGeneric(maximumMisalignedNode, -1*maximumMisalignment, DiffTree::getPreviousMatched, a -> true);
+//                    }
+//                    else
+//                    {
+//                        beforeNewNode = getNodeGeneric(maximumMisalignedNode, maximumMisalignment, DiffTree::getNextMatched, a -> true);
+//                    }
+//
+//                    maximumMisalignedNode.setReferenceType(ReferenceType.MOVE_TO);
+//
+//                    DiffTree<L> moveFromNode = new DiffTree<L>(maximumMisalignedNode.getLabel(), maximumMisalignedNode.getValue(), Collections.emptyList(), true);
+//                    maximumMisalignedNode.setReferenceLocation(moveFromNode);
+//
+//                    moveFromNode.setChildNumber(maximumMisalignedNode.getMatch().getChildNumber());
+//                    moveFromNode.setParent(maximumMisalignedNode.getParent());
+//                    moveFromNode.setHasAdvancedDataBeenPopulated(true);
+//                    moveFromNode.setReferenceType(ReferenceType.MOVE_FROM);
+//
+//                    parent.insertNodeAfter(beforeNewNode, moveFromNode);
+//                    maximumMisalignedNode.getMatch().unmatch();
+//                    moveFromNode.setMatch(maximumMisalignedNode.getMatch());
+//                    maximumMisalignedNode.unmatch();
                 }
 
                 //Theoretically, by this point, all nodes are in order

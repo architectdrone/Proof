@@ -12,6 +12,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.NONE;
+
 /**
  * Simple tree data structure with data for the matching process.
  * @param <L> The label type
@@ -50,7 +52,7 @@ public class DiffTree<L> {
     @Getter @Setter
     DiffTree<L> referenceLocation;
     @Getter @Setter @Builder.Default
-    ReferenceType referenceType = ReferenceType.NONE;
+    ReferenceType referenceType = NONE;
     @Getter @Setter
     String oldValue;
 
@@ -343,7 +345,7 @@ public class DiffTree<L> {
                 break;
             }
             if (current.getPrevious() == null || current.getPrevious() != null && current.getReferenceType().linesCreated + current.getPrevious()
-                    .getReferenceType().linesCreated != 0 || current.getReferenceType() == ReferenceType.NONE) {
+                    .getReferenceType().linesCreated != 0 || current.getReferenceType() == NONE) {
                         childNumber++;
                     }
             current.setChildNumber(childNumber);
@@ -387,6 +389,16 @@ public class DiffTree<L> {
     public DiffTree<L> getNextMatched()
     {
         return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent());
+    }
+
+    public DiffTree<L> getNextMatchedNone()
+    {
+        return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent() && a.getReferenceType() == NONE);
+    }
+
+    public DiffTree<L> getPreviousMatchedNone()
+    {
+        return DiffTree.getNodeGeneric(this.getPrevious(), 0, DiffTree::getPrevious, a -> a.isMatched && a.getParent() == this.getParent()&& a.getReferenceType() == NONE);
     }
 
     public DiffTree<L> getPreviousMatched()
@@ -460,6 +472,67 @@ public class DiffTree<L> {
                 currentIndex++;
             }
             current = iterator.apply(current);
+        }
+    }
+
+    static <L> boolean areNodesMisaligned(DiffTree<L> x, DiffTree<L> y)
+    {
+        if (x == null || y == null)
+        {
+            return false;
+        }
+
+        boolean xThenY = x.getNextMatchedNone() == y;
+        boolean xMatchThenYMatch;
+        DiffTree<L> xNextMatch = x.getMatch().getNextMatchedNone();
+        DiffTree<L> xPrevMatch = x.getMatch().getPreviousMatchedNone();
+
+        while (true)
+        {
+            if (xPrevMatch == y.getMatch())
+            {
+                xMatchThenYMatch = true;
+                break;
+            }
+            else if (xNextMatch == y.getMatch())
+            {
+                xMatchThenYMatch = false;
+                break;
+            }
+            else if (xNextMatch == null && xPrevMatch == null)
+            {
+                return false;
+            }
+            else {
+                xNextMatch = xNextMatch != null ? xNextMatch.getNextMatchedNone() : null;
+                xPrevMatch = xPrevMatch != null ? xPrevMatch.getPreviousMatchedNone() : null;
+            }
+        }
+
+        if (xMatchThenYMatch == xThenY)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    static <L> DiffTree<L> getMisalignedDual(DiffTree<L> x)
+    {
+        DiffTree<L> xMatch = x.getMatch();
+        DiffTree<L> preX = xMatch.getPreviousMatched();
+        DiffTree<L> postX = xMatch.getNextMatched();
+
+        if (areNodesMisaligned(xMatch, preX))
+        {
+            return preX;
+        } else if (areNodesMisaligned(xMatch, postX))
+        {
+            return postX;
+        } else {
+            return null;
         }
     }
 }

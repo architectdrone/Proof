@@ -2427,6 +2427,56 @@ class PopulateDiffTreeImplTest {
             }
 
             /**
+             * In A1, we have B1. In B1, we have D1. In D1, we have F1.
+             * In A2, we have B2 and D2. In D2, we have F2.
+             * We expect D1 to be moved from B1 to A1, to the correct location (after B1).
+             * Everything else should be in the same location, with type NONE.
+             */
+            @Test
+            void movingToUpperLevelWithSomeNestedNodes()
+            {
+                //Setup trees
+                DiffTree<String> f1 = createFNode(true);
+                DiffTree<String> d1 = createDNode(true, f1);
+                DiffTree<String> b1 = createBNode(true, d1);
+                DiffTree<String> a1 = createANode(true, b1);
+
+                DiffTree<String> f2 = createDNode(false);
+                DiffTree<String> d2 = createDNode(false, f2);
+                DiffTree<String> b2 = createBNode(false);
+                DiffTree<String> a2 = createANode(false, b2, d2);
+
+                //Match trees
+                a1.setMatch(a2);
+                b1.setMatch(b2);
+                d1.setMatch(d2);
+                f1.setMatch(f2);
+
+                populateDiffTree.populateDiffTree(a1, a2);
+                DiffTree<String> d1_mt = d1;
+                DiffTree<String> d1_mf = getSingleChild(a1, 1);
+
+                assertParent(b1, a1);
+                assertParent(d1_mf, a1);
+                assertChildNumber(b1, 0);
+                assertChildNumber(d1_mf, 1);
+                assertParent(d1_mt, b1);
+                assertChildNumber(d1_mt, 0);
+
+                assertChild(d1_mf, f1);
+                assertChild(d1_mt, f1);
+                assertParent(f1, d1_mt);
+
+                assertNone(a1);
+                assertNone(b1);
+                assertNone(f1);
+                assertMovedFrom(d1_mf);
+                assertMovedTo(d1_mt);
+
+                assertPointsAt(d1_mt, d1_mf);
+            }
+
+            /**
              * In A1, we have D1 and C1. In C1, we have E1.
              * In A2, we have C2. C2 has E2 and D2.
              * We expect D1 to be moved from A1 to C1, to the correct location (after E1).
@@ -2468,6 +2518,62 @@ class PopulateDiffTreeImplTest {
                 assertNone(a1);
                 assertNone(c1);
                 assertNone(e1);
+                assertMovedFrom(d1_mf);
+                assertMovedTo(d1_mt);
+
+                assertPointsAt(d1_mt, d1_mf);
+            }
+
+            /**
+             * In A1, we have D1 and C1. In C1, we have E1. In D1, we have F1.
+             * In A2, we have C2. C2 has E2 and D2. In D2, we have F2.
+             * We expect D1 to be moved from A1 to C1, to the correct location (after E1).
+             * Everything else should be in the same location, with type NONE.
+             */
+            @Test
+            void movingToLowerLevelNested()
+            {
+                //Setup trees
+                DiffTree<String> f1 = createENode(true);
+                DiffTree<String> e1 = createENode(true);
+                DiffTree<String> d1 = createDNode(true, f1);
+                DiffTree<String> c1 = createCNode(true, e1);
+                DiffTree<String> a1 = createANode(true, d1, c1);
+
+                DiffTree<String> f2 = createENode(false);
+                DiffTree<String> e2 = createENode(false);
+                DiffTree<String> d2 = createDNode(false, f2);
+                DiffTree<String> c2 = createCNode(false, e2, d2);
+                DiffTree<String> a2 = createANode(false, c2);
+
+                //Match trees
+                a1.setMatch(a2);
+                c1.setMatch(c2);
+                d1.setMatch(d2);
+                e1.setMatch(e2);
+                f1.setMatch(f2);
+
+                populateDiffTree.populateDiffTree(a1, a2);
+                DiffTree<String> d1_mt = d1;
+                DiffTree<String> d1_mf = getSingleChild(c1, 1);
+
+                assertParent(d1_mt, a1);
+                assertParent(c1, a1);
+                assertChildNumber(d1_mt, 0);
+                assertChildNumber(c1, 1);
+                assertParent(e1, c1);
+                assertParent(d1_mf, c1);
+                assertChildNumber(e1, 0);
+                assertChildNumber(d1_mf, 1);
+
+                assertChild(d1_mf, f1);
+                assertChild(d1_mt, f1);
+                assertParent(f1, d1_mt);
+
+                assertNone(a1);
+                assertNone(c1);
+                assertNone(e1);
+                assertNone(f1);
                 assertMovedFrom(d1_mf);
                 assertMovedTo(d1_mt);
 

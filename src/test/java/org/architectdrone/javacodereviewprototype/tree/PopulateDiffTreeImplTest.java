@@ -169,10 +169,10 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeWithNoChildren_resultsInCreationInOriginal()
         {
             //Setup trees
-            DiffTree<String> a1 = createNode("a1", Collections.emptyList(), true);
+            DiffTree<String> a1 = createANode(true);
 
-            DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-            DiffTree<String> a2 = createNode("A2", Collections.singletonList(b2), false);
+            DiffTree<String> b2 = createBNode(false);
+            DiffTree<String> a2 = createANode(false, b2);
 
             //Match trees
             a1.setMatch(a2);
@@ -182,7 +182,7 @@ class PopulateDiffTreeImplTest {
             DiffTree<String> b1 = getSingleChild(a1, 0);
 
             assertCreated(b1);
-            assertName(b1, "B2");
+            assertName(b1, "B");
             assertMatch(b1, b2);
         }
 
@@ -196,19 +196,19 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeWithNoChildren_andSiblingBefore_resultsInCreationInOriginal_atCorrectPosition()
         {
             //Setup trees
-            DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-            DiffTree<String> a1 = createNode("A1", Collections.singletonList(b1), true);
+            DiffTree<String> b1 = createBNode(true);
+            DiffTree<String> a1 = createANode(true, b1);
 
-            DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-            DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-            DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, c2), false);
+            DiffTree<String> c2 = createCNode(false);
+            DiffTree<String> b2 = createBNode(false);
+            DiffTree<String> a2 = createANode(false, b2, c2);
 
             //Match trees
             a1.setMatch(a2);
             b1.setMatch(b2);
 
             populateDiffTree.populateDiffTree(a1, a2);
-            DiffTree<String> c1 = getNodeWithLabel(a1, "C2");
+            DiffTree<String> c1 = getNodeWithType(a1, ReferenceType.CREATE);
 
             assertNumberOfChildren(a1, 2);
             assertMatch(c1, c2);
@@ -224,12 +224,12 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeWithNoChildren_andSiblingAfter_resultsInCreationInOriginal_atCorrectPosition()
         {
             //Setup trees
-            DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-            DiffTree<String> a1 = createNode("A1", Collections.singletonList(c1), true);
+            DiffTree<String> c1 = createCNode(true);
+            DiffTree<String> a1 = createANode(true, c1);
 
-            DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-            DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-            DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, c2), false);
+            DiffTree<String> c2 = createCNode(false);
+            DiffTree<String> b2 = createBNode(false);
+            DiffTree<String> a2 = createANode(false, b2, c2);
 
             //Match trees
             a1.setMatch(a2);
@@ -253,14 +253,14 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeWithNoChildren_andSiblingBeforeAndAfter_resultsInCreationInOriginal_atCorrectPosition()
         {
             //Setup trees
-            DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-            DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-            DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, d1), true);
+            DiffTree<String> d1 = createDNode(true);
+            DiffTree<String> b1 = createBNode(true);
+            DiffTree<String> a1 = createANode(true, b1, d1);
 
-            DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-            DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-            DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-            DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, c2, d2), false);
+            DiffTree<String> d2 = createDNode(false);
+            DiffTree<String> c2 = createCNode(false);
+            DiffTree<String> b2 = createBNode(false);
+            DiffTree<String> a2 = createANode(false, b2, c2, d2);
 
             //Match trees
             a1.setMatch(a2);
@@ -273,7 +273,7 @@ class PopulateDiffTreeImplTest {
 
             DiffTree<String> c1 = getSingleChild(a1, 1);
             assertCreated(c1);
-            assertName(c1, "C2");
+            assertName(c1, "C");
             
             assertMatch(c1, c2);
 
@@ -289,18 +289,18 @@ class PopulateDiffTreeImplTest {
          * In this test, the new node has some children.
          * The original tree (A1) has no children.
          * The modified tree (A2) has one child (B2) which has it's own child (C2)
-         * We expect a new node "B1" to be added as a child of A2, and a new node "C1" to be added as a child of "B1".
-         * (Note that B1 and C1 are just aliases I am using. The names of the nodes will be "B2" and "C2" respectively)
+         * We expect a new node "B" to be added as a child of A2, and a new node "C" to be added as a child of "B".
+         * (Note that B1 and C1 are just aliases I am using. The names of the nodes will be "B" and "C" respectively)
          */
         @Test
         void unmatchedNodeWithSomeChildren_resultsInAllChildrenBeingAdded()
         {
             //Setup trees
-            DiffTree<String> a1 = createNode("a1", Collections.emptyList(), true);
+            DiffTree<String> a1 = createANode(true);
 
-            DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-            DiffTree<String> b2 = createNode("B2", Collections.singletonList(c2), false);
-            DiffTree<String> a2 = createNode("A2", Collections.singletonList(b2), false);
+            DiffTree<String> c2 = createCNode(false);
+            DiffTree<String> b2 = createBNode(false, c2);
+            DiffTree<String> a2 = createANode(false, b2);
 
             //Match trees
             a1.setMatch(a2);
@@ -337,10 +337,10 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeInOriginal_resultsInNodeDeleted()
         {
             //Setup trees
-            DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-            DiffTree<String> a1 = createNode("A1", Collections.singletonList(b1), true);
+            DiffTree<String> b1 = createBNode(true);
+            DiffTree<String> a1 = createANode(true, b1);
 
-            DiffTree<String> a2 = createNode("A2", Collections.emptyList(), false);
+            DiffTree<String> a2 = createANode(false);
 
             //Match trees
             a1.setMatch(a2);
@@ -350,7 +350,7 @@ class PopulateDiffTreeImplTest {
             assertNumberOfChildren(a1, 1);
 
             assertDeleted(b1);
-            assertName(b1, "B1");
+            assertName(b1, "B");
             assertChildNumber(b1, 0);
         }
 
@@ -367,12 +367,12 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeInOriginal_andSiblingBefore_resultsInNodeDeleted()
         {
             //Setup trees
-            DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-            DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-            DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1), true);
+            DiffTree<String> c1 = createCNode(true);
+            DiffTree<String> b1 = createBNode(true);
+            DiffTree<String> a1 = createANode(true, b1, c1);
 
-            DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-            DiffTree<String> a2 = createNode("A2", Collections.singletonList(b2), false);
+            DiffTree<String> b2 = createBNode(false);
+            DiffTree<String> a2 = createANode(false, b2);
 
             //Match trees
             a1.setMatch(a2);
@@ -402,12 +402,12 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeInOriginal_andSiblingAfter_resultsInNodeDeleted()
         {
             //Setup trees
-            DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-            DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-            DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1), true);
+            DiffTree<String> c1 = createCNode(true);
+            DiffTree<String> b1 = createBNode(true);
+            DiffTree<String> a1 = createANode(true, b1, c1);
 
-            DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-            DiffTree<String> a2 = createNode("A2", Collections.singletonList(c2), false);
+            DiffTree<String> c2 = createCNode(false);
+            DiffTree<String> a2 = createANode(false, c2);
 
             //Match trees
             a1.setMatch(a2);
@@ -437,14 +437,14 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeInOriginal_andSiblingBeforeAndAfter_resultsInNodeDeleted()
         {
             //Setup trees
-            DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-            DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-            DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-            DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1, d1), true);
+            DiffTree<String> d1 = createDNode(true);
+            DiffTree<String> c1 = createCNode(true);
+            DiffTree<String> b1 = createBNode(true);
+            DiffTree<String> a1 = createANode(true, b1, c1, d1);
 
-            DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-            DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-            DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, d2), false);
+            DiffTree<String> d2 = createDNode(false);
+            DiffTree<String> b2 = createBNode(false);
+            DiffTree<String> a2 = createANode(false, b2, d2);
 
             //Match trees
             a1.setMatch(a2);
@@ -474,11 +474,11 @@ class PopulateDiffTreeImplTest {
         void unmatchedNodeInOriginal_withChildren_resultsInAllNodesDeleted()
         {
             //Setup trees
-            DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-            DiffTree<String> b1 = createNode("B1", Collections.singletonList(c1), true);
-            DiffTree<String> a1 = createNode("A1", Collections.singletonList(b1), true);
+            DiffTree<String> c1 = createCNode(true);
+            DiffTree<String> b1 = createBNode(true, c1);
+            DiffTree<String> a1 = createANode(true, b1);
             
-            DiffTree<String> a2 = createNode("A2", Collections.emptyList(), false);
+            DiffTree<String> a2 = createANode(false);
 
             //Match trees
             a1.setMatch(a2);
@@ -512,17 +512,17 @@ class PopulateDiffTreeImplTest {
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                DiffTree<String> a1 = createNode("A1", Collections.singletonList(b1), true);
+                DiffTree<String> b1 = createBNode(true);
+                DiffTree<String> a1 = createANode(true, b1);
 
-                DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-                DiffTree<String> a2 = createNode("A2", Collections.singletonList(c2), false);
+                DiffTree<String> c2 = createCNode(false);
+                DiffTree<String> a2 = createANode(false, c2);
 
                 //Match trees
                 a1.setMatch(a2);
 
                 populateDiffTree.populateDiffTree(a1, a2);
-                DiffTree<String> c1 = getNodeWithLabel(a1, "C2");
+                DiffTree<String> c1 = getNodeWithLabel(a1, "C");
 
                 assertNumberOfChildren(a1, 2);
 
@@ -547,20 +547,20 @@ class PopulateDiffTreeImplTest {
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_andMatchedNodeBefore_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1), true);
+                DiffTree<String> c1 = createCNode(true);
+                DiffTree<String> b1 = createBNode(true);
+                DiffTree<String> a1 = createANode(true, b1, c1);
 
-                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, d2), false);
+                DiffTree<String> d2 = createDNode(false);
+                DiffTree<String> b2 = createBNode(false);
+                DiffTree<String> a2 = createANode(false, b2, d2);
 
                 //Match trees
                 a1.setMatch(a2);
                 b1.setMatch(b2);
 
                 populateDiffTree.populateDiffTree(a1, a2);
-                DiffTree<String> d1 = getNodeWithLabel(a1, "D2");
+                DiffTree<String> d1 = getNodeWithLabel(a1, "D");
 
                 assertNumberOfChildren(a1, 3);
 
@@ -587,20 +587,20 @@ class PopulateDiffTreeImplTest {
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_andMatchedNodeAfter_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                DiffTree<String> a1 = createNode("A1", Arrays.asList(c1, b1), true);
+                DiffTree<String> c1 = createCNode(true);
+                DiffTree<String> b1 = createBNode(true);
+                DiffTree<String> a1 = createANode(true, c1, b1);
 
-                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                DiffTree<String> a2 = createNode("A2", Arrays.asList(d2, b2), false);
+                DiffTree<String> d2 = createDNode(false);
+                DiffTree<String> b2 = createBNode(false);
+                DiffTree<String> a2 = createANode(false, d2, b2);
 
                 //Match trees
                 a1.setMatch(a2);
                 b1.setMatch(b2);
 
                 populateDiffTree.populateDiffTree(a1, a2);
-                DiffTree<String> d1 = getNodeWithLabel(a1, "D2");
+                DiffTree<String> d1 = getNodeWithLabel(a1, "D");
 
                 assertNumberOfChildren(a1, 3);
 
@@ -628,13 +628,13 @@ class PopulateDiffTreeImplTest {
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_andMatchedNodeBetween_originalFirst_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                DiffTree<String> a1 = createNode("A1", Arrays.asList(c1, b1), true);
+                DiffTree<String> c1 = createCNode(true);
+                DiffTree<String> b1 = createBNode(true);
+                DiffTree<String> a1 = createANode(true, c1, b1);
 
-                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, d2), false);
+                DiffTree<String> d2 = createDNode(false);
+                DiffTree<String> b2 = createBNode(false);
+                DiffTree<String> a2 = createANode(false, b2, d2);
 
                 //Match trees
                 a1.setMatch(a2);
@@ -670,13 +670,13 @@ class PopulateDiffTreeImplTest {
             void unmatchedNodeInOriginal_andUnmatchedNodeInModified_andMatchedNodeBetween_originalLast_resultsInCreationAndDeletion()
             {
                 //Setup trees
-                DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1), true);
+                DiffTree<String> c1 = createCNode(true);
+                DiffTree<String> b1 = createBNode(true);
+                DiffTree<String> a1 = createANode(true, b1, c1);
 
-                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                DiffTree<String> a2 = createNode("A2", Arrays.asList(d2, b2), false);
+                DiffTree<String> d2 = createDNode(false);
+                DiffTree<String> b2 = createBNode(false);
+                DiffTree<String> a2 = createANode(false, d2, b2);
 
                 //Match trees
                 a1.setMatch(a2);
@@ -737,13 +737,13 @@ class PopulateDiffTreeImplTest {
                 void perfectSwap_causesMove()
                 {
                     //Setup trees
-                    DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                    DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                    DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1), true);
+                    DiffTree<String> c1 = createCNode(true);
+                    DiffTree<String> b1 = createBNode(true);
+                    DiffTree<String> a1 = createANode(true, b1, c1);
 
-                    DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-                    DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                    DiffTree<String> a2 = createNode("A2", Arrays.asList(c2, b2), false);
+                    DiffTree<String> c2 = createCNode(false);
+                    DiffTree<String> b2 = createBNode(false);
+                    DiffTree<String> a2 = createANode(false, c2, b2);
 
                     //Match trees
                     a1.setMatch(a2);
@@ -779,17 +779,17 @@ class PopulateDiffTreeImplTest {
                 void twoPerfectSwaps_causesTwoMoves()
                 {
                     //Setup trees
-                    DiffTree<String> e1 = createNode("E1", Collections.emptyList(), true);
-                    DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                    DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                    DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                    DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1, d1, e1), true);
+                    DiffTree<String> e1 = createENode(true);
+                    DiffTree<String> d1 = createDNode(true);
+                    DiffTree<String> c1 = createCNode(true);
+                    DiffTree<String> b1 = createBNode(true);
+                    DiffTree<String> a1 = createANode(true, b1, c1, d1, e1);
 
-                    DiffTree<String> e2 = createNode("E2", Collections.emptyList(), false);
-                    DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                    DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-                    DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                    DiffTree<String> a2 = createNode("A2", Arrays.asList(c2, b2, e2, d2), false);
+                    DiffTree<String> e2 = createENode(false);
+                    DiffTree<String> d2 = createDNode(false);
+                    DiffTree<String> c2 = createCNode(false);
+                    DiffTree<String> b2 = createBNode(false);
+                    DiffTree<String> a2 = createANode(false, c2, b2, e2, d2);
 
                     //Match trees
                     a1.setMatch(a2);
@@ -835,15 +835,15 @@ class PopulateDiffTreeImplTest {
                 void perfectSwap_withNodeBefore_causesMove()
                 {
                     //Setup trees
-                    DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                    DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                    DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                    DiffTree<String> a1 = createNode("A1", Arrays.asList(d1, b1, c1), true);
+                    DiffTree<String> d1 = createDNode(true);
+                    DiffTree<String> c1 = createCNode(true);
+                    DiffTree<String> b1 = createBNode(true);
+                    DiffTree<String> a1 = createANode(true, d1, b1, c1);
 
-                    DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                    DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-                    DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                    DiffTree<String> a2 = createNode("A2", Arrays.asList(d2, c2, b2), false);
+                    DiffTree<String> d2 = createDNode(false);
+                    DiffTree<String> c2 = createCNode(false);
+                    DiffTree<String> b2 = createBNode(false);
+                    DiffTree<String> a2 = createANode(false, d2, c2, b2);
 
                     //Match trees
                     a1.setMatch(a2);
@@ -881,15 +881,15 @@ class PopulateDiffTreeImplTest {
                 void perfectSwap_sameParent_differentOrder_withNodeAfter_causesMove()
                 {
                     //Setup trees
-                    DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                    DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                    DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                    DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1, d1), true);
+                    DiffTree<String> d1 = createDNode(true);
+                    DiffTree<String> c1 = createCNode(true);
+                    DiffTree<String> b1 = createBNode(true);
+                    DiffTree<String> a1 = createANode(true, b1, c1, d1);
 
-                    DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                    DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-                    DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                    DiffTree<String> a2 = createNode("A2", Arrays.asList(c2, b2, d2), false);
+                    DiffTree<String> d2 = createDNode(false);
+                    DiffTree<String> c2 = createCNode(false);
+                    DiffTree<String> b2 = createBNode(false);
+                    DiffTree<String> a2 = createANode(false, c2, b2, d2);
 
                     //Match trees
                     a1.setMatch(a2);
@@ -928,17 +928,17 @@ class PopulateDiffTreeImplTest {
                 void perfectSwap_withNodeBeforeAndAfter_causesMove()
                 {
                     //Setup trees
-                    DiffTree<String> e1 = createNode("E1", Collections.emptyList(), true);
-                    DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                    DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                    DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                    DiffTree<String> a1 = createNode("A1", Arrays.asList(d1, b1, c1, e1), true);
+                    DiffTree<String> e1 = createENode(true);
+                    DiffTree<String> d1 = createDNode(true);
+                    DiffTree<String> c1 = createCNode(true);
+                    DiffTree<String> b1 = createBNode(true);
+                    DiffTree<String> a1 = createANode(true, d1, b1, c1, e1);
 
-                    DiffTree<String> e2 = createNode("E2", Collections.emptyList(), false);
-                    DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                    DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-                    DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                    DiffTree<String> a2 = createNode("A2", Arrays.asList(d2, c2, b2, e2), false);
+                    DiffTree<String> e2 = createENode(false);
+                    DiffTree<String> d2 = createDNode(false);
+                    DiffTree<String> c2 = createCNode(false);
+                    DiffTree<String> b2 = createBNode(false);
+                    DiffTree<String> a2 = createANode(false, d2, c2, b2, e2);
 
                     //Match trees
                     a1.setMatch(a2);
@@ -984,14 +984,14 @@ class PopulateDiffTreeImplTest {
                     void perfectSwap_andNodeBefore_works()
                     {
                         //Setup trees
-                        DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                        DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                        DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, d1), true);
+                        DiffTree<String> d1 = createDNode(true);
+                        DiffTree<String> b1 = createBNode(true);
+                        DiffTree<String> a1 = createANode(true, b1, d1);
 
-                        DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                        DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-                        DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                        DiffTree<String> a2 = createNode("A2", Arrays.asList(c2, d2, b2), false);
+                        DiffTree<String> d2 = createDNode(false);
+                        DiffTree<String> c2 = createCNode(false);
+                        DiffTree<String> b2 = createBNode(false);
+                        DiffTree<String> a2 = createANode(false, c2, d2, b2);
 
                         //Match trees
                         a1.setMatch(a2);
@@ -1029,14 +1029,14 @@ class PopulateDiffTreeImplTest {
                     void perfectSwap_andNodeAfter_works()
                     {
                         //Setup trees
-                        DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                        DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                        DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, d1), true);
+                        DiffTree<String> d1 = createDNode(true);
+                        DiffTree<String> b1 = createBNode(true);
+                        DiffTree<String> a1 = createANode(true, b1, d1);
 
-                        DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                        DiffTree<String> c2 = createNode("C2", Collections.emptyList(), false);
-                        DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                        DiffTree<String> a2 = createNode("A2", Arrays.asList(d2, b2, c2), false);
+                        DiffTree<String> d2 = createDNode(false);
+                        DiffTree<String> c2 = createCNode(false);
+                        DiffTree<String> b2 = createBNode(false);
+                        DiffTree<String> a2 = createANode(false, d2, b2, c2);
 
                         //Match trees
                         a1.setMatch(a2);
@@ -1080,14 +1080,14 @@ class PopulateDiffTreeImplTest {
                     void perfectSwap_andNodeBefore_works()
                     {
                         //Setup trees
-                        DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                        DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                        DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                        DiffTree<String> a1 = createNode("A1", Arrays.asList(c1, b1, d1), true);
+                        DiffTree<String> c1 = createCNode(true);
+                        DiffTree<String> d1 = createDNode(true);
+                        DiffTree<String> b1 = createBNode(true);
+                        DiffTree<String> a1 = createANode(true, c1, b1, d1);
 
-                        DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                        DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                        DiffTree<String> a2 = createNode("A2", Arrays.asList(d2, b2), false);
+                        DiffTree<String> d2 = createDNode(false);
+                        DiffTree<String> b2 = createBNode(false);
+                        DiffTree<String> a2 = createANode(false, d2, b2);
 
                         //Match trees
                         a1.setMatch(a2);
@@ -1124,14 +1124,14 @@ class PopulateDiffTreeImplTest {
                     void perfectSwap_andNodeAfter_works()
                     {
                         //Setup trees
-                        DiffTree<String> c1 = createNode("C1", Collections.emptyList(), true);
-                        DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                        DiffTree<String> b1 = createNode("B1", Collections.emptyList(), true);
-                        DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, d1, c1), true);
+                        DiffTree<String> c1 = createCNode(true);
+                        DiffTree<String> d1 = createDNode(true);
+                        DiffTree<String> b1 = createBNode(true);
+                        DiffTree<String> a1 = createANode(true, b1, d1, c1);
 
-                        DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                        DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                        DiffTree<String> a2 = createNode("A2", Arrays.asList(d2, b2), false);
+                        DiffTree<String> d2 = createDNode(false);
+                        DiffTree<String> b2 = createBNode(false);
+                        DiffTree<String> a2 = createANode(false, d2, b2);
 
                         //Match trees
                         a1.setMatch(a2);
@@ -2275,17 +2275,17 @@ class PopulateDiffTreeImplTest {
             void movingInSameLevel()
             {
                 //Setup trees
-                DiffTree<String> e1 = createNode("E1", Collections.emptyList(), true);
-                DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                DiffTree<String> c1 = createNode("C1", Arrays.asList(e1), true);
-                DiffTree<String> b1 = createNode("B1", Arrays.asList(d1), true);
-                DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1), true);
+                DiffTree<String> e1 = createENode(true);
+                DiffTree<String> d1 = createDNode(true);
+                DiffTree<String> c1 = createCNode(true, e1);
+                DiffTree<String> b1 = createBNode(true, d1);
+                DiffTree<String> a1 = createANode(true, b1, c1);
 
-                DiffTree<String> e2 = createNode("E2", Collections.emptyList(), false);
-                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                DiffTree<String> c2 = createNode("C2", Arrays.asList(e2, d2), false);
-                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, c2), false);
+                DiffTree<String> e2 = createENode(false);
+                DiffTree<String> d2 = createDNode(false);
+                DiffTree<String> c2 = createCNode(false, e2, d2);
+                DiffTree<String> b2 = createBNode(false);
+                DiffTree<String> a2 = createANode(false, b2, c2);
 
                 //Match trees
                 a1.setMatch(a2);
@@ -2332,19 +2332,19 @@ class PopulateDiffTreeImplTest {
             void movingInSameLevelWithSomeNestedNodes()
             {
                 //Setup trees
-                DiffTree<String> f1 = createNode("F1", Collections.emptyList(), true);
-                DiffTree<String> e1 = createNode("E1", Collections.emptyList(), true);
-                DiffTree<String> d1 = createNode("D1", Arrays.asList(f1), true);
-                DiffTree<String> c1 = createNode("C1", Arrays.asList(e1), true);
-                DiffTree<String> b1 = createNode("B1", Arrays.asList(d1), true);
-                DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1), true);
+                DiffTree<String> f1 = createFNode(true);
+                DiffTree<String> e1 = createENode(true);
+                DiffTree<String> d1 = createDNode(true, f1);
+                DiffTree<String> c1 = createCNode(true, e1);
+                DiffTree<String> b1 = createBNode(true, d1);
+                DiffTree<String> a1 = createANode(true, b1, c1);
 
-                DiffTree<String> f2 = createNode("E2", Collections.emptyList(), false);
-                DiffTree<String> e2 = createNode("E2", Collections.emptyList(), false);
-                DiffTree<String> d2 = createNode("D2", Arrays.asList(f2), false);
-                DiffTree<String> c2 = createNode("C2", Arrays.asList(e2, d2), false);
-                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, c2), false);
+                DiffTree<String> f2 = createENode(false);
+                DiffTree<String> e2 = createENode(false);
+                DiffTree<String> d2 = createDNode(false, f2);
+                DiffTree<String> c2 = createCNode(false, e2, d2);
+                DiffTree<String> b2 = createBNode(false);
+                DiffTree<String> a2 = createANode(false, b2, c2);
 
                 //Match trees
                 a1.setMatch(a2);
@@ -2394,13 +2394,13 @@ class PopulateDiffTreeImplTest {
             void movingToUpperLevel()
             {
                 //Setup trees
-                DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                DiffTree<String> b1 = createNode("B1", Arrays.asList(d1), true);
-                DiffTree<String> a1 = createNode("A1", Arrays.asList(b1), true);
+                DiffTree<String> d1 = createDNode(true);
+                DiffTree<String> b1 = createBNode(true, d1);
+                DiffTree<String> a1 = createANode(true, b1);
 
-                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
-                DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, d2), false);
+                DiffTree<String> d2 = createDNode(false);
+                DiffTree<String> b2 = createBNode(false);
+                DiffTree<String> a2 = createANode(false, b2, d2);
 
                 //Match trees
                 a1.setMatch(a2);
@@ -2436,15 +2436,15 @@ class PopulateDiffTreeImplTest {
             void movingToLowerLevel()
             {
                 //Setup trees
-                DiffTree<String> e1 = createNode("E1", Collections.emptyList(), true);
-                DiffTree<String> d1 = createNode("D1", Collections.emptyList(), true);
-                DiffTree<String> c1 = createNode("C1", Arrays.asList(e1), true);
-                DiffTree<String> a1 = createNode("A1", Arrays.asList(d1, c1), true);
+                DiffTree<String> e1 = createENode(true);
+                DiffTree<String> d1 = createDNode(true);
+                DiffTree<String> c1 = createCNode(true, e1);
+                DiffTree<String> a1 = createANode(true, d1, c1);
 
-                DiffTree<String> e2 = createNode("E2", Collections.emptyList(), false);
-                DiffTree<String> d2 = createNode("D2", Collections.emptyList(), false);
-                DiffTree<String> c2 = createNode("C2", Arrays.asList(e2, d2), false);
-                DiffTree<String> a2 = createNode("A2", Arrays.asList(c2), false);
+                DiffTree<String> e2 = createENode(false);
+                DiffTree<String> d2 = createDNode(false);
+                DiffTree<String> c2 = createCNode(false, e2, d2);
+                DiffTree<String> a2 = createANode(false, c2);
 
                 //Match trees
                 a1.setMatch(a2);

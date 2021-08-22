@@ -57,10 +57,6 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                 //Identify and fix mismatched nodes
                 doForEachPairOfMatchedNodes(parent, PopulateDiffTreeImpl::handleMisalignedNodes, DiffTree::areNodesMisaligned);
 
-                //Theoretically, by this point, all nodes are in order
-                //Now, we are left with some disconnected nodes
-                //We handle these now
-
                 //First, nodes that are created and nodes that are moved into this tree
                 if (parent.isMatched())
                 {

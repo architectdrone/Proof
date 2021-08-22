@@ -96,24 +96,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                 //First, nodes that are created and nodes that are moved into this tree
                 if (parent.isMatched())
                 {
-                    current = parent.getMatch().getFirst();
-                    while (true)
-                    {
-                        if (current == null)
-                        {
-                            break;
-                        }
-                        else if (!current.isMatched())
-                        {
-                            createNewNode(current, parent);
-                        }
-                        else if (current.getParent() != current.getMatch().getParent().getMatch())
-                        {
-                            handleInterTreeMove(current, parent);
-                        }
-                        current = current.getNext();
-
-                    }
+                    doForEachChild(parent.getMatch(), PopulateDiffTreeImpl::handleNodeInModified, a -> true);
                 }
 
                 //Then we take care of deleted and moved out nodes
@@ -136,26 +119,24 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
         treeA.rectifyNodes();
     }
 
-//    private static <L> void handleUnmatchedNodesInModified(DiffTree<L> unmatchedNode)
-//    {
-//        DiffTree<>
-//        if (!current.isMatched())
-//        {
-//            createNewNode(current, parent);
-//        }
-//        else if (current.getParent() != current.getMatch().getParent().getMatch())
-//        {
-//            handleInterTreeMove(current, parent);
-//        }
-//    }
+    private static <L> void handleNodeInModified(DiffTree<L> unmatchedNode)
+    {
+        if (!unmatchedNode.isMatched())
+        {
+            createNewNode(unmatchedNode);
+        }
+        else if (unmatchedNode.getParent() != unmatchedNode.getMatch().getParent().getMatch())
+        {
+            handleInterTreeMove(unmatchedNode);
+        }
+    }
 
     /**
      * Handles inter-tree moves.
      * @param original Node in modified tree with a different parent from it's match.
-     * @param parent The parent of the location where the MOVE_FROM should be inserted.
      * @param <L> Label type.
      */
-    private static <L> void handleInterTreeMove(DiffTree<L> original, DiffTree<L> parent)
+    private static <L> void handleInterTreeMove(DiffTree<L> original)
     {
         DiffTree<L> createdNode = copyNode(original, ReferenceType.MOVE_FROM);
 
@@ -171,10 +152,9 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
     /**
      * Creates a copy of original under parent at the correct location.
      * @param original The original to copy.
-     * @param parent The parent to put it under.
      * @param <L> The Label Type.
      */
-    private static <L> void createNewNode(DiffTree<L> original, DiffTree<L> parent)
+    private static <L> void createNewNode(DiffTree<L> original)
     {
         copyNode(original, ReferenceType.CREATE);
     }

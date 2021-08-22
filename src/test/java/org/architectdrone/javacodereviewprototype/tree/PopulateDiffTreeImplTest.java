@@ -114,6 +114,11 @@ class PopulateDiffTreeImplTest {
             assertEquals(name, node.getValue());
         }
 
+        static void assertChild(DiffTree<String> parent, DiffTree<String> child)
+        {
+            assertTrue(parent.getChildren().contains(child));
+        }
+
         static void assertParent(DiffTree<String> child, DiffTree<String> parent)
         {
             assertEquals(parent, child.getParent());
@@ -131,7 +136,7 @@ class PopulateDiffTreeImplTest {
 
         static void assertPointsAt(DiffTree<String> moveTo, DiffTree<String> moveFrom)
         {
-            assertEquals(moveFrom, moveTo.getReferenceLocation());
+            assertEquals(moveFrom.getReferenceLocation(), moveTo);
         }
 
         static DiffTree<String> getNodeWithLabel(DiffTree<String> tree, String label)
@@ -2314,6 +2319,71 @@ class PopulateDiffTreeImplTest {
             }
 
             /**
+             * In A1, we have B1 and C1. In B1, we have D1. In D1, we have F1. In C1, we have E1.
+             * In A2, we have B2 and C2. C2 has E2 and D2. D2 has F2.
+             * Same as before, except with a node nested beneath the moving node.
+             * The node should be considered a child of both the MOVE_FROM and MOVE_TO.
+             * However, the node should have, as a parent, only MOVE_FROM.
+             * The node beneath the MOVE_FROM and MOVE_TO should be equal.
+             * We want that node to have type NONE.
+             */
+            @Test
+            void movingInSameLevelWithSomeNestedNodes()
+            {
+                //Setup trees
+                DiffTree<String> f1 = createNode("F1", Collections.emptyList(), true);
+                DiffTree<String> e1 = createNode("E1", Collections.emptyList(), true);
+                DiffTree<String> d1 = createNode("D1", Arrays.asList(f1), true);
+                DiffTree<String> c1 = createNode("C1", Arrays.asList(e1), true);
+                DiffTree<String> b1 = createNode("B1", Arrays.asList(d1), true);
+                DiffTree<String> a1 = createNode("A1", Arrays.asList(b1, c1), true);
+
+                DiffTree<String> f2 = createNode("E2", Collections.emptyList(), false);
+                DiffTree<String> e2 = createNode("E2", Collections.emptyList(), false);
+                DiffTree<String> d2 = createNode("D2", Arrays.asList(f2), false);
+                DiffTree<String> c2 = createNode("C2", Arrays.asList(e2, d2), false);
+                DiffTree<String> b2 = createNode("B2", Collections.emptyList(), false);
+                DiffTree<String> a2 = createNode("A2", Arrays.asList(b2, c2), false);
+
+                //Match trees
+                a1.setMatch(a2);
+                b1.setMatch(b2);
+                c1.setMatch(c2);
+                d1.setMatch(d2);
+                e1.setMatch(e2);
+                f1.setMatch(f2);
+
+                populateDiffTree.populateDiffTree(a1, a2);
+                DiffTree<String> d1_mt = d1;
+                DiffTree<String> d1_mf = getSingleChild(c1, 1);
+
+                assertParent(b1, a1);
+                assertParent(c1, a1);
+                assertChildNumber(b1, 0);
+                assertChildNumber(c1, 1);
+                assertParent(d1_mt, b1);
+                assertChildNumber(d1_mt, 0);
+                assertParent(e1, c1);
+                assertParent(d1_mf, c1);
+                assertChildNumber(e1, 0);
+                assertChildNumber(d1_mf, 1);
+
+                assertChild(d1_mf, f1);
+                assertChild(d1_mt, f1);
+                assertParent(f1, d1_mt);
+
+                assertNone(a1);
+                assertNone(b1);
+                assertNone(c1);
+                assertNone(e1);
+                assertNone(f1);
+                assertMovedFrom(d1_mf);
+                assertMovedTo(d1_mt);
+
+                assertPointsAt(d1_mt, d1_mf);
+            }
+
+            /**
              * In A1, we have B1. In B1, we have D1.
              * In A2, we have B2 and D2.
              * We expect D1 to be moved from B1 to A1, to the correct location (after B1).
@@ -2402,6 +2472,7 @@ class PopulateDiffTreeImplTest {
 
                 assertPointsAt(d1_mt, d1_mf);
             }
+
 
             @Nested
             class Creation

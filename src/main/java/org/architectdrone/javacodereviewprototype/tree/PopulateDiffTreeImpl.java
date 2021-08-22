@@ -77,6 +77,11 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
 
             for (DiffTree<L> parent : parents)
             {
+                if (parent.getReferenceType() == ReferenceType.MOVE_FROM)
+                {
+                    parent = parent.getReferenceLocation();
+                }
+
                 //Identify and fix mismatched nodes
                 while (true)
                 {
@@ -103,7 +108,8 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                             maximumMisalignedNode.setReferenceType(ReferenceType.MOVE_TO);
 
                             DiffTree<L> moveFromNode = new DiffTree<L>(maximumMisalignedNode.getLabel(), maximumMisalignedNode.getValue(), Collections.emptyList(), true);
-                            maximumMisalignedNode.setReferenceLocation(moveFromNode);
+                            //maximumMisalignedNode.setReferenceLocation(moveFromNode);
+                            moveFromNode.setReferenceLocation(maximumMisalignedNode);
 
                             moveFromNode.setChildNumber(maximumMisalignedNode.getMatch().getChildNumber());
                             moveFromNode.setParent(maximumMisalignedNode.getParent());
@@ -180,11 +186,12 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
 
                             DiffTree<L> moveTo = current.getMatch();
                             moveTo.setReferenceType(ReferenceType.MOVE_TO);
-                            moveTo.setReferenceLocation(createdNode);
+                            //moveTo.setReferenceLocation(createdNode);
                             moveTo.unmatch();
 
                             createdNode.setMatch(current);
                             createdNode.setReferenceType(ReferenceType.MOVE_FROM);
+                            createdNode.setReferenceLocation(moveTo);
 
                             DiffTree<L> previous = getNodeGeneric(current, 1, DiffTree::getPreviousMatched, a -> true);
                             DiffTree<L> previousMatch = previous != null ? previous.getMatch() : null;

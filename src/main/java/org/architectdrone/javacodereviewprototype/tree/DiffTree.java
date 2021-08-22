@@ -21,7 +21,6 @@ import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.NONE
  */
 public class DiffTree<L> {
     //Tree data
-    @Getter
     List<DiffTree<L>> children; //Children of the root node
 
     //Advanced tree data
@@ -96,6 +95,18 @@ public class DiffTree<L> {
         toReturn.addAll(children.stream().flatMap(c -> c.getDescendants(includeLeaves).stream()).collect(Collectors.toList()));
         toReturn.addAll(children.stream().filter(c -> !c.getChildren().isEmpty() || includeLeaves).collect(Collectors.toList()));
         return toReturn;
+    }
+
+    public List<DiffTree<L>> getChildren()
+    {
+        if (referenceLocation == null)
+        {
+            return children;
+        }
+        else
+        {
+            return referenceLocation.getChildren();
+        }
     }
 
     public void setMatch(DiffTree<L> match)

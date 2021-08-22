@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.MOVE_TO;
 import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.NONE;
 
 /**
@@ -348,6 +349,10 @@ public class DiffTree<L> {
                     .getReferenceType().linesCreated != 0 || current.getReferenceType() == NONE) {
                         childNumber++;
                     }
+            if (current.getReferenceType() == MOVE_TO)
+            {
+                current.unmatch();
+            }
             current.setChildNumber(childNumber);
             current.rectifyNodes();
             current = current.getNext();

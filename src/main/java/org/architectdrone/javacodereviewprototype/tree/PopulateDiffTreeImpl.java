@@ -122,31 +122,6 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                     {
                         break;
                     }
-
-//                    DiffTree<L> beforeNewNode;
-//                    if (maximumMisalignment < 0)
-//                    {
-//                        beforeNewNode = getNodeGeneric(maximumMisalignedNode, -1*maximumMisalignment, DiffTree::getPreviousMatched, a -> true);
-//                    }
-//                    else
-//                    {
-//                        beforeNewNode = getNodeGeneric(maximumMisalignedNode, maximumMisalignment, DiffTree::getNextMatched, a -> true);
-//                    }
-//
-//                    maximumMisalignedNode.setReferenceType(ReferenceType.MOVE_TO);
-//
-//                    DiffTree<L> moveFromNode = new DiffTree<L>(maximumMisalignedNode.getLabel(), maximumMisalignedNode.getValue(), Collections.emptyList(), true);
-//                    maximumMisalignedNode.setReferenceLocation(moveFromNode);
-//
-//                    moveFromNode.setChildNumber(maximumMisalignedNode.getMatch().getChildNumber());
-//                    moveFromNode.setParent(maximumMisalignedNode.getParent());
-//                    moveFromNode.setHasAdvancedDataBeenPopulated(true);
-//                    moveFromNode.setReferenceType(ReferenceType.MOVE_FROM);
-//
-//                    parent.insertNodeAfter(beforeNewNode, moveFromNode);
-//                    maximumMisalignedNode.getMatch().unmatch();
-//                    moveFromNode.setMatch(maximumMisalignedNode.getMatch());
-//                    maximumMisalignedNode.unmatch();
                 }
 
                 //Theoretically, by this point, all nodes are in order
@@ -168,12 +143,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                         else if (!current.isMatched())
                         {
                             //Create
-                            DiffTree<L> createdNode = new DiffTree<L>(
-                                    current.getLabel(),
-                                    current.getValue(),
-                                    Collections.emptyList(),
-                                    true
-                            );
+                            DiffTree<L> createdNode = new DiffTree<>(current.getLabel(), current.getValue(), Collections.emptyList(), true);
 
                             DiffTree<L> createdNodeParent = current.getParent().getMatch();
 
@@ -192,7 +162,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                             DiffTree<L> previousMatch = previous != null ? previous.getMatch() : null;
                             parent.insertNodeAfter(previousMatch, createdNode);
                         }
-                        else if (current.getParent().getMatch() != parent)
+                        else if (current.getParent() != current.getMatch().getParent().getMatch())
                         {
                             //Move from
                             DiffTree<L> createdNode = new DiffTree<L>(
@@ -208,11 +178,17 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                             createdNode.setParent(createdNodeParent);
                             createdNode.setHasAdvancedDataBeenPopulated(true);
 
+                            DiffTree<L> moveTo = current.getMatch();
+                            moveTo.setReferenceType(ReferenceType.MOVE_TO);
+                            moveTo.setReferenceLocation(createdNode);
+                            moveTo.unmatch();
+
                             createdNode.setMatch(current);
                             createdNode.setReferenceType(ReferenceType.MOVE_FROM);
 
-                            DiffTree<L> previous = current.getPrevious();
-                            parent.insertNodeAfter(previous, createdNode);
+                            DiffTree<L> previous = getNodeGeneric(current, 1, DiffTree::getPreviousMatched, a -> true);
+                            DiffTree<L> previousMatch = previous != null ? previous.getMatch() : null;
+                            parent.insertNodeAfter(previousMatch, createdNode);
                         }
                         current = current.getNext();
 
@@ -234,95 +210,12 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                     }
                     else if ((current.getReferenceType() == ReferenceType.NONE) && current.getParent() != current.getMatch().getParent().getMatch())
                     {
-                        current.setReferenceType(ReferenceType.MOVE_TO);
-                        current.setReferenceLocation(current.getMatch());
+//                        current.setReferenceType(ReferenceType.MOVE_TO);
+//                        current.setReferenceLocation(current.getMatch().getMatch());
                     }
                     current = current.getNext();
                 }
             }
-
-
-//            List<DiffTree<L>> nodesToCreate = modifiedNodes
-//                    .stream()
-//                    .filter(a -> !a.isMatched())
-//                    .collect(Collectors.toList());
-//            List<DiffTree<L>> nodesToDelete = originalNodes
-//                    .stream()
-//                    .filter(a -> !a.isMatched())
-//                    .collect(Collectors.toList());
-//
-//            for (DiffTree<L> nodeToDelete : nodesToDelete)
-//            {
-//                nodeToDelete.setReferenceType(ReferenceType.DELETE);
-//                DiffTree<L> deletedNodeParent = nodeToDelete.getParent();
-//                int childNumber = nodeToDelete.getChildNumber();
-//                nodeToDelete.getParent().shiftDownAfterChild(nodeToDelete.getChildNumber());
-//            }
-//            for (DiffTree<L> createdNodeMatch : nodesToCreate)
-//            {
-//                DiffTree<L> createdNode = new DiffTree<>(
-//                        createdNodeMatch.getLabel(),
-//                        createdNodeMatch.getValue(),
-//                        Collections.emptyList(),
-//                        true
-//                );
-//
-//                DiffTree<L> createdNodeParent = createdNodeMatch.getParent().getMatch();
-//
-//                createdNode.setChildNumber(createdNodeMatch.getChildNumber());
-//                createdNode.setParent(createdNodeParent);
-//                createdNode.setHasAdvancedDataBeenPopulated(true);
-//
-//                createdNode.setMatch(createdNodeMatch);
-//                createdNode.setReferenceType(ReferenceType.CREATE);
-//
-//                createdNodeParent.insertAndShiftUp(createdNode);
-//            }
-//
-//            List<DiffTree<L>> allMisMatchedNodes = originalNodes
-//                    .stream()
-//                    .filter(DiffTree::isMatched)
-//                    .filter(a -> a.getParent() == a.getMatch().getParent().getMatch())
-//                    .filter(a -> a.getChildNumber() != a.getMatch().getChildNumber())
-//                    .collect(Collectors.toList());
-//            Map<DiffTree<L>, List<DiffTree<L>>> parentToMismatchedNodes = new HashMap<>();
-//            for (DiffTree<L> node : allMisMatchedNodes)
-//            {
-//                parentToMismatchedNodes.compute(node.getParent(), (k, v) -> {
-//                    if (v == null)
-//                    {
-//                        v = new ArrayList<>();
-//                    }
-//                    v.add(node);
-//                    return v;
-//                });
-//            }
-//            for (Map.Entry<DiffTree<L>, List<DiffTree<L>>> parentAndMisMatchedChildren : parentToMismatchedNodes.entrySet())
-//            {
-//                List<DiffTree<L>> sortedMismatchedNodes = parentAndMisMatchedChildren
-//                        .getValue()
-//                        .stream()
-//                        .sorted(Comparator.comparingInt(a -> -1*Math.abs(a.getChildNumber() - a.getMatch().getChildNumber())))
-//                        .collect(Collectors.toList());
-//                for (DiffTree<L> mismatchedNode : sortedMismatchedNodes)
-//                {
-//                    if (mismatchedNode.getChildNumber() != mismatchedNode.getMatch().getChildNumber())
-//                    {
-//                        mismatchedNode.setReferenceType(ReferenceType.MOVE_TO);
-//                        mismatchedNode.getParent().shiftDownAfterChild(mismatchedNode.getChildNumber());
-//
-//                        DiffTree<L> moveFromNode = new DiffTree<L>(mismatchedNode.getLabel(), mismatchedNode.getValue(), Collections.emptyList(), true);
-//                        mismatchedNode.setReferenceLocation(moveFromNode);
-//
-//                        moveFromNode.setChildNumber(mismatchedNode.getMatch().getChildNumber());
-//                        moveFromNode.setParent(mismatchedNode.getParent());
-//                        moveFromNode.setHasAdvancedDataBeenPopulated(true);
-//                        moveFromNode.setReferenceType(ReferenceType.MOVE_FROM);
-//                        mismatchedNode.getParent().insertAndShiftUp(moveFromNode);
-//
-//                    }
-//                }
-//            }
         }
         treeA.rectifyNodes();
     }

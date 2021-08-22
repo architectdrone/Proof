@@ -99,24 +99,16 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                     doForEachChild(parent.getMatch(), PopulateDiffTreeImpl::handleNodeInModified, a -> true);
                 }
 
-                //Then we take care of deleted and moved out nodes
-                current = parent.getFirst();
-                while (true)
-                {
-                    if (current == null)
-                    {
-                        break;
-                    }
-                    else if (!current.isMatched() && (current.getReferenceType() == ReferenceType.NONE))
-                    {
-                        //Delete
-                        current.setReferenceType(ReferenceType.DELETE);
-                    }
-                    current = current.getNext();
-                }
+                //Then we take care of deleted nodes
+                doForEachChild(parent, PopulateDiffTreeImpl::deleteNode, a -> (!a.isMatched() && (a.getReferenceType() == ReferenceType.NONE)));
             }
         }
         treeA.rectifyNodes();
+    }
+
+    private static <L> void deleteNode(DiffTree<L> unmatchedNode)
+    {
+        unmatchedNode.setReferenceType(ReferenceType.DELETE);
     }
 
     private static <L> void handleNodeInModified(DiffTree<L> unmatchedNode)

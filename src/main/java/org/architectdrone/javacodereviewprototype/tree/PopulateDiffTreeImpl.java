@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static org.architectdrone.javacodereviewprototype.tree.DiffTree.areNodesMisaligned;
 import static org.architectdrone.javacodereviewprototype.tree.DiffTree.getMisalignedDual;
@@ -134,6 +136,19 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
         treeA.rectifyNodes();
     }
 
+//    private static <L> void handleUnmatchedNodesInModified(DiffTree<L> unmatchedNode)
+//    {
+//        DiffTree<>
+//        if (!current.isMatched())
+//        {
+//            createNewNode(current, parent);
+//        }
+//        else if (current.getParent() != current.getMatch().getParent().getMatch())
+//        {
+//            handleInterTreeMove(current, parent);
+//        }
+//    }
+
     /**
      * Handles inter-tree moves.
      * @param original Node in modified tree with a different parent from it's match.
@@ -142,7 +157,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
      */
     private static <L> void handleInterTreeMove(DiffTree<L> original, DiffTree<L> parent)
     {
-        DiffTree<L> createdNode = copyNode(original, parent, ReferenceType.MOVE_FROM);
+        DiffTree<L> createdNode = copyNode(original, ReferenceType.MOVE_FROM);
 
         DiffTree<L> moveTo = original.getMatch();
         moveTo.setReferenceType(ReferenceType.MOVE_TO);
@@ -161,18 +176,17 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
      */
     private static <L> void createNewNode(DiffTree<L> original, DiffTree<L> parent)
     {
-        copyNode(original, parent, ReferenceType.CREATE);
+        copyNode(original, ReferenceType.CREATE);
     }
 
     /**
      * Creates a copy of the given node.
-     * @param original The original node. (Should be in opposite of parent)
-     * @param parent The parent that new node should be inserted into.
-     * @param referenceType The new reference type of the node.
      * @param <L> Label type
+     * @param original The original node. (Should be in opposite of parent)
+     * @param referenceType The new reference type of the node.
      * @return New node.
      */
-    private static <L> DiffTree<L> copyNode(DiffTree<L> original, DiffTree<L> parent, ReferenceType referenceType)
+    private static <L> DiffTree<L> copyNode(DiffTree<L> original, ReferenceType referenceType)
     {
         //Create
         DiffTree<L> createdNode = new DiffTree<>(original.getLabel(), original.getValue(), Collections.emptyList(), true);
@@ -188,8 +202,24 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
 
         DiffTree<L> previous = getNodeGeneric(original, 1, DiffTree::getPreviousMatched, a -> true);
         DiffTree<L> previousMatch = previous != null ? previous.getMatch() : null;
-        parent.insertNodeAfter(previousMatch, createdNode);
+        createdNode.getParent().insertNodeAfter(previousMatch, createdNode);
 
         return createdNode;
+    }
+
+    private static <L> void doForEachChild(DiffTree<L> parent, Consumer<DiffTree<L>> handler, Predicate<DiffTree<L>> discriminator)
+    {
+        DiffTree<L> current = parent.getFirst();
+        while (true) {
+            if (current == null)
+            {
+                break;
+            }
+            else if (discriminator.test(current))
+            {
+                handler.accept(current);
+            }
+            current = current.getNext();
+        }
     }
 }

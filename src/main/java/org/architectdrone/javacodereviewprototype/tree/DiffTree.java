@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.MOVE_FROM;
 import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.MOVE_TO;
 import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.NONE;
 
@@ -99,7 +100,7 @@ public class DiffTree<L> {
 
     public List<DiffTree<L>> getChildren()
     {
-        if (referenceLocation == null)
+        if (referenceType != MOVE_FROM)
         {
             return children;
         }

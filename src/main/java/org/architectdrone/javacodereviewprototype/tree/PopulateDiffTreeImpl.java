@@ -108,7 +108,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                             maximumMisalignedNode.setReferenceType(ReferenceType.MOVE_TO);
 
                             DiffTree<L> moveFromNode = new DiffTree<L>(maximumMisalignedNode.getLabel(), maximumMisalignedNode.getValue(), Collections.emptyList(), true);
-                            //maximumMisalignedNode.setReferenceLocation(moveFromNode);
+                            maximumMisalignedNode.setReferenceLocation(moveFromNode);
                             moveFromNode.setReferenceLocation(maximumMisalignedNode);
 
                             moveFromNode.setChildNumber(maximumMisalignedNode.getMatch().getChildNumber());
@@ -186,7 +186,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
 
                             DiffTree<L> moveTo = current.getMatch();
                             moveTo.setReferenceType(ReferenceType.MOVE_TO);
-                            //moveTo.setReferenceLocation(createdNode);
+                            moveTo.setReferenceLocation(createdNode);
                             moveTo.unmatch();
 
                             createdNode.setMatch(current);

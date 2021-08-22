@@ -137,6 +137,7 @@ class PopulateDiffTreeImplTest {
         static void assertPointsAt(DiffTree<String> moveTo, DiffTree<String> moveFrom)
         {
             assertEquals(moveFrom.getReferenceLocation(), moveTo);
+            assertEquals(moveTo.getReferenceLocation(), moveFrom);
         }
 
         static DiffTree<String> getNodeWithLabel(DiffTree<String> tree, String label)

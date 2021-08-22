@@ -55,20 +55,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                 }
 
                 //Identify and fix mismatched nodes
-                DiffTree<L> current = getNodeGeneric(parent.getFirst(), 0, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE && a.isMatched());
-                while (true)
-                {
-                    DiffTree<L> next = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
-                    if (next == null)
-                    {
-                        break;
-                    }
-                    if (areNodesMisaligned(current, next))
-                    {
-                        handleMisalignedNodes(current, next);
-                    }
-                    current = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
-                }
+                doForEachPairOfMatchedNodes(parent, PopulateDiffTreeImpl::handleMisalignedNodes, DiffTree::areNodesMisaligned);
 
                 //Theoretically, by this point, all nodes are in order
                 //Now, we are left with some disconnected nodes
@@ -209,8 +196,8 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
             if (next == null) {
                 break;
             }
-            if (discriminator.test(next, current)) {
-                handler.accept(next, current);
+            if (discriminator.test(current, next)) {
+                handler.accept(current, next);
             }
             current = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
         }

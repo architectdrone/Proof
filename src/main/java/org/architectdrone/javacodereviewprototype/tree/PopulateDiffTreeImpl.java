@@ -103,41 +103,11 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                         }
                         else if (!current.isMatched())
                         {
-                            //Create
-                            DiffTree<L> createdNode = new DiffTree<>(current.getLabel(), current.getValue(), Collections.emptyList(), true);
-
-                            DiffTree<L> createdNodeParent = current.getParent().getMatch();
-
-                            createdNode.setChildNumber(current.getChildNumber());
-                            createdNode.setParent(createdNodeParent);
-                            createdNode.setHasAdvancedDataBeenPopulated(true);
-
-                            createdNode.setMatch(current);
-                            createdNode.setReferenceType(ReferenceType.CREATE);
-
-                            /*
-                             * We want to place the new node after the node before's match
-                             * Unless the node before's match is a MOVE_FROM, in which case we want to move it to the node before
-                             */
-                            DiffTree<L> previous = getNodeGeneric(current, 1, DiffTree::getPreviousMatched, a -> true);
-                            DiffTree<L> previousMatch = previous != null ? previous.getMatch() : null;
-                            parent.insertNodeAfter(previousMatch, createdNode);
+                            createNewNode(current, parent);
                         }
                         else if (current.getParent() != current.getMatch().getParent().getMatch())
                         {
-                            //Move from
-                            DiffTree<L> createdNode = new DiffTree<L>(
-                                    current.getLabel(),
-                                    current.getValue(),
-                                    Collections.emptyList(),
-                                    true
-                            );
-
-                            DiffTree<L> createdNodeParent = current.getParent().getMatch();
-
-                            createdNode.setChildNumber(current.getChildNumber());
-                            createdNode.setParent(createdNodeParent);
-                            createdNode.setHasAdvancedDataBeenPopulated(true);
+                            DiffTree<L> createdNode = createNewNode(current, parent);
 
                             DiffTree<L> moveTo = current.getMatch();
                             moveTo.setReferenceType(ReferenceType.MOVE_TO);
@@ -147,10 +117,6 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                             createdNode.setMatch(current);
                             createdNode.setReferenceType(ReferenceType.MOVE_FROM);
                             createdNode.setReferenceLocation(moveTo);
-
-                            DiffTree<L> previous = getNodeGeneric(current, 1, DiffTree::getPreviousMatched, a -> true);
-                            DiffTree<L> previousMatch = previous != null ? previous.getMatch() : null;
-                            parent.insertNodeAfter(previousMatch, createdNode);
                         }
                         current = current.getNext();
 
@@ -175,5 +141,29 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
             }
         }
         treeA.rectifyNodes();
+    }
+    
+    private static <L> DiffTree<L> createNewNode(DiffTree<L> original, DiffTree<L> parent)
+    {
+        //Create
+        DiffTree<L> createdNode = new DiffTree<>(original.getLabel(), original.getValue(), Collections.emptyList(), true);
+
+        DiffTree<L> createdNodeParent = original.getParent().getMatch();
+
+        createdNode.setChildNumber(original.getChildNumber());
+        createdNode.setParent(createdNodeParent);
+        createdNode.setHasAdvancedDataBeenPopulated(true);
+
+        createdNode.setMatch(original);
+        createdNode.setReferenceType(ReferenceType.CREATE);
+
+        /*
+         * We want to place the new node after the node before's match
+         */
+        DiffTree<L> previous = getNodeGeneric(original, 1, DiffTree::getPreviousMatched, a -> true);
+        DiffTree<L> previousMatch = previous != null ? previous.getMatch() : null;
+        parent.insertNodeAfter(previousMatch, createdNode);
+
+        return createdNode;
     }
 }

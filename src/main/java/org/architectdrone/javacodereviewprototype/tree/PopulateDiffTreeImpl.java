@@ -107,7 +107,7 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                         }
                         else if (current.getParent() != current.getMatch().getParent().getMatch())
                         {
-                            DiffTree<L> createdNode = createNewNode(current, parent);
+                            DiffTree<L> createdNode = copyNode(current, parent, ReferenceType.MOVE_FROM);
 
                             DiffTree<L> moveTo = current.getMatch();
                             moveTo.setReferenceType(ReferenceType.MOVE_TO);
@@ -115,7 +115,6 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                             moveTo.unmatch();
 
                             createdNode.setMatch(current);
-                            createdNode.setReferenceType(ReferenceType.MOVE_FROM);
                             createdNode.setReferenceLocation(moveTo);
                         }
                         current = current.getNext();
@@ -142,8 +141,27 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
         }
         treeA.rectifyNodes();
     }
-    
-    private static <L> DiffTree<L> createNewNode(DiffTree<L> original, DiffTree<L> parent)
+
+    /**
+     * Creates a copy of original under parent at the correct location.
+     * @param original The original to copy.
+     * @param parent The parent to put it under.
+     * @param <L> The Label Type.
+     */
+    private static <L> void createNewNode(DiffTree<L> original, DiffTree<L> parent)
+    {
+        copyNode(original, parent, ReferenceType.CREATE);
+    }
+
+    /**
+     * Creates a copy of the given node.
+     * @param original The original node. (Should be in opposite of parent)
+     * @param parent The parent that new node should be inserted into.
+     * @param referenceType The new reference type of the node.
+     * @param <L> Label type
+     * @return New node.
+     */
+    private static <L> DiffTree<L> copyNode(DiffTree<L> original, DiffTree<L> parent, ReferenceType referenceType)
     {
         //Create
         DiffTree<L> createdNode = new DiffTree<>(original.getLabel(), original.getValue(), Collections.emptyList(), true);
@@ -155,11 +173,8 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
         createdNode.setHasAdvancedDataBeenPopulated(true);
 
         createdNode.setMatch(original);
-        createdNode.setReferenceType(ReferenceType.CREATE);
+        createdNode.setReferenceType(referenceType);
 
-        /*
-         * We want to place the new node after the node before's match
-         */
         DiffTree<L> previous = getNodeGeneric(original, 1, DiffTree::getPreviousMatched, a -> true);
         DiffTree<L> previousMatch = previous != null ? previous.getMatch() : null;
         parent.insertNodeAfter(previousMatch, createdNode);

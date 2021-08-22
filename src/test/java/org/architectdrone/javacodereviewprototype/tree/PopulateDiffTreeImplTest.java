@@ -19,24 +19,6 @@ class PopulateDiffTreeImplTest {
 
     static class Utils
     {
-        enum TreeNames
-        {
-            A("A"),
-            B("B"),
-            C("C"),
-            D("D"),
-            E("E"),
-            F("F"),
-            G("G");
-
-            String name;
-
-            TreeNames(String name)
-            {
-                this.name = name;
-            }
-        }
-
         static DiffTree<String> createNode(String name, List<DiffTree<String>> children, boolean isOriginal)
         {
             return new DiffTree<>(name, name, children, isOriginal);
@@ -77,27 +59,6 @@ class PopulateDiffTreeImplTest {
             return createNode("G", Arrays.asList(children), isOriginal);
         }
 
-//        static DiffTree<String> createModifiedSingleLevelTree(DiffTree<String> originalSingleLevelTree, TreeNames... treeNames)
-//        {
-//            DiffTree<String> newTree = createSingleLevelTree(false, treeNames);
-//            Pair<DiffTree<String>, DiffTree<String>>
-//        }
-//
-//        static DiffTree<String> createOriginalSingleLevelTree(TreeNames... treeNames) {
-//            return createSingleLevelTree(true, treeNames);
-//        }
-//
-//        static DiffTree<String> createSingleLevelTree(boolean isOriginal, TreeNames... treeNames)
-//        {
-//            return createNode(
-//                "A",
-//                Arrays.stream(treeNames)
-//                    .map(treeName -> treeName.name)
-//                    .map(name -> createNode(name, Collections.emptyList(), isOriginal))
-//                    .collect(Collectors.toList()),
-//                isOriginal);
-//        }
-
         static DiffTree<String> getSingleChild(DiffTree<String> parent, int childNumber)
         {
             List<DiffTree<String>> potentialChildren = parent.getChild(childNumber);
@@ -127,13 +88,13 @@ class PopulateDiffTreeImplTest {
         static void assertMovedTo(DiffTree<String> node)
         {
             assertEquals(ReferenceType.MOVE_TO, node.getReferenceType());
-            assertTrue(node.isMatched());
+            assertFalse(node.isMatched());
         }
 
         static void assertMovedFrom(DiffTree<String> node)
         {
             assertEquals(ReferenceType.MOVE_FROM, node.getReferenceType());
-            assertFalse(node.isMatched());
+            assertTrue(node.isMatched());
         }
 
         static void assertNone(DiffTree<String> node)
@@ -1053,10 +1014,10 @@ class PopulateDiffTreeImplTest {
                      * In the original tree, we have B1, D1.
                      * In the modified tree, we have D2, B2, C2.
                      *
-                     * At 0, we want B1, MF.
+                     * At 0, we want B1, MT.
                      * At 1, we want D1, NONE.
-                     * At 2, we want B1, MT.
-                     * At 2, we want C1, CREATE.
+                     * At 2, we want B1, MF.
+                     * At 3, we want C1, CREATE.
                      */
                     @Test
                     void perfectSwap_andNodeAfter_works()
@@ -1078,13 +1039,13 @@ class PopulateDiffTreeImplTest {
 
                         populateDiffTree.populateDiffTree(a1, a2);
                         DiffTree<String> b1_mt = b1;
-                        DiffTree<String> b1_mf = getSingleChild(a1, 0);
+                        DiffTree<String> b1_mf = getSingleChild(a1, 2);
                         DiffTree<String> c1 = getNodeWithType(a1, ReferenceType.CREATE);
 
-                        assertChildNumber(b1_mf, 0);
+                        assertChildNumber(b1_mt, 0);
                         assertChildNumber(d1, 1);
-                        assertChildNumber(b1_mt, 2);
-                        assertChildNumber(c1, 2);
+                        assertChildNumber(b1_mf, 2);
+                        assertChildNumber(c1, 3);
 
                         assertMovedFrom(b1_mf);
                         assertNone(d1);
@@ -1406,7 +1367,7 @@ class PopulateDiffTreeImplTest {
                                 assertCreated(f1);
                                 assertMovedTo(b1_mt);
 
-                                assertPointsAt(b1_mf, b1_mt);
+                                assertPointsAt(b1_mt, b1_mf);
                             }
 
                             /**
@@ -1968,7 +1929,7 @@ class PopulateDiffTreeImplTest {
                                 DiffTree<String> e1 = createENode(true);
                                 DiffTree<String> d1 = createDNode(true);
                                 DiffTree<String> c1 = createCNode(true);
-                                DiffTree<String> b1 = createCNode(true);
+                                DiffTree<String> b1 = createBNode(true);
                                 DiffTree<String> a1 = createANode(true, b1, c1, d1, e1);
 
                                 DiffTree<String> e2 = createENode(false);
@@ -1983,7 +1944,7 @@ class PopulateDiffTreeImplTest {
                                 e1.setMatch(e2);
 
                                 populateDiffTree.populateDiffTree(a1, a2);
-                                DiffTree<String> e1_mf = getNodeWithLabel(a1, "E");
+                                DiffTree<String> e1_mf = getNodeWithType(a1, ReferenceType.MOVE_FROM);
                                 DiffTree<String> e1_mt = e1;
 
                                 assertChildNumber(b1, 0);
@@ -2215,8 +2176,8 @@ class PopulateDiffTreeImplTest {
                         assertNone(f1);
                         assertNone(g1);
 
-                        assertPointsAt(b1_mf, b1_mt);
-                        assertPointsAt(d1_mf, d1_mt);
+                        assertPointsAt(b1_mt, b1_mf);
+                        assertPointsAt(d1_mt, d1_mf);
                     }
 
                     /**
@@ -2227,6 +2188,7 @@ class PopulateDiffTreeImplTest {
                      */
                     @Test
                     void twinReordering() {
+                        //fail("Infinte loop");
                         //Setup trees
                         DiffTree<String> g1 = createGNode(true);
                         DiffTree<String> f1 = createFNode(true);
@@ -2348,7 +2310,7 @@ class PopulateDiffTreeImplTest {
                 assertMovedFrom(d1_mf);
                 assertMovedTo(d1_mt);
 
-                assertPointsAt(d1_mf, d1_mt);
+                assertPointsAt(d1_mt, d1_mf);
             }
 
             /**
@@ -2390,7 +2352,7 @@ class PopulateDiffTreeImplTest {
                 assertMovedFrom(d1_mf);
                 assertMovedTo(d1_mt);
 
-                assertPointsAt(d1_mf, d1_mt);
+                assertPointsAt(d1_mt, d1_mf);
             }
 
             /**
@@ -2438,7 +2400,7 @@ class PopulateDiffTreeImplTest {
                 assertMovedFrom(d1_mf);
                 assertMovedTo(d1_mt);
 
-                assertPointsAt(d1_mf, d1_mt);
+                assertPointsAt(d1_mt, d1_mf);
             }
 
             @Nested
@@ -2465,14 +2427,14 @@ class PopulateDiffTreeImplTest {
                     b1.setMatch(b2);
 
                     populateDiffTree.populateDiffTree(a1, a2);
-                    DiffTree<String> c1 = getSingleChild(a1, 1);
+                    DiffTree<String> c1 = getNodeWithType(a1, ReferenceType.CREATE);
                     DiffTree<String> b1_mt = b1;
                     DiffTree<String> b1_mf = getSingleChild(c1, 0);
 
                     assertParent(b1_mt, a1);
                     assertParent(c1, a1);
                     assertChildNumber(b1_mt, 0);
-                    assertChildNumber(c1, 1);
+                    assertChildNumber(c1, 0);
                     assertParent(b1_mf, c1);
 
                     assertMovedFrom(b1_mf);
@@ -2506,12 +2468,12 @@ class PopulateDiffTreeImplTest {
 
                     populateDiffTree.populateDiffTree(a1, a2);
                     DiffTree<String> b1_mt = b1;
-                    DiffTree<String> b1_mf = getSingleChild(a1, 0);
+                    DiffTree<String> b1_mf = getNodeWithType(a1, ReferenceType.MOVE_FROM);
 
                     assertParent(b1_mf, a1);
                     assertParent(c1, a1);
                     assertChildNumber(b1_mf, 0);
-                    assertChildNumber(c1, 1);
+                    assertChildNumber(c1, 0);
                     assertParent(b1_mt, c1);
 
                     assertMovedFrom(b1_mf);

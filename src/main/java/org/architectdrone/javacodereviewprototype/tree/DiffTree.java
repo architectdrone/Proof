@@ -2,18 +2,18 @@ package org.architectdrone.javacodereviewprototype.tree;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.omg.PortableInterceptor.NON_EXISTENT;
+
+import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.MOVE_TO;
+import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.NONE;
 
 /**
  * Simple tree data structure with data for the matching process.
@@ -28,6 +28,10 @@ public class DiffTree<L> {
     private DiffTree<L> parent;
     private int childNumber;
     @Setter private boolean hasAdvancedDataBeenPopulated;
+
+    @Getter @Setter private DiffTree<L> next;
+    @Getter @Setter private DiffTree<L> previous;
+    @Getter @Setter private DiffTree<L> first;
 
     //Container data
     @Getter
@@ -49,7 +53,7 @@ public class DiffTree<L> {
     @Getter @Setter
     DiffTree<L> referenceLocation;
     @Getter @Setter @Builder.Default
-    ReferenceType referenceType = ReferenceType.NONE;
+    ReferenceType referenceType = NONE;
     @Getter @Setter
     String oldValue;
 
@@ -76,7 +80,7 @@ public class DiffTree<L> {
     public DiffTree(final L label, final String value, final List<DiffTree<L>> children, boolean isOriginal) {
         this.label = label;
         this.value = value;
-        this.children = children;
+        this.children = new ArrayList<>(children);
         this.isOriginal = isOriginal;
     }
 
@@ -103,6 +107,12 @@ public class DiffTree<L> {
         {
             match.setMatch(this);
         }
+    }
+
+    public void unmatch()
+    {
+        this.match = null;
+        this.isMatched = false;
     }
 
     public List<DiffTree<L>> getLeaves() {
@@ -240,8 +250,23 @@ public class DiffTree<L> {
             throw new RuntimeException("Advanced tree data has already been populated.");
         }
 
+        if (getChildren().size() != 0)
+        {
+            first = getChildren().get(0);
+        }
+
         for (int i = 0; i < getChildren().size(); i++) {
             DiffTree<L> child = getChildren().get(i);
+            if (i != 0)
+            {
+                child.setPrevious(getChildren().get(i-1));
+            }
+
+            if (i != getChildren().size()-1)
+            {
+                child.setNext(getChildren().get(i+1));
+            }
+
             child.setChildNumber(i);
             child.setParent(this);
             child.populateAdvancedData();
@@ -312,36 +337,207 @@ public class DiffTree<L> {
 
     public void rectifyNodes()
     {
-        EnumSet<ReferenceType> collapsableTypes = EnumSet.of(ReferenceType.CREATE, ReferenceType.DELETE, ReferenceType.MOVE_FROM);
-        children.sort(Comparator.comparingInt(DiffTree::getChildNumber));
-        int numberOfDeletes = 0;
-        DiffTree<L> previousChild = null;
-        for (DiffTree<L> child : children)
+        DiffTree<L> current = getFirst();
+        int childNumber = -1;
+        while (true)
         {
-            if (previousChild == null)
+            if (current == null)
             {
-                child.setChildNumber(0);
-                previousChild = child;
-                continue;
+                break;
             }
+            if (current.getPrevious() == null || current.getPrevious() != null && current.getReferenceType().linesCreated + current.getPrevious()
+                    .getReferenceType().linesCreated != 0 || current.getReferenceType() == NONE) {
+                        childNumber++;
+                    }
+            if (current.getReferenceType() == MOVE_TO)
+            {
+                current.unmatch();
+            }
+            current.setChildNumber(childNumber);
+            current.rectifyNodes();
+            current = current.getNext();
+        }
+    }
 
-            child.setChildNumber(child.getChildNumber()+numberOfDeletes);
-            int changeVector = child.getReferenceType().linesCreated + previousChild.getReferenceType().linesCreated;
-            //Collapsing
-            if ((child.getChildNumber() != previousChild.getChildNumber()) && (changeVector == 0) && child.getReferenceType().linesCreated != 0)
+    /**
+     * Inserts a node after some other node.
+     * Should be called on the parent of before
+     * @param before The node before the new node
+     * @param newNode The new node
+     */
+    public void insertNodeAfter(DiffTree<L> before, DiffTree<L> newNode)
+    {
+        if (before == null)
+        {
+            newNode.setNext(getFirst());
+            if (getFirst() != null)
             {
-                    numberOfDeletes -= 1;
-                    child.setChildNumber(child.getChildNumber()-1);
+                getFirst().setPrevious(newNode);
             }
-            //Uncollapsing
-            if ((child.getChildNumber() == previousChild.getChildNumber()) && (changeVector != 0))
+            setFirst(newNode);
+        }
+        else
+        {
+            DiffTree<L> oldAfter = before.getNext();
+            before.setNext(newNode);
+            newNode.setNext(oldAfter);
+            newNode.setPrevious(before);
+            if (oldAfter != null)
             {
-                    numberOfDeletes += 1;
-                    child.setChildNumber(child.getChildNumber()+1);
+                oldAfter.setPrevious(newNode);
             }
+        }
 
-            previousChild = child;
-            child.rectifyNodes();
+        children.add(newNode);
+    }
+
+    public DiffTree<L> getNextMatched()
+    {
+        return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent());
+    }
+
+    public DiffTree<L> getNextMatchedNone()
+    {
+        return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent() && a.getReferenceType() == NONE);
+    }
+
+    public DiffTree<L> getPreviousMatchedNone()
+    {
+        return DiffTree.getNodeGeneric(this.getPrevious(), 0, DiffTree::getPrevious, a -> a.isMatched && a.getParent() == this.getParent()&& a.getReferenceType() == NONE);
+    }
+
+    public DiffTree<L> getPreviousMatched()
+    {
+        return DiffTree.getNodeGeneric(this.getPrevious(), 0, DiffTree::getPrevious, a -> a.isMatched && a.getParent() == this.getParent());
+    }
+
+    public int getMisalignmentSize(DiffTree<L> x, DiffTree<L> y)
+    {
+        boolean xIsNextOfY = x.getNextMatched() == y;
+
+        DiffTree<L> xNextMatch = x.getMatch().getNextMatched();
+        DiffTree<L> xPrevMatch = x.getMatch().getPreviousMatched();
+
+        int misalignmentSize = 1;
+        boolean misaligned;
+        boolean isNext;
+        while (true)
+        {
+            if (xPrevMatch == y.getMatch())
+            {
+                misaligned = xIsNextOfY;
+                isNext = false;
+                break;
+            }
+            else if (xNextMatch == y.getMatch())
+            {
+                misaligned = !xIsNextOfY;
+                isNext = true;
+                break;
+            }
+            else {
+                xNextMatch = xNextMatch != null ? xNextMatch.getNextMatched() : null;
+                xPrevMatch = xPrevMatch != null ? xPrevMatch.getPreviousMatched() : null;
+                misalignmentSize++;
+            }
+        }
+
+        if (misaligned)
+        {
+            if (!isNext)
+            {
+                return -1*misalignmentSize;
+            }
+            else {
+                return misalignmentSize;
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    public static <L> DiffTree<L> getNodeGeneric(DiffTree<L> start,  int index, UnaryOperator<DiffTree<L>> iterator, Predicate<DiffTree<L>> discriminator)
+    {
+        int currentIndex = 0;
+        DiffTree<L> current = start;
+        while (true)
+        {
+            if (current == null)
+            {
+                return null;
+            }
+            if (discriminator.test(current))
+            {
+                if (currentIndex == index)
+                {
+                    return current;
+                }
+                currentIndex++;
+            }
+            current = iterator.apply(current);
+        }
+    }
+
+    static <L> boolean areNodesMisaligned(DiffTree<L> x, DiffTree<L> y)
+    {
+        if (x == null || y == null)
+        {
+            return false;
+        }
+
+        boolean xThenY = x.getNextMatchedNone() == y;
+        boolean xMatchThenYMatch;
+        DiffTree<L> xNextMatch = x.getMatch().getNextMatchedNone();
+        DiffTree<L> xPrevMatch = x.getMatch().getPreviousMatchedNone();
+
+        while (true)
+        {
+            if (xPrevMatch == y.getMatch())
+            {
+                xMatchThenYMatch = true;
+                break;
+            }
+            else if (xNextMatch == y.getMatch())
+            {
+                xMatchThenYMatch = false;
+                break;
+            }
+            else if (xNextMatch == null && xPrevMatch == null)
+            {
+                return false;
+            }
+            else {
+                xNextMatch = xNextMatch != null ? xNextMatch.getNextMatchedNone() : null;
+                xPrevMatch = xPrevMatch != null ? xPrevMatch.getPreviousMatchedNone() : null;
+            }
+        }
+
+        if (xMatchThenYMatch == xThenY)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    static <L> DiffTree<L> getMisalignedDual(DiffTree<L> x)
+    {
+        DiffTree<L> xMatch = x.getMatch();
+        DiffTree<L> preX = xMatch.getPreviousMatched();
+        DiffTree<L> postX = xMatch.getNextMatched();
+
+        if (areNodesMisaligned(xMatch, preX))
+        {
+            return preX;
+        } else if (areNodesMisaligned(xMatch, postX))
+        {
+            return postX;
+        } else {
+            return null;
         }
     }
 }

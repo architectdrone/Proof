@@ -10,51 +10,18 @@ import static org.architectdrone.javacodereviewprototype.tree.DiffTree.getMisali
 import static org.architectdrone.javacodereviewprototype.tree.DiffTree.getNodeGeneric;
 
 /**
- * The algorithm used here is of my own creation.
- *
- * We proceed in level order from the root nodes.
- * 1. Gather all nodes on level n of both trees.
- * 2. For each node, (exclude all nodes whose ancestor's reference type is in (MOVE_FROM, DELETE)
- *  a. If the node is matched,
- *      i. And the parent nodes are both matched,
- *          - And the parent nodes are matched to each other,
- *              1. And the child number for both is equal,
- *                  a. Then the nodes are considered good.
- *              2. And the child numbers are different,
- *                  a. Then a SWAP action is needed.
- *                  b. Set reference type of original to MOVE_TO.
- *                  c. Insert new reference node beneath original's parent w/ reference type of MOVE_FROM.
- *                  d. Set original's effective subtree to the new reference node.
- *                  e. Match new reference node with corresponding modified node.
- *          - And the parent nodes are not matched to each other,
- *              1. Then a MOVE action is needed.
- *              2. Set reference type of original to MOVE_TO.
- *              3. Define destination node = modified node's parent's match.
- *              4. Insert new reference node beneath destination w/ reference type of MOVE_FROM.
- *              5. Set original's effective subtree to the new reference node.
- *              6. Match new reference node with corresponding modified node.
- *      ii. And the parent nodes are not both matched,
- *          - I don't think this can happen, so throw an error.
- *      iii. If the value of the modified and original values differ,
- *          - If some other action has already been taken,
- *              - In the other reference node, silently change the value.
- *          - If no other action has been taken,
- *              - Set reference type of original to EDIT
- *              - Set new_value to the new value
- *              - Set old_value to the old value
- *              - Set effective subtree to own subtree.
- *  b. If the node is unmatched,
- *      1. If the node is original,
- *          - Then a DELETE action is needed.
- *          - Set reference type to DELETE.
- *          - Set effective subtree to itself.
- *      2. If the node is modified,
- *          - If parent is matched,
- *              a. Then a CREATE action is needed.
- *              b. Create new node beneath parent's match with appropriate child number
- *              c. Set reference type to CREATE.
- *              d. Match new node with modified node.
- *          - Otherwise, something has gone wrong, lol
+ * Populates a diff tree. The results are:
+ * 1. In some parent,
+ *      a. If nodes match, order matches, and value matches, the node is assigned a reference type of NONE.
+ *      b. If nodes match, order matches, but value does not match, the node is assigned a reference type of MODIFY, the value is changed to the value in the modified tree, and the original value is stored.
+ *      c. If nodes match, but order does not match, set reference type of original node to MOVE_TO, and create a new node w/ reference type MOVE_FROM at correct location.
+ *      d. If nodes match, but parents do not match, set reference type of original to MOVE_TO, and create a new node with correct position MOVE_FROM
+ *          i. Any nodes existing beneath the original are considered children of both the move from and move to.
+ *      d. If a node does not match, and exists in the original tree, set the type of the node to DELETE.
+ *      e. If a node does not match, and exists in the modified tree, create a new node at the correct location in original tree with type CREATE.
+ * Once populated, we have the following requirements:
+ * 1. The value of all nodes, with lines created either 0 of -1 should have the same order as the original tree.
+ * 2. The value of all nodes, with lines created either 0 of +1 should have the same order as the modified tree.
  */
 public class PopulateDiffTreeImpl implements PopulateDiffTree {
     @Override
@@ -77,64 +44,52 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
 
             for (DiffTree<L> parent : parents)
             {
+                //If the parent is a MOVE_FROM, we want to consider the corresponding MOVE_TO's children.
                 if (parent.getReferenceType() == ReferenceType.MOVE_FROM)
                 {
                     parent = parent.getReferenceLocation();
                 }
 
                 //Identify and fix mismatched nodes
+                    //Populate misalignment map
+                DiffTree<L> current = getNodeGeneric(parent.getFirst(), 0, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE && a.isMatched());
                 while (true)
                 {
-                    DiffTree<L> maximumMisalignedNode = null;
-                    int maximumMisalignment = 0;
-
-                    //Populate misalignment map
-                    DiffTree<L> current = getNodeGeneric(parent.getFirst(), 0, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE && a.isMatched());
-                    while (true)
-                    {
-                        DiffTree<L> next = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
-                        if (next == null)
-                        {
-                            break;
-                        }
-                        if (areNodesMisaligned(current, next))
-                        {
-                            DiffTree<L> currentMisalignedDual = getMisalignedDual(current);
-                            DiffTree<L> nextMisalignedDual = getMisalignedDual(next);
-                            assert !((currentMisalignedDual == null) && (nextMisalignedDual == null));
-                            DiffTree<L> beforeNewNode = currentMisalignedDual != null ? currentMisalignedDual.getMatch() : nextMisalignedDual.getMatch().getPrevious();
-                            maximumMisalignedNode = currentMisalignedDual != null ? current : next;
-
-                            maximumMisalignedNode.setReferenceType(ReferenceType.MOVE_TO);
-
-                            DiffTree<L> moveFromNode = new DiffTree<L>(maximumMisalignedNode.getLabel(), maximumMisalignedNode.getValue(), Collections.emptyList(), true);
-                            maximumMisalignedNode.setReferenceLocation(moveFromNode);
-                            moveFromNode.setReferenceLocation(maximumMisalignedNode);
-
-                            moveFromNode.setChildNumber(maximumMisalignedNode.getMatch().getChildNumber());
-                            moveFromNode.setParent(maximumMisalignedNode.getParent());
-                            moveFromNode.setHasAdvancedDataBeenPopulated(true);
-                            moveFromNode.setReferenceType(ReferenceType.MOVE_FROM);
-
-                            parent.insertNodeAfter(beforeNewNode, moveFromNode);
-                            maximumMisalignedNode.getMatch().unmatch();
-                            moveFromNode.setMatch(maximumMisalignedNode.getMatch());
-                            maximumMisalignedNode.unmatch();
-                        }
-                        current = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
-                    }
-
-                    if (maximumMisalignment == 0)
+                    DiffTree<L> next = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
+                    if (next == null)
                     {
                         break;
                     }
+                    if (areNodesMisaligned(current, next))
+                    {
+                        DiffTree<L> currentMisalignedDual = getMisalignedDual(current);
+                        DiffTree<L> nextMisalignedDual = getMisalignedDual(next);
+                        assert !((currentMisalignedDual == null) && (nextMisalignedDual == null));
+                        DiffTree<L> beforeNewNode = currentMisalignedDual != null ? currentMisalignedDual.getMatch() : nextMisalignedDual.getMatch().getPrevious();
+                        DiffTree<L> maximumMisalignedNode = currentMisalignedDual != null ? current : next;
+
+                        maximumMisalignedNode.setReferenceType(ReferenceType.MOVE_TO);
+
+                        DiffTree<L> moveFromNode = new DiffTree<L>(maximumMisalignedNode.getLabel(), maximumMisalignedNode.getValue(), Collections.emptyList(), true);
+                        maximumMisalignedNode.setReferenceLocation(moveFromNode);
+                        moveFromNode.setReferenceLocation(maximumMisalignedNode);
+
+                        moveFromNode.setChildNumber(maximumMisalignedNode.getMatch().getChildNumber());
+                        moveFromNode.setParent(maximumMisalignedNode.getParent());
+                        moveFromNode.setHasAdvancedDataBeenPopulated(true);
+                        moveFromNode.setReferenceType(ReferenceType.MOVE_FROM);
+
+                        parent.insertNodeAfter(beforeNewNode, moveFromNode);
+                        maximumMisalignedNode.getMatch().unmatch();
+                        moveFromNode.setMatch(maximumMisalignedNode.getMatch());
+                        maximumMisalignedNode.unmatch();
+                    }
+                    current = getNodeGeneric(current, 1, DiffTree::getNextMatched, a -> a.getReferenceType() == ReferenceType.NONE);
                 }
 
                 //Theoretically, by this point, all nodes are in order
                 //Now, we are left with some disconnected nodes
                 //We handle these now
-
-                DiffTree<L> current;
 
                 //First, nodes that are created and nodes that are moved into this tree
                 if (parent.isMatched())
@@ -214,11 +169,6 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
                     {
                         //Delete
                         current.setReferenceType(ReferenceType.DELETE);
-                    }
-                    else if ((current.getReferenceType() == ReferenceType.NONE) && current.getParent() != current.getMatch().getParent().getMatch())
-                    {
-//                        current.setReferenceType(ReferenceType.MOVE_TO);
-//                        current.setReferenceLocation(current.getMatch().getMatch());
                     }
                     current = current.getNext();
                 }

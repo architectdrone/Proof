@@ -23,15 +23,16 @@ import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.NONE
 public class DiffTree<L> {
     //Tree data
     List<DiffTree<L>> children; //Children of the root node
+    @Getter private int childNumber = -1;
+
 
     //Advanced tree data
+    //Includes data for interpreting nodes as a part of a linked list
     private DiffTree<L> parent;
-    private int childNumber;
-    @Setter private boolean hasAdvancedDataBeenPopulated;
-
     @Getter @Setter private DiffTree<L> next;
     @Getter @Setter private DiffTree<L> previous;
     @Getter @Setter private DiffTree<L> first;
+    @Setter private boolean hasAdvancedDataBeenPopulated;
 
     //Container data
     @Getter
@@ -223,18 +224,6 @@ public class DiffTree<L> {
     }
 
     /**
-     * @return The child number.
-     */
-    public int getChildNumber()
-    {
-        if (!hasAdvancedDataBeenPopulated)
-        {
-            throw new RuntimeException("Advanced tree data has not been populated yet.");
-        }
-        return childNumber;
-    }
-
-    /**
      * Sets the child number.
      * @param childNumber New child number
      */
@@ -279,7 +268,6 @@ public class DiffTree<L> {
                 child.setNext(getChildren().get(i+1));
             }
 
-            child.setChildNumber(i);
             child.setParent(this);
             child.populateAdvancedData();
         }
@@ -320,236 +308,5 @@ public class DiffTree<L> {
                 .stream()
                 .filter(t -> t.getChildNumber() == childNumber)
                 .collect(Collectors.toList());
-    }
-
-    public void shiftDownAfterChild(int childNumber)
-    {
-        getChildren()
-                .stream()
-                .filter(c -> c.getChildNumber() >= childNumber)
-                .filter(c -> c.getChildNumber() > 0)
-                .forEach(c -> c.setChildNumber(c.getChildNumber()-1));
-    }
-
-    /**
-     * Inserts a node, and shifts subsequent nodes up to account for the new node.
-     * @param toInsert The node to insert.
-     */
-    public void insertAndShiftUp(DiffTree<L> toInsert)
-    {
-        getChildren()
-                .stream()
-                .filter(c -> c.getChildNumber() >= toInsert.getChildNumber())
-                .forEach(c -> c.setChildNumber(c.getChildNumber()+1));
-        //TODO: find a better way to do this!
-        ArrayList<DiffTree<L>> temp = new ArrayList<>(getChildren());
-        temp.add(toInsert);
-        children = temp;
-    }
-
-    public void rectifyNodes()
-    {
-        DiffTree<L> current = getFirst();
-        int childNumber = -1;
-        while (true)
-        {
-            if (current == null)
-            {
-                break;
-            }
-            if (current.getPrevious() == null || current.getPrevious() != null && current.getReferenceType().linesCreated + current.getPrevious()
-                    .getReferenceType().linesCreated != 0 || current.getReferenceType() == NONE) {
-                        childNumber++;
-                    }
-            if (current.getReferenceType() == MOVE_TO)
-            {
-                current.unmatch();
-            }
-            current.setChildNumber(childNumber);
-            current.rectifyNodes();
-            current = current.getNext();
-        }
-    }
-
-    /**
-     * Inserts a node after some other node.
-     * Should be called on the parent of before
-     * @param before The node before the new node
-     * @param newNode The new node
-     */
-    public void insertNodeAfter(DiffTree<L> before, DiffTree<L> newNode)
-    {
-        if (before == null)
-        {
-            newNode.setNext(getFirst());
-            if (getFirst() != null)
-            {
-                getFirst().setPrevious(newNode);
-            }
-            setFirst(newNode);
-        }
-        else
-        {
-            DiffTree<L> oldAfter = before.getNext();
-            before.setNext(newNode);
-            newNode.setNext(oldAfter);
-            newNode.setPrevious(before);
-            if (oldAfter != null)
-            {
-                oldAfter.setPrevious(newNode);
-            }
-        }
-
-        children.add(newNode);
-    }
-
-    public DiffTree<L> getNextMatched()
-    {
-        return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent());
-    }
-
-    public DiffTree<L> getNextMatchedNone()
-    {
-        return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent() && a.getReferenceType() == NONE);
-    }
-
-    public DiffTree<L> getPreviousMatchedNone()
-    {
-        return DiffTree.getNodeGeneric(this.getPrevious(), 0, DiffTree::getPrevious, a -> a.isMatched && a.getParent() == this.getParent()&& a.getReferenceType() == NONE);
-    }
-
-    public DiffTree<L> getPreviousMatched()
-    {
-        return DiffTree.getNodeGeneric(this.getPrevious(), 0, DiffTree::getPrevious, a -> a.isMatched && a.getParent() == this.getParent());
-    }
-
-    public int getMisalignmentSize(DiffTree<L> x, DiffTree<L> y)
-    {
-        boolean xIsNextOfY = x.getNextMatched() == y;
-
-        DiffTree<L> xNextMatch = x.getMatch().getNextMatched();
-        DiffTree<L> xPrevMatch = x.getMatch().getPreviousMatched();
-
-        int misalignmentSize = 1;
-        boolean misaligned;
-        boolean isNext;
-        while (true)
-        {
-            if (xPrevMatch == y.getMatch())
-            {
-                misaligned = xIsNextOfY;
-                isNext = false;
-                break;
-            }
-            else if (xNextMatch == y.getMatch())
-            {
-                misaligned = !xIsNextOfY;
-                isNext = true;
-                break;
-            }
-            else {
-                xNextMatch = xNextMatch != null ? xNextMatch.getNextMatched() : null;
-                xPrevMatch = xPrevMatch != null ? xPrevMatch.getPreviousMatched() : null;
-                misalignmentSize++;
-            }
-        }
-
-        if (misaligned)
-        {
-            if (!isNext)
-            {
-                return -1*misalignmentSize;
-            }
-            else {
-                return misalignmentSize;
-            }
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
-    public static <L> DiffTree<L> getNodeGeneric(DiffTree<L> start,  int index, UnaryOperator<DiffTree<L>> iterator, Predicate<DiffTree<L>> discriminator)
-    {
-        int currentIndex = 0;
-        DiffTree<L> current = start;
-        while (true)
-        {
-            if (current == null)
-            {
-                return null;
-            }
-            if (discriminator.test(current))
-            {
-                if (currentIndex == index)
-                {
-                    return current;
-                }
-                currentIndex++;
-            }
-            current = iterator.apply(current);
-        }
-    }
-
-    static <L> boolean areNodesMisaligned(DiffTree<L> x, DiffTree<L> y)
-    {
-        if (x == null || y == null)
-        {
-            return false;
-        }
-
-        boolean xThenY = x.getNextMatchedNone() == y;
-        boolean xMatchThenYMatch;
-        DiffTree<L> xNextMatch = x.getMatch().getNextMatchedNone();
-        DiffTree<L> xPrevMatch = x.getMatch().getPreviousMatchedNone();
-
-        while (true)
-        {
-            if (xPrevMatch == y.getMatch())
-            {
-                xMatchThenYMatch = true;
-                break;
-            }
-            else if (xNextMatch == y.getMatch())
-            {
-                xMatchThenYMatch = false;
-                break;
-            }
-            else if (xNextMatch == null && xPrevMatch == null)
-            {
-                return false;
-            }
-            else {
-                xNextMatch = xNextMatch != null ? xNextMatch.getNextMatchedNone() : null;
-                xPrevMatch = xPrevMatch != null ? xPrevMatch.getPreviousMatchedNone() : null;
-            }
-        }
-
-        if (xMatchThenYMatch == xThenY)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    static <L> DiffTree<L> getMisalignedDual(DiffTree<L> x)
-    {
-        DiffTree<L> xMatch = x.getMatch();
-        DiffTree<L> preX = xMatch.getPreviousMatched();
-        DiffTree<L> postX = xMatch.getNextMatched();
-
-        if (areNodesMisaligned(xMatch, preX))
-        {
-            return preX;
-        } else if (areNodesMisaligned(xMatch, postX))
-        {
-            return postX;
-        } else {
-            return null;
-        }
     }
 }

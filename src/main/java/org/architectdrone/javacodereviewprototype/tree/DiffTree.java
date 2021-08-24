@@ -23,16 +23,16 @@ import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.NONE
 public class DiffTree<L> {
     //Tree data
     List<DiffTree<L>> children; //Children of the root node
+    @Getter private int childNumber = -1;
+
 
     //Advanced tree data
+    //Includes data for interpreting nodes as a part of a linked list
     private DiffTree<L> parent;
-    private int childNumber;
-    @Setter private boolean hasAdvancedDataBeenPopulated;
-
-    //Data for interpreting nodes as a part of a linked list
     @Getter @Setter private DiffTree<L> next;
     @Getter @Setter private DiffTree<L> previous;
     @Getter @Setter private DiffTree<L> first;
+    @Setter private boolean hasAdvancedDataBeenPopulated;
 
     //Container data
     @Getter
@@ -224,18 +224,6 @@ public class DiffTree<L> {
     }
 
     /**
-     * @return The child number.
-     */
-    public int getChildNumber()
-    {
-        if (!hasAdvancedDataBeenPopulated)
-        {
-            throw new RuntimeException("Advanced tree data has not been populated yet.");
-        }
-        return childNumber;
-    }
-
-    /**
      * Sets the child number.
      * @param childNumber New child number
      */
@@ -280,7 +268,6 @@ public class DiffTree<L> {
                 child.setNext(getChildren().get(i+1));
             }
 
-            child.setChildNumber(i);
             child.setParent(this);
             child.populateAdvancedData();
         }

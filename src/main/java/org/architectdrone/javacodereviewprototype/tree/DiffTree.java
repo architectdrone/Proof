@@ -322,6 +322,9 @@ public class DiffTree<L> {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Ensures nodes are in correct form after running PopulateDiffTree.
+     */
     public void rectifyNodes()
     {
         DiffTree<L> current = getFirst();
@@ -378,26 +381,47 @@ public class DiffTree<L> {
         children.add(newNode);
     }
 
+    /**
+     * @return the next matched node after this ndoe, or null.
+     */
     public DiffTree<L> getNextMatched()
     {
         return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent());
     }
 
+    /**
+     * @return the next matched NONE node after this ndoe, or null.
+     */
     public DiffTree<L> getNextMatchedNone()
     {
         return DiffTree.getNodeGeneric(this.getNext(), 0, DiffTree::getNext, a -> a.isMatched && a.getParent() == this.getParent() && a.getReferenceType() == NONE);
     }
 
+    /**
+     * @return the previous matched NONE after this node
+     */
     public DiffTree<L> getPreviousMatchedNone()
     {
         return DiffTree.getNodeGeneric(this.getPrevious(), 0, DiffTree::getPrevious, a -> a.isMatched && a.getParent() == this.getParent()&& a.getReferenceType() == NONE);
     }
 
+    /**
+     * @return the previous matched after this node
+     */
     public DiffTree<L> getPreviousMatched()
     {
         return DiffTree.getNodeGeneric(this.getPrevious(), 0, DiffTree::getPrevious, a -> a.isMatched && a.getParent() == this.getParent());
     }
 
+    /**
+     * Gets a node by some criteria
+     * @param start The first node in the sequence
+     * @param index Which node to get.
+     * @param iterator The function to return the next node
+     * @param discriminator The function to determine if it valid
+     * @param <L> The label type
+     * @return The node
+     */
     public static <L> DiffTree<L> getNodeGeneric(DiffTree<L> start,  int index, UnaryOperator<DiffTree<L>> iterator, Predicate<DiffTree<L>> discriminator)
     {
         int currentIndex = 0;
@@ -420,6 +444,13 @@ public class DiffTree<L> {
         }
     }
 
+    /**
+     * Determines whether two nodes are misaligned.
+     * @param x The first node.
+     * @param y The second node.
+     * @param <L> The label type.
+     * @return Whether they are misaligned.
+     */
     static <L> boolean areNodesMisaligned(DiffTree<L> x, DiffTree<L> y)
     {
         if (x == null || y == null)
@@ -452,6 +483,12 @@ public class DiffTree<L> {
         }
     }
 
+    /**
+     * Gets the misaligned dual of x
+     * @param x The node to get the dual of
+     * @param <L> The label type
+     * @return The misaligned dual, or null if x is not misaligned.
+     */
     static <L> DiffTree<L> getMisalignedDual(DiffTree<L> x)
     {
         DiffTree<L> xMatch = x.getMatch();

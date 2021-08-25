@@ -13,9 +13,10 @@ public interface LanguageContext {
 
     /**
      * Create a {@link DiffTree} from a file.
-     * @param file The text of some file.
      * @param <L> Label type.
+     * @param file The text of some file.
+     * @param isOriginal
      * @return The parsed file.
      */
-    <L> DiffTree<L> parse(String file);
+    <L> DiffTree<L> parse(String file, Boolean isOriginal);
 }

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="1" failures="0" name="servicetests.RunServiceTest" time="0.101" errors="1" skipped="0">
+  <properties>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\bin"/>
+    <property name="java.vm.version" value="25.265-b01"/>
+    <property name="java.vm.vendor" value="AdoptOpenJDK"/>
+    <property name="maven.multiModuleProjectDirectory" value="C:/dev/personal/JavaCodeReviewPrototype"/>
+    <property name="java.vendor.url" value="http://java.oracle.com/"/>
+    <property name="path.separator" value=";"/>
+    <property name="guice.disable.misplaced.annotation.check" value="true"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="user.script" value=""/>
+    <property name="user.country" value="US"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="C:\dev\personal\JavaCodeReviewPrototype"/>
+    <property name="java.runtime.version" value="1.8.0_265-b01"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
+    <property name="java.endorsed.dirs" value="C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\lib\endorsed"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.io.tmpdir" value="C:\Users\OM078173\AppData\Local\Temp\"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="user.variant" value=""/>
+    <property name="os.name" value="Windows 10"/>
+    <property name="classworlds.conf" value="C:/Program Files/Maven/apache-maven-3.6.3/bin/m2.conf"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\dev\outpatient-pharmacy\tools\;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\OM078173\bin;C:\Program Files\Fortify\Fortify_SCA_and_Apps_20.1.4\bin;C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\bin;C:\Program Files\Java\jdk-11\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\nodejs;C:\Program Files (x86)\GitExtensions;C:\Program Files\Cerner;C:\Program Files\SourceGear\Common\DiffMerge;C:\Program Files\TortoiseSVN\bin;C:\Program Files\PuTTY;C:\Program Files\dotnet;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files (x86)\dotnet;C:\Program Files\IBM\WebSphere MQ\bin64;C:\Program Files\IBM\WebSphere MQ\bin;C:\Program Files\IBM\WebSphere MQ\tools\c\samples\bin64;C:\Program Files\IBM\WebSphere MQ\tools\c\samples\bin;C:\Program Files\SlikSvn\bin;C:\Program Files\Git\cmd;C:\Users\OM078173\AppData\Local\Programs\Python\Python38-32;C:\Users\OM078173\AppData\Local\Programs\Python\Python38-32\Scripts;C:\Users\OM078173\scoop\apps\oh-my-posh\current\bin;C:\Users\OM078173\scoop\shims;C:\Users\OM078173\AppData\Local\Microsoft\WindowsApps;C:\Users\OM078173\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\MongoDB\Server\4.2\bin;C:\Users\OM078173\AppData\Roaming\npm;C:\Users\OM078173\AppData\Local\GitHubDesktop\bin;C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\bin;C:\Program Files\Maven\apache-maven-3.6.3\bin;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2020.2.2\bin;C:\Users\OM078173\.dotnet\tools;C:\Users\OM078173\AppData\Local\Microsoft\WindowsApps;."/>
+    <property name="maven.conf" value="C:/Program Files/Maven/apache-maven-3.6.3/conf"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="52.0"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="os.version" value="10.0"/>
+    <property name="library.jansi.path" value="C:/Program Files/Maven/apache-maven-3.6.3/lib/jansi-native"/>
+    <property name="user.home" value="C:\Users\OM078173"/>
+    <property name="user.timezone" value="America/Chicago"/>
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
+    <property name="java.specification.version" value="1.8"/>
+    <property name="file.encoding" value="Cp1252"/>
+    <property name="user.name" value="OM078173"/>
+    <property name="java.class.path" value="C:/Program Files/Maven/apache-maven-3.6.3/boot/plexus-classworlds-2.6.0.jar"/>
+    <property name="java.vm.specification.version" value="1.8"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.home" value="C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher clean install"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="user.language" value="en"/>
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="1.8.0_265"/>
+    <property name="java.ext.dirs" value="C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\lib\ext;C:\WINDOWS\Sun\Java\lib\ext"/>
+    <property name="sun.boot.class.path" value="C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\lib\resources.jar;C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\lib\rt.jar;C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\lib\sunrsasign.jar;C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\lib\jsse.jar;C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\lib\jce.jar;C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\lib\charsets.jar;C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\lib\jfr.jar;C:\Program Files\AdoptOpenJDK\jdk-8.0.265.01-hotspot\jre\classes"/>
+    <property name="sun.stderr.encoding" value="cp437"/>
+    <property name="java.vendor" value="AdoptOpenJDK"/>
+    <property name="maven.home" value="C:\Program Files\Maven\apache-maven-3.6.3"/>
+    <property name="file.separator" value="\"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="sun.stdout.encoding" value="cp437"/>
+    <property name="sun.desktop" value="windows"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+  </properties>
+  <testcase classname="Java Classes can be turned into DiffTrees" name="A change in class title is recognized." time="0.101">
+    <error message="The step &apos;an original:&apos; and 9 other step(s) are undefined.
+You can implement these steps using the snippet(s) below:
+
+@Given(&quot;an original:&quot;)
+public void an_original(String docString) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given(&quot;a modified:&quot;)
+public void a_modified(String docString) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@When(&quot;a DiffTree is created&quot;)
+public void a_diff_tree_is_created() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;node ROOT has label CLASS&quot;)
+public void node_root_has_label_class() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;ROOT has a child, CAM, at position {int}&quot;)
+public void root_has_a_child_cam_at_position(Integer int1) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;ROOT has two children, OLD_NAME and NEW_NAME, at position {int}, where OLD_NAME is of type DELETE and NEW_NAME is of type CREATE&quot;)
+public void root_has_two_children_old_name_and_new_name_at_position_where_old_name_is_of_type_delete_and_new_name_is_of_type_create(Integer int1) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;OLD_NAME has label IDENTIFIER&quot;)
+public void old_name_has_label_identifier() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;OLD_NAME has value Foo&quot;)
+public void old_name_has_value_foo() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;NEW_NAME has label IDENTIFIER&quot;)
+public void new_name_has_label_identifier() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;NEW_NAME has value Bar&quot;)
+public void new_name_has_value_bar() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+" type="io.cucumber.junit.UndefinedStepException">io.cucumber.junit.UndefinedStepException: The step &apos;an original:&apos; and 9 other step(s) are undefined.
+You can implement these steps using the snippet(s) below:
+
+@Given(&quot;an original:&quot;)
+public void an_original(String docString) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given(&quot;a modified:&quot;)
+public void a_modified(String docString) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@When(&quot;a DiffTree is created&quot;)
+public void a_diff_tree_is_created() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;node ROOT has label CLASS&quot;)
+public void node_root_has_label_class() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;ROOT has a child, CAM, at position {int}&quot;)
+public void root_has_a_child_cam_at_position(Integer int1) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;ROOT has two children, OLD_NAME and NEW_NAME, at position {int}, where OLD_NAME is of type DELETE and NEW_NAME is of type CREATE&quot;)
+public void root_has_two_children_old_name_and_new_name_at_position_where_old_name_is_of_type_delete_and_new_name_is_of_type_create(Integer int1) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;OLD_NAME has label IDENTIFIER&quot;)
+public void old_name_has_label_identifier() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;OLD_NAME has value Foo&quot;)
+public void old_name_has_value_foo() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;NEW_NAME has label IDENTIFIER&quot;)
+public void new_name_has_label_identifier() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then(&quot;NEW_NAME has value Bar&quot;)
+public void new_name_has_value_bar() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+
+</error>
+    <system-out>
+Scenario: A change in class title is recognized.                                                                                   &amp;#27;[90m# servicetests/classes_are_handled_correctly.feature:4&amp;#27;[0m
+  &amp;#27;[33mGiven &amp;#27;[0m&amp;#27;[33man original:&amp;#27;[0m                                                                                                               &amp;#27;[90m# null&amp;#27;[0m
+  &amp;#27;[36mAnd &amp;#27;[0m&amp;#27;[36ma modified:&amp;#27;[0m                                                                                                                  &amp;#27;[90m# null&amp;#27;[0m
+  &amp;#27;[36mWhen &amp;#27;[0m&amp;#27;[36ma DiffTree is created&amp;#27;[0m                                                                                                       &amp;#27;[90m# null&amp;#27;[0m
+  &amp;#27;[36mThen &amp;#27;[0m&amp;#27;[36mnode ROOT has label CLASS&amp;#27;[0m                                                                                                   &amp;#27;[90m# null&amp;#27;[0m
+  &amp;#27;[36mAnd &amp;#27;[0m&amp;#27;[36mROOT has a child, CAM, at position 0&amp;#27;[0m                                                                                         &amp;#27;[90m# null&amp;#27;[0m
+  &amp;#27;[36mAnd &amp;#27;[0m&amp;#27;[36mROOT has two children, OLD_NAME and NEW_NAME, at position 1, where OLD_NAME is of type DELETE and NEW_NAME is of type CREATE&amp;#27;[0m &amp;#27;[90m# null&amp;#27;[0m
+  &amp;#27;[36mAnd &amp;#27;[0m&amp;#27;[36mOLD_NAME has label IDENTIFIER&amp;#27;[0m                                                                                                &amp;#27;[90m# null&amp;#27;[0m
+  &amp;#27;[36mAnd &amp;#27;[0m&amp;#27;[36mOLD_NAME has value Foo&amp;#27;[0m                                                                                                       &amp;#27;[90m# null&amp;#27;[0m
+  &amp;#27;[36mAnd &amp;#27;[0m&amp;#27;[36mNEW_NAME has label IDENTIFIER&amp;#27;[0m                                                                                                &amp;#27;[90m# null&amp;#27;[0m
+  &amp;#27;[36mAnd &amp;#27;[0m&amp;#27;[36mNEW_NAME has value Bar&amp;#27;[0m                                                                                                       &amp;#27;[90m# null&amp;#27;[0m
+</system-out>
+  </testcase>
+</testsuite>

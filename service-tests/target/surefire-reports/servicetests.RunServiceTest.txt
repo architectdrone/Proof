@@ -1,0 +1,60 @@
+-------------------------------------------------------------------------------
+Test set: servicetests.RunServiceTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.663 sec <<< FAILURE!
+A change in class title is recognized.(Java Classes can be turned into DiffTrees)  Time elapsed: 0.101 sec  <<< ERROR!
+io.cucumber.junit.UndefinedStepException: The step 'an original:' and 9 other step(s) are undefined.
+You can implement these steps using the snippet(s) below:
+
+@Given("an original:")
+public void an_original(String docString) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Given("a modified:")
+public void a_modified(String docString) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@When("a DiffTree is created")
+public void a_diff_tree_is_created() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("node ROOT has label CLASS")
+public void node_root_has_label_class() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("ROOT has a child, CAM, at position {int}")
+public void root_has_a_child_cam_at_position(Integer int1) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("ROOT has two children, OLD_NAME and NEW_NAME, at position {int}, where OLD_NAME is of type DELETE and NEW_NAME is of type CREATE")
+public void root_has_two_children_old_name_and_new_name_at_position_where_old_name_is_of_type_delete_and_new_name_is_of_type_create(Integer int1) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("OLD_NAME has label IDENTIFIER")
+public void old_name_has_label_identifier() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("OLD_NAME has value Foo")
+public void old_name_has_value_foo() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("NEW_NAME has label IDENTIFIER")
+public void new_name_has_label_identifier() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("NEW_NAME has value Bar")
+public void new_name_has_value_bar() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+
+

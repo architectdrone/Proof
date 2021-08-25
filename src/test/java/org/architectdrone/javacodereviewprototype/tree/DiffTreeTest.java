@@ -139,16 +139,6 @@ class DiffTreeTest {
             assertEquals(b.getParent(), c);
             assertEquals(a.getParent(), c);
         }
-
-        @Test
-        void getChildNumber_works()
-        {
-            d.populateAdvancedData();
-            assertEquals(d.getChildNumber(), 0);
-            assertEquals(c.getChildNumber(), 0);
-            assertEquals(b.getChildNumber(), 1);
-            assertEquals(a.getChildNumber(), 0);
-        }
     }
 
     @Nested

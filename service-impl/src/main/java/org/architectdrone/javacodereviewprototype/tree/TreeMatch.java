@@ -4,7 +4,7 @@ package org.architectdrone.javacodereviewprototype.tree;
  * Tools for matching trees.
  * That is, for setting the "match" field on {@link DiffTree}s
  */
-interface TreeMatch {
+public interface TreeMatch {
     /**
      * Matches nodes in one tree to nodes in another tree.
      * @param treeA The original tree

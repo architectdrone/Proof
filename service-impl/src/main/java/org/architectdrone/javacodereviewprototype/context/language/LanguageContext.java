@@ -1,5 +1,6 @@
 package org.architectdrone.javacodereviewprototype.context.language;
 
+import org.architectdrone.javacodereviewprototype.context.language.display.DisplayElement;
 import org.architectdrone.javacodereviewprototype.tree.DiffTree;
 
 /*
@@ -19,4 +20,12 @@ public interface LanguageContext {
      * @return The parsed file.
      */
     <L> DiffTree<L> parse(String file, Boolean isOriginal);
+
+    /**
+     * Creates a DiffTree display
+     * @param fileA The original file.
+     * @param fileB The modified file.
+     * @return The display element.
+     */
+    DisplayElement getDisplayElement(String fileA, String fileB);
 }

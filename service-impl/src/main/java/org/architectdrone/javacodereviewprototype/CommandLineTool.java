@@ -9,8 +9,8 @@ import org.architectdrone.javacodereviewprototype.context.language.JavaContext;
 import org.architectdrone.javacodereviewprototype.dependencyinjection.DefaultModule;
 
 public class CommandLineTool {
-    public static String fileALocation = "C:\\dev\\personal\\JavaCodeReviewPrototype\\service-impl\\src\\main\\resources\\fileA.java";
-    public static String fileBLocation = "C:\\dev\\personal\\JavaCodeReviewPrototype\\service-impl\\src\\main\\resources\\fileB.java";
+    public static String fileALocation = "C:\\dev\\proof\\service-impl\\src\\main\\resources\\fileA.java";
+    public static String fileBLocation = "C:\\dev\\proof\\service-impl\\src\\main\\resources\\fileB.java";
     public static void main(String[] args) throws IOException {
         Injector injector = Guice.createInjector(new DefaultModule());
         JavaContext myJavaContext = injector.getInstance(JavaContext.class);

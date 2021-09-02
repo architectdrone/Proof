@@ -9,6 +9,7 @@ import lombok.Getter;
 import org.architectdrone.javacodereviewprototype.tree.DiffTree;
 import com.github.javaparser.ast.Node;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class JavaTree extends DiffTree<Class<Node>> {
@@ -21,6 +22,7 @@ public class JavaTree extends DiffTree<Class<Node>> {
                         .getChildNodes()
                         .stream()
                         .filter(c -> !(c instanceof LineComment))
+                        .filter(c -> !(c instanceof SimpleName))
                         .map(c -> new JavaTree(c, isOriginal))
                         .collect(Collectors.toList()),
                 isOriginal
@@ -37,6 +39,16 @@ public class JavaTree extends DiffTree<Class<Node>> {
      */
     private static String javaParserNodeToString(Node javaParserNode)
     {
+        Optional<String> nestedSimpleName = javaParserNode
+                .getChildNodes()
+                .stream()
+                .filter(a -> a instanceof SimpleName)
+                .map(a -> ((SimpleName)a).getIdentifier())
+                .findFirst();
+        if (nestedSimpleName.isPresent())
+        {
+            return nestedSimpleName.get();
+        }
         if (javaParserNode instanceof SimpleName)
         {
             return ((SimpleName) javaParserNode).getIdentifier();

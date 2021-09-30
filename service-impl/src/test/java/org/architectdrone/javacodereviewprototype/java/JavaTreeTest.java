@@ -48,7 +48,7 @@ class JavaTreeTest {
         assertEquals(CompilationUnit.class, javaTree.getLabel());
 
         JavaTree classJavaTree = (JavaTree) javaTree.getChildren().get(0);
-        assertEquals(3, classJavaTree.getChildren().size());
+        assertEquals(2, classJavaTree.getChildren().size());
         assertEquals("", classJavaTree.getValue());
         assertEquals(ClassOrInterfaceDeclaration.class, classJavaTree.getLabel());
     }

@@ -14,6 +14,7 @@ import static org.architectdrone.javacodereviewprototype.tree.PopulateDiffTreeIm
  * This test suite hits a variety of different scenarios in the populate phase.
  * Due to the inherent complexity of trees, the tests are rather lengthy.
  */
+@SuppressWarnings("ALL")
 class PopulateDiffTreeImplTest {
     PopulateDiffTree populateDiffTree = new PopulateDiffTreeImpl();
 
@@ -2339,7 +2340,7 @@ class PopulateDiffTreeImplTest {
                 DiffTree<String> b1 = createBNode(true, d1);
                 DiffTree<String> a1 = createANode(true, b1, c1);
 
-                DiffTree<String> f2 = createENode(false);
+                DiffTree<String> f2 = createFNode(false);
                 DiffTree<String> e2 = createENode(false);
                 DiffTree<String> d2 = createDNode(false, f2);
                 DiffTree<String> c2 = createCNode(false, e2, d2);
@@ -2441,7 +2442,7 @@ class PopulateDiffTreeImplTest {
                 DiffTree<String> b1 = createBNode(true, d1);
                 DiffTree<String> a1 = createANode(true, b1);
 
-                DiffTree<String> f2 = createDNode(false);
+                DiffTree<String> f2 = createFNode(false);
                 DiffTree<String> d2 = createDNode(false, f2);
                 DiffTree<String> b2 = createBNode(false);
                 DiffTree<String> a2 = createANode(false, b2, d2);
@@ -2659,6 +2660,35 @@ class PopulateDiffTreeImplTest {
                     assertDeleted(c1);
                 }
             }
+        }
+    }
+
+    /**
+     * Tests where a matched node's value changes.
+     */
+    @Nested
+    class ModifyTests {
+        @Test
+        void simpleTest() {
+            //Setup trees
+            DiffTree<String> c1 = createCNode(true);
+            DiffTree<String> b1 = createBNode(true);
+            DiffTree<String> a1 = createANode(true, b1, c1);
+
+            DiffTree<String> c2 = createCNode(false);
+            DiffTree<String> b2 = createBNode(false);
+            DiffTree<String> a2 = createANode(false, b2, c2);
+
+            //Match trees
+            a1.setMatch(a2);
+            b1.setMatch(b2);
+            c1.setMatch(c2);
+            c2.setValue("Test");
+            populateDiffTree.populateDiffTree(a1, a2);
+
+            assertEquals("A", a1.value);
+            assertEquals("B", b1.value);
+            assertEquals("Test", c1.value);
         }
     }
 }

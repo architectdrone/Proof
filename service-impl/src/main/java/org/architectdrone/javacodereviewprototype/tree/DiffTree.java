@@ -38,7 +38,7 @@ public class DiffTree<L> {
     @Getter
     final L label; //The label of the root node
     @Getter
-    final String value; //The value of the root node
+    String value; //The value of the root node
     
     //Matching data
     @Getter

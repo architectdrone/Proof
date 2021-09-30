@@ -10,8 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.MOVE_TO;
-import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.NONE;
+import static org.architectdrone.javacodereviewprototype.tree.ReferenceType.*;
 
 /**
  * Populates a diff tree. The results are:
@@ -65,9 +64,32 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
 
                 //Then we take care of deleted nodes
                 doForEachChild(parent, PopulateDiffTreeImpl::deleteNode, a -> (!a.isMatched() && (a.getReferenceType() == ReferenceType.NONE)));
+
+                //Finally, we take care of renamed nodes.
+                doForEachChild(parent, PopulateDiffTreeImpl::modifyNode, (a -> a.isMatched() && !a.getMatch().getValue().equals(a.getValue())));
             }
         }
         rectifyNodes(treeA);
+    }
+
+    /**
+     * Renames a node.
+     * Node renaming occurs when two matching nodes have different values.
+     * The given node's old value is assigned to the given node's oldValue field.
+     * The matched node's value is assigned to the given node's value field.
+     * Finally, if the given node does not already have a reference type, it is assigned as MODIFY.
+     * @param nodeToModify the node to modify
+     * @param <L> The reference type.
+     */
+    private static <L> void modifyNode(DiffTree<L> nodeToModify)
+    {
+        DiffTree<L> matchedNode = nodeToModify.getMatch();
+        nodeToModify.oldValue = nodeToModify.value;
+        nodeToModify.value = matchedNode.value;
+        if (nodeToModify.getReferenceType() == NONE)
+        {
+            nodeToModify.setReferenceType(MODIFY);
+        }
     }
 
     private static <L> void deleteNode(DiffTree<L> unmatchedNode)

@@ -2339,7 +2339,7 @@ class PopulateDiffTreeImplTest {
                 DiffTree<String> b1 = createBNode(true, d1);
                 DiffTree<String> a1 = createANode(true, b1, c1);
 
-                DiffTree<String> f2 = createENode(false);
+                DiffTree<String> f2 = createFNode(false);
                 DiffTree<String> e2 = createENode(false);
                 DiffTree<String> d2 = createDNode(false, f2);
                 DiffTree<String> c2 = createCNode(false, e2, d2);
@@ -2441,7 +2441,7 @@ class PopulateDiffTreeImplTest {
                 DiffTree<String> b1 = createBNode(true, d1);
                 DiffTree<String> a1 = createANode(true, b1);
 
-                DiffTree<String> f2 = createDNode(false);
+                DiffTree<String> f2 = createFNode(false);
                 DiffTree<String> d2 = createDNode(false, f2);
                 DiffTree<String> b2 = createBNode(false);
                 DiffTree<String> a2 = createANode(false, b2, d2);

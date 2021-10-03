@@ -1,6 +1,7 @@
 package org.architectdrone.javacodereviewprototype.tree;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Different types of reference nodes.
@@ -14,5 +15,5 @@ public enum ReferenceType {
     MODIFY(0),
     NONE(0);
 
-    int linesCreated;
+    @Getter int linesCreated;
 }

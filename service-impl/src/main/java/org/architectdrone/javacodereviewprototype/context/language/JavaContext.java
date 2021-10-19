@@ -33,28 +33,24 @@ public class JavaContext implements LanguageContext {
 
     @Override
     public DisplayElement getDisplayElement(final String fileA, final String fileB) {
-        DiffTree<Class<Node>> result = getPopulatedDiffTree(fileA, fileB);
+        DiffTree<String> result = getPopulatedDiffTree(fileA, fileB);
         return getDisplayElement(result);
     }
 
-    public DisplayElement getDisplayElement(DiffTree<Class<Node>> node)
+    public DisplayElement getDisplayElement(DiffTree<String> node)
     {
-        if (node.getLabel().isInstance(ClassOrInterfaceDeclaration.class))
-        {
-
-        }
         return null;
     }
 
     @Override
-    public DiffTree<Class<Node>> parse(final String file, final Boolean isOriginal) {
+    public DiffTree<String> parse(final String file, final Boolean isOriginal) {
         return new JavaTree(StaticJavaParser.parse(file), isOriginal);
     }
 
-    public DiffTree<Class<Node>> getPopulatedDiffTree(final String fileA, final String fileB)
+    public DiffTree<String> getPopulatedDiffTree(final String fileA, final String fileB)
     {
-        DiffTree<Class<Node>> original = parse(fileA, true);
-        DiffTree<Class<Node>> modified = parse(fileB, false);
+        DiffTree<String> original = parse(fileA, true);
+        DiffTree<String> modified = parse(fileB, false);
 
         treeMatch.matchTrees(original, modified);
         populateDiffTree.populateDiffTree(original, modified);
@@ -64,11 +60,11 @@ public class JavaContext implements LanguageContext {
 
     public void printDiffTree(final String fileA, final String fileB)
     {
-        DiffTree<Class<Node>> result = getPopulatedDiffTree(fileA, fileB);
+        DiffTree<String> result = getPopulatedDiffTree(fileA, fileB);
         printDiffTree(0, result);
     }
 
-    public void printDiffTree(int tabLevel, final DiffTree<Class<Node>> toPrint)
+    public void printDiffTree(int tabLevel, final DiffTree<String> toPrint)
     {
         StringBuilder builder = new StringBuilder();
 
@@ -102,15 +98,15 @@ public class JavaContext implements LanguageContext {
         if (!toPrint.getValue()
                 .equals(""))
         {
-            builder.append(MessageFormat.format("{0}:{1}", toPrint.getLabel().getSimpleName(), toPrint.getValue()));
+            builder.append(MessageFormat.format("{0}:{1}", toPrint.getLabel(), toPrint.getValue()));
         }
         else
         {
-            builder.append(toPrint.getLabel().getSimpleName());
+            builder.append(toPrint.getLabel());
         }
 
         System.out.println(builder.toString());
-        for (DiffTree<Class<Node>> child : toPrint.getChildren())
+        for (DiffTree<String> child : toPrint.getChildren())
         {
             printDiffTree(tabLevel+1, child);
         }

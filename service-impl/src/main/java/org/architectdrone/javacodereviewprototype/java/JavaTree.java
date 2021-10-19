@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class JavaTree extends DiffTree<Class<Node>> {
+public class JavaTree extends DiffTree<String> {
     @Getter private final Node javaParserNode;
     public JavaTree(Node javaParserNode, boolean isOriginal) {
         super(
-                (Class<Node>) javaParserNode.getClass(),
+                javaParserNode.getClass().toString(),
                 javaParserNodeToString(javaParserNode),
                 javaParserNode
                         .getChildNodes()

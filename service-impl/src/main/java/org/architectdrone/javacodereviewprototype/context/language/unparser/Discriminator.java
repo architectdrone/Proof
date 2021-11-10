@@ -1,7 +1,7 @@
 package org.architectdrone.javacodereviewprototype.context.language.unparser;
 
 import java.util.List;
-import java.util.function.Predicate;
+import org.architectdrone.javacodereviewprototype.tree.DiffTree;
 
 /*
  * Returns the correct pattern to use.
@@ -9,6 +9,6 @@ import java.util.function.Predicate;
  * Copyrights 2021. Cerner Corporation.
  * @author Pharmacy Outpatient
  */
-abstract class Discriminator<T> {
-    void Pattern
+abstract class Discriminator<L> {
+    abstract UnparserPattern<L> getPattern(List<DiffTree<L>> children);
 }

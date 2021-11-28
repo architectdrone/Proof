@@ -1,15 +1,17 @@
 package org.architectdrone.javacodereviewprototype.context.language.unparser;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.architectdrone.javacodereviewprototype.context.language.display.DisplayElement;
+import org.architectdrone.javacodereviewprototype.context.language.display.action.*;
 import org.architectdrone.javacodereviewprototype.tree.DiffTree;
 import org.architectdrone.javacodereviewprototype.tree.ReferenceType;
 
 /*
- * Description
+ * Unparses a tree.
  * <p>
  * Copyrights 2021. Cerner Corporation.
  * @author Pharmacy Outpatient
@@ -27,11 +29,33 @@ public class Unparser {
         DisplayElementAccessor<L> displayElementAccessor = new DisplayElementAccessor<>(displayElementAccessors);
         List<DisplayElement> displayElements = pattern.unparse(diffTree.getValue(), displayElementAccessor);
 
-        if (diffTree.getReferenceType() == ReferenceType.DELETE)
+        if (diffTree.getReferenceType() != ReferenceType.NONE)
         {
-            //Add
+            ActionDisplayElement actionDisplayElement;
+            switch (diffTree.getReferenceType())
+            {
+                case CREATE:
+                    actionDisplayElement = new CreateDisplayElement(displayElements);
+                    break;
+                case DELETE:
+                    actionDisplayElement = new DeleteDisplayElement(displayElements);
+                    break;
+                case MOVE_FROM:
+                    actionDisplayElement = new MoveFromDisplayElement(displayElements);
+                    break;
+                case MOVE_TO:
+                    actionDisplayElement = new MoveToDisplayElement(displayElements);
+                    break;
+                case MODIFY:
+                    throw new RuntimeException("Huh. I can't handle MODIFY actions like this.");
+                default:
+                    throw new RuntimeException("Unrecognized reference type.");
+            }
+            return Collections.singletonList(actionDisplayElement);
+        }
+        else {
+            return displayElements;
         }
 
-        return displayElements;
     }
 }

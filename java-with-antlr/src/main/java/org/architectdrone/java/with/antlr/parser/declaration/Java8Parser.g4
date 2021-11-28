@@ -54,7 +54,11 @@ Total lexer+parser time 30844ms.
 parser grammar Java8Parser;
 
 options {
-    tokenVocab=Java8Lexer;
+    tokenVocab='../implementation/Java8Lexer';
+}
+
+@header {
+package org.architectdrone.java.with.antlr.parser.implementation;
 }
 /*
  * Productions from §3 (Lexical Structure)

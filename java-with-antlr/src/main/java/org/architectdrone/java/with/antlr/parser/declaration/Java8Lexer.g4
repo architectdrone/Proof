@@ -52,7 +52,12 @@
 /Users/parrt/antlr/code/grammars-v4/java8/./Test.java
 Total lexer+parser time 30844ms.
  */
+
 lexer grammar Java8Lexer;
+
+@header {
+package org.architectdrone.java.with.antlr.parser.implementation;
+}
 
 // LEXER
 

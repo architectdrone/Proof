@@ -1,4 +1,4 @@
-package org.architectdrone.java.with.antlr.parser.implementation;// Generated from Java8Parser.g4 by ANTLR 4.3
+// Generated from Java8Parser.g4 by ANTLR 4.3
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.NotNull;

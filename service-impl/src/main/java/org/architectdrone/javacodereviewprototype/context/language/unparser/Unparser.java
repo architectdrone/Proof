@@ -20,11 +20,6 @@ import org.architectdrone.javacodereviewprototype.tree.ReferenceType;
 public class Unparser {
     public static <L> List<DisplayElement> unparse(Function<L, Discriminator<L>> discriminatorRetriever, DiffTree<L> diffTree)
     {
-        if (diffTree.getChildren().isEmpty())
-        {
-            return Collections.emptyList();
-        }
-
         Discriminator<L> discriminator = discriminatorRetriever.apply(diffTree.getLabel());
         UnparserPattern<L> pattern = discriminator.getPattern(diffTree.getChildren());
         Set<DisplayElementAccessor<L>> displayElementAccessors = diffTree

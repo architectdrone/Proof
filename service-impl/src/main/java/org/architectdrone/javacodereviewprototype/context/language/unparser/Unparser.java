@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.architectdrone.javacodereviewprototype.context.language.display.DisplayElement;
+import org.architectdrone.javacodereviewprototype.context.language.display.StringDisplayElement;
 import org.architectdrone.javacodereviewprototype.context.language.display.action.*;
 import org.architectdrone.javacodereviewprototype.tree.DiffTree;
 import org.architectdrone.javacodereviewprototype.tree.ReferenceType;
@@ -27,7 +28,15 @@ public class Unparser {
                 .map(a -> new DisplayElementAccessor<L>(a.getChildNumber(), a.getLabel(), unparse(discriminatorRetriever, diffTree)))
                 .collect(Collectors.toSet());
         DisplayElementAccessor<L> displayElementAccessor = new DisplayElementAccessor<>(displayElementAccessors);
-        List<DisplayElement> displayElements = pattern.unparse(diffTree.getValue(), displayElementAccessor);
+        DisplayElement label;
+        if (!diffTree.getOldValue().equals(diffTree.getValue()))
+        {
+            label = new ModifyDisplayElement(diffTree.getOldValue(), diffTree.getValue());
+        }
+        else {
+            label = new StringDisplayElement(diffTree.getValue());
+        }
+        List<DisplayElement> displayElements = pattern.unparse(label, displayElementAccessor);
 
         if (diffTree.getReferenceType() != ReferenceType.NONE)
         {

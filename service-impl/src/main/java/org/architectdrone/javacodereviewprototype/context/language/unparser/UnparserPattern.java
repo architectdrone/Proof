@@ -10,5 +10,5 @@ import org.architectdrone.javacodereviewprototype.context.language.display.Displ
  * @author Pharmacy Outpatient
  */
 abstract class UnparserPattern<L> {
-    abstract List<DisplayElement> unparse(String label, DisplayElementAccessor<L> displayElementAccessor);
+    abstract List<DisplayElement> unparse(DisplayElement label, DisplayElementAccessor<L> displayElementAccessor);
 }

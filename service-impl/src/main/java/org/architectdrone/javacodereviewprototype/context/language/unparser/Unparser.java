@@ -38,7 +38,7 @@ public class Unparser {
         }
         List<DisplayElement> displayElements = pattern.unparse(label, displayElementAccessor);
 
-        if (diffTree.getReferenceType() != ReferenceType.NONE)
+        if (diffTree.getReferenceType() != ReferenceType.NONE && diffTree.getReferenceType() != ReferenceType.MODIFY)
         {
             ActionDisplayElement actionDisplayElement;
             switch (diffTree.getReferenceType())
@@ -55,8 +55,6 @@ public class Unparser {
                 case MOVE_TO:
                     actionDisplayElement = new MoveToDisplayElement(displayElements);
                     break;
-                case MODIFY:
-                    throw new RuntimeException("Huh. I can't handle MODIFY actions like this.");
                 default:
                     throw new RuntimeException("Unrecognized reference type.");
             }

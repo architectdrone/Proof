@@ -30,8 +30,8 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>4.3</version>
                 <configuration>
-                    <sourceDirectory>${basedir}/src/main/java/org/architectdrone/java/with/antlr/parser/declaration</sourceDirectory>
-                    <outputDirectory>${basedir}/src/main/java/org/architectdrone/java/with/antlr/parser/implementation</outputDirectory>
+                    <sourceDirectory>${basedir}\src\main\java\org\architectdrone\java\with\antlr\parser\declaration</sourceDirectory>
+                    <outputDirectory>${basedir}\src\main\java\org\architectdrone\java\with\antlr\parser\implementation</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>

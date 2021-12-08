@@ -163,8 +163,8 @@ public enum JavaNode {
      *
      * Value: Empty string
      * Children:
-     *  - QUALIFIER
      *  - ANNOTATION*
+     *  - QUALIFIER
      */
     PACKAGE_DECLARATION,
 
@@ -577,7 +577,7 @@ public enum JavaNode {
      * A name and value for an element, in an annotation. In "@Foo(bar=baz)", "bar=baz" is the element pair.
      *
      * {value} is:
-     *  - CONDITIONAL_expression
+     *  - EXPRESSION
      *  - ELEMENT_ARRAY
      *  - ANNOTATION
      *

@@ -1479,51 +1479,136 @@ andExpression
 //BINARY_EXPRESSION
 equalityExpression
 	:	relationalExpression
-	|	equalityExpression '==' relationalExpression
-	|	equalityExpression '!=' relationalExpression
+	|	equalityExpression equalityExpressionEqualToSymbol relationalExpression
+	|	equalityExpression equalityExpressionNotEqualToSymbol relationalExpression
 	;
+
+//Added by me
+equalityExpressionEqualToSymbol
+    : '=='
+    ;
+
+//Added by me
+equalityExpressionNotEqualToSymbol
+    : '!='
+    ;
 
 //BINARY_EXPRESSION
 relationalExpression
 	:	shiftExpression
-	|	relationalExpression '<' shiftExpression
-	|	relationalExpression '>' shiftExpression
-	|	relationalExpression '<=' shiftExpression
-	|	relationalExpression '>=' shiftExpression
-	|	relationalExpression 'instanceof' referenceType
+	|	relationalExpression relationalExpressionLT shiftExpression
+	|	relationalExpression relationalExpressionGT shiftExpression
+	|	relationalExpression relationalExpressionLTE shiftExpression
+	|	relationalExpression relationalExpressionGTE shiftExpression
+	|	relationalExpression relationalExpressionIO referenceType
 	;
+
+//Added by me
+relationalExpressionLT
+    : '<'
+    ;
+
+//Added by me
+relationalExpressionGT
+    : '>'
+    ;
+
+//Added by me
+relationalExpressionLTE
+    : '<='
+    ;
+
+//Added by me
+relationalExpressionGTE
+    : '>='
+    ;
+
+//Added by me
+relationalExpressionIO
+    : '>='
+    ;
 
 //BINARY_EXPRESSION
 shiftExpression
 	:	additiveExpression
-	|	shiftExpression '<' '<' additiveExpression
-	|	shiftExpression '>' '>' additiveExpression
-	|	shiftExpression '>' '>' '>' additiveExpression
+	|	shiftExpression shiftExpressionSLL additiveExpression
+	|	shiftExpression shiftExpressionSRL additiveExpression
+	|	shiftExpression shiftExpressionSRA additiveExpression
 	;
+
+//Added by me
+shiftExpressionSLL
+    : '<' '<'
+    ;
+
+//Added by me
+shiftExpressionSRL
+    : '>' '>'
+    ;
+    
+//Added by me
+shiftExpressionSRA
+    : '>' '>' '>'
+    ;
 
 //BINARY_EXPRESSION
 additiveExpression
 	:	multiplicativeExpression
-	|	additiveExpression '+' multiplicativeExpression
-	|	additiveExpression '-' multiplicativeExpression
+	|	additiveExpression additiveExpressionP multiplicativeExpression
+	|	additiveExpression additiveExpressionM multiplicativeExpression
 	;
+
+//Added by me
+additiveExpressionP
+    : '+'
+    ;
+
+//Added by me
+additiveExpressionM
+    : '-'
+    ;
 
 //BINARY_EXPRESSION
 multiplicativeExpression
 	:	unaryExpression
-	|	multiplicativeExpression '*' unaryExpression
-	|	multiplicativeExpression '/' unaryExpression
-	|	multiplicativeExpression '%' unaryExpression
+	|	multiplicativeExpression multiplicativeExpressionM unaryExpression
+	|	multiplicativeExpression multiplicativeExpressionD unaryExpression
+	|	multiplicativeExpression multiplicativeExpressionMod unaryExpression
 	;
+
+//Added by me
+multiplicativeExpressionM
+    : '*'
+    ;
+
+//Added by me
+multiplicativeExpressionD
+    : '/'
+    ;
+
+//Added by me
+multiplicativeExpressionMod
+    : '/'
+    ;
 
 //misc
 unaryExpression
 	:	preIncrementExpression
 	|	preDecrementExpression
-	|	'+' unaryExpression //LONG_INCREMENT_DECREMENT_EXPRESSION
-	|	'-' unaryExpression //LONG_INCREMENT_DECREMENT_EXPRESSION
+	|	unaryExpressionP unaryExpression
+	|	unaryExpressionM unaryExpression
 	|	unaryExpressionNotPlusMinus
 	;
+
+//Added by me
+unaryExpressionP
+    : '+'
+    ;
+
+//Added by me
+unaryExpressionM
+    : '-'
+    ;
 
 //INCREMENT_DECREMENT_STATEMENT
 preIncrementExpression
@@ -1538,10 +1623,20 @@ preDecrementExpression
 //UNARY_EXPRESSION
 unaryExpressionNotPlusMinus
 	:	postfixExpression
-	|	'~' unaryExpression
-	|	'!' unaryExpression
+	|	unaryExpressionNotPlusMinusBN unaryExpression
+	|	unaryExpressionNotPlusMinusCN unaryExpression
 	|	castExpression
 	;
+
+//Added by me
+unaryExpressionNotPlusMinusBN
+    : '~'
+    ;
+
+//Added by me
+unaryExpressionNotPlusMinusCN
+    : '!'
+    ;
 
 //UNARY_EXPRESSION
 postfixExpression

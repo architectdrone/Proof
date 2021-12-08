@@ -11,6 +11,17 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface Java8ParserListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#relationalExpressionIO}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelationalExpressionIO(@NotNull Java8Parser.RelationalExpressionIOContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#relationalExpressionIO}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelationalExpressionIO(@NotNull Java8Parser.RelationalExpressionIOContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#classMemberDeclaration}.
 	 * @param ctx the parse tree
 	 */
@@ -110,6 +121,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitArgumentList(@NotNull Java8Parser.ArgumentListContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#relationalExpressionLTE}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelationalExpressionLTE(@NotNull Java8Parser.RelationalExpressionLTEContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#relationalExpressionLTE}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelationalExpressionLTE(@NotNull Java8Parser.RelationalExpressionLTEContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#classBodyDeclaration}.
 	 * @param ctx the parse tree
 	 */
@@ -176,6 +198,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitArrayType(@NotNull Java8Parser.ArrayTypeContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#unaryExpressionP}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnaryExpressionP(@NotNull Java8Parser.UnaryExpressionPContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#unaryExpressionP}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnaryExpressionP(@NotNull Java8Parser.UnaryExpressionPContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#simpleTypeName}.
 	 * @param ctx the parse tree
 	 */
@@ -185,6 +218,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSimpleTypeName(@NotNull Java8Parser.SimpleTypeNameContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#multiplicativeExpressionMod}.
+	 * @param ctx the parse tree
+	 */
+	void enterMultiplicativeExpressionMod(@NotNull Java8Parser.MultiplicativeExpressionModContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#multiplicativeExpressionMod}.
+	 * @param ctx the parse tree
+	 */
+	void exitMultiplicativeExpressionMod(@NotNull Java8Parser.MultiplicativeExpressionModContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#expressionName}.
@@ -207,6 +251,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStatementWithoutTrailingSubstatement(@NotNull Java8Parser.StatementWithoutTrailingSubstatementContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#unaryExpressionM}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnaryExpressionM(@NotNull Java8Parser.UnaryExpressionMContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#unaryExpressionM}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnaryExpressionM(@NotNull Java8Parser.UnaryExpressionMContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#constructorDeclarator}.
@@ -528,6 +583,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitAnnotation(@NotNull Java8Parser.AnnotationContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#shiftExpressionSRL}.
+	 * @param ctx the parse tree
+	 */
+	void enterShiftExpressionSRL(@NotNull Java8Parser.ShiftExpressionSRLContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#shiftExpressionSRL}.
+	 * @param ctx the parse tree
+	 */
+	void exitShiftExpressionSRL(@NotNull Java8Parser.ShiftExpressionSRLContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#variableInitializer}.
 	 * @param ctx the parse tree
 	 */
@@ -548,6 +614,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStaticImportOnDemandDeclaration(@NotNull Java8Parser.StaticImportOnDemandDeclarationContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#relationalExpressionLT}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelationalExpressionLT(@NotNull Java8Parser.RelationalExpressionLTContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#relationalExpressionLT}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelationalExpressionLT(@NotNull Java8Parser.RelationalExpressionLTContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#expression}.
@@ -671,6 +748,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitUnannTypeVariable(@NotNull Java8Parser.UnannTypeVariableContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#equalityExpressionEqualToSymbol}.
+	 * @param ctx the parse tree
+	 */
+	void enterEqualityExpressionEqualToSymbol(@NotNull Java8Parser.EqualityExpressionEqualToSymbolContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#equalityExpressionEqualToSymbol}.
+	 * @param ctx the parse tree
+	 */
+	void exitEqualityExpressionEqualToSymbol(@NotNull Java8Parser.EqualityExpressionEqualToSymbolContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#normalInterfaceDeclaration}.
 	 * @param ctx the parse tree
 	 */
@@ -702,6 +790,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitConstructorModifier(@NotNull Java8Parser.ConstructorModifierContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#shiftExpressionSRA}.
+	 * @param ctx the parse tree
+	 */
+	void enterShiftExpressionSRA(@NotNull Java8Parser.ShiftExpressionSRAContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#shiftExpressionSRA}.
+	 * @param ctx the parse tree
+	 */
+	void exitShiftExpressionSRA(@NotNull Java8Parser.ShiftExpressionSRAContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#enumConstantName}.
@@ -757,6 +856,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPreDecrementExpression(@NotNull Java8Parser.PreDecrementExpressionContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#unaryExpressionNotPlusMinusCN}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnaryExpressionNotPlusMinusCN(@NotNull Java8Parser.UnaryExpressionNotPlusMinusCNContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#unaryExpressionNotPlusMinusCN}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnaryExpressionNotPlusMinusCN(@NotNull Java8Parser.UnaryExpressionNotPlusMinusCNContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#variableInitializerList}.
@@ -869,6 +979,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitTypeParameterList(@NotNull Java8Parser.TypeParameterListContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#shiftExpressionSLL}.
+	 * @param ctx the parse tree
+	 */
+	void enterShiftExpressionSLL(@NotNull Java8Parser.ShiftExpressionSLLContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#shiftExpressionSLL}.
+	 * @param ctx the parse tree
+	 */
+	void exitShiftExpressionSLL(@NotNull Java8Parser.ShiftExpressionSLLContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#normalClassDeclaration}.
 	 * @param ctx the parse tree
 	 */
@@ -935,6 +1056,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitWildcardBounds(@NotNull Java8Parser.WildcardBoundsContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#multiplicativeExpressionD}.
+	 * @param ctx the parse tree
+	 */
+	void enterMultiplicativeExpressionD(@NotNull Java8Parser.MultiplicativeExpressionDContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#multiplicativeExpressionD}.
+	 * @param ctx the parse tree
+	 */
+	void exitMultiplicativeExpressionD(@NotNull Java8Parser.MultiplicativeExpressionDContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#primaryNoNewArray_lf_arrayAccess}.
 	 * @param ctx the parse tree
 	 */
@@ -944,6 +1076,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPrimaryNoNewArray_lf_arrayAccess(@NotNull Java8Parser.PrimaryNoNewArray_lf_arrayAccessContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#multiplicativeExpressionM}.
+	 * @param ctx the parse tree
+	 */
+	void enterMultiplicativeExpressionM(@NotNull Java8Parser.MultiplicativeExpressionMContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#multiplicativeExpressionM}.
+	 * @param ctx the parse tree
+	 */
+	void exitMultiplicativeExpressionM(@NotNull Java8Parser.MultiplicativeExpressionMContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#enhancedForStatement}.
@@ -1076,6 +1219,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitEnumBody(@NotNull Java8Parser.EnumBodyContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#relationalExpressionGT}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelationalExpressionGT(@NotNull Java8Parser.RelationalExpressionGTContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#relationalExpressionGT}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelationalExpressionGT(@NotNull Java8Parser.RelationalExpressionGTContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#additionalBound}.
@@ -1639,6 +1793,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitIntegralType(@NotNull Java8Parser.IntegralTypeContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#additiveExpressionM}.
+	 * @param ctx the parse tree
+	 */
+	void enterAdditiveExpressionM(@NotNull Java8Parser.AdditiveExpressionMContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#additiveExpressionM}.
+	 * @param ctx the parse tree
+	 */
+	void exitAdditiveExpressionM(@NotNull Java8Parser.AdditiveExpressionMContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#postIncrementExpression_lf_postfixExpression}.
 	 * @param ctx the parse tree
 	 */
@@ -1648,6 +1813,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPostIncrementExpression_lf_postfixExpression(@NotNull Java8Parser.PostIncrementExpression_lf_postfixExpressionContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#additiveExpressionP}.
+	 * @param ctx the parse tree
+	 */
+	void enterAdditiveExpressionP(@NotNull Java8Parser.AdditiveExpressionPContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#additiveExpressionP}.
+	 * @param ctx the parse tree
+	 */
+	void exitAdditiveExpressionP(@NotNull Java8Parser.AdditiveExpressionPContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#classOrInterfaceType}.
@@ -1780,6 +1956,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLabeledStatement(@NotNull Java8Parser.LabeledStatementContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#relationalExpressionGTE}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelationalExpressionGTE(@NotNull Java8Parser.RelationalExpressionGTEContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#relationalExpressionGTE}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelationalExpressionGTE(@NotNull Java8Parser.RelationalExpressionGTEContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#switchLabels}.
@@ -1934,6 +2121,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDoStatement(@NotNull Java8Parser.DoStatementContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#unaryExpressionNotPlusMinusBN}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnaryExpressionNotPlusMinusBN(@NotNull Java8Parser.UnaryExpressionNotPlusMinusBNContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#unaryExpressionNotPlusMinusBN}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnaryExpressionNotPlusMinusBN(@NotNull Java8Parser.UnaryExpressionNotPlusMinusBNContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#catchType}.
@@ -2154,6 +2352,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitResourceSpecification(@NotNull Java8Parser.ResourceSpecificationContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#equalityExpressionNotEqualToSymbol}.
+	 * @param ctx the parse tree
+	 */
+	void enterEqualityExpressionNotEqualToSymbol(@NotNull Java8Parser.EqualityExpressionNotEqualToSymbolContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#equalityExpressionNotEqualToSymbol}.
+	 * @param ctx the parse tree
+	 */
+	void exitEqualityExpressionNotEqualToSymbol(@NotNull Java8Parser.EqualityExpressionNotEqualToSymbolContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#interfaceTypeList}.

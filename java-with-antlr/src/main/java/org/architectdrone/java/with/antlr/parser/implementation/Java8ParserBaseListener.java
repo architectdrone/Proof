@@ -19,6 +19,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRelationalExpressionIO(@NotNull Java8Parser.RelationalExpressionIOContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelationalExpressionIO(@NotNull Java8Parser.RelationalExpressionIOContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterClassMemberDeclaration(@NotNull Java8Parser.ClassMemberDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -136,6 +149,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRelationalExpressionLTE(@NotNull Java8Parser.RelationalExpressionLTEContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelationalExpressionLTE(@NotNull Java8Parser.RelationalExpressionLTEContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterClassBodyDeclaration(@NotNull Java8Parser.ClassBodyDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -214,6 +240,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterUnaryExpressionP(@NotNull Java8Parser.UnaryExpressionPContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnaryExpressionP(@NotNull Java8Parser.UnaryExpressionPContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSimpleTypeName(@NotNull Java8Parser.SimpleTypeNameContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -221,6 +260,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSimpleTypeName(@NotNull Java8Parser.SimpleTypeNameContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMultiplicativeExpressionMod(@NotNull Java8Parser.MultiplicativeExpressionModContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMultiplicativeExpressionMod(@NotNull Java8Parser.MultiplicativeExpressionModContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -247,6 +299,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitStatementWithoutTrailingSubstatement(@NotNull Java8Parser.StatementWithoutTrailingSubstatementContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUnaryExpressionM(@NotNull Java8Parser.UnaryExpressionMContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnaryExpressionM(@NotNull Java8Parser.UnaryExpressionMContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -630,6 +695,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterShiftExpressionSRL(@NotNull Java8Parser.ShiftExpressionSRLContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitShiftExpressionSRL(@NotNull Java8Parser.ShiftExpressionSRLContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterVariableInitializer(@NotNull Java8Parser.VariableInitializerContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -650,6 +728,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitStaticImportOnDemandDeclaration(@NotNull Java8Parser.StaticImportOnDemandDeclarationContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelationalExpressionLT(@NotNull Java8Parser.RelationalExpressionLTContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelationalExpressionLT(@NotNull Java8Parser.RelationalExpressionLTContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -799,6 +890,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterEqualityExpressionEqualToSymbol(@NotNull Java8Parser.EqualityExpressionEqualToSymbolContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEqualityExpressionEqualToSymbol(@NotNull Java8Parser.EqualityExpressionEqualToSymbolContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNormalInterfaceDeclaration(@NotNull Java8Parser.NormalInterfaceDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -832,6 +936,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitConstructorModifier(@NotNull Java8Parser.ConstructorModifierContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterShiftExpressionSRA(@NotNull Java8Parser.ShiftExpressionSRAContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitShiftExpressionSRA(@NotNull Java8Parser.ShiftExpressionSRAContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -897,6 +1014,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPreDecrementExpression(@NotNull Java8Parser.PreDecrementExpressionContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUnaryExpressionNotPlusMinusCN(@NotNull Java8Parser.UnaryExpressionNotPlusMinusCNContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnaryExpressionNotPlusMinusCN(@NotNull Java8Parser.UnaryExpressionNotPlusMinusCNContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -1033,6 +1163,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterShiftExpressionSLL(@NotNull Java8Parser.ShiftExpressionSLLContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitShiftExpressionSLL(@NotNull Java8Parser.ShiftExpressionSLLContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNormalClassDeclaration(@NotNull Java8Parser.NormalClassDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1111,6 +1254,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterMultiplicativeExpressionD(@NotNull Java8Parser.MultiplicativeExpressionDContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMultiplicativeExpressionD(@NotNull Java8Parser.MultiplicativeExpressionDContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterPrimaryNoNewArray_lf_arrayAccess(@NotNull Java8Parser.PrimaryNoNewArray_lf_arrayAccessContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1118,6 +1274,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPrimaryNoNewArray_lf_arrayAccess(@NotNull Java8Parser.PrimaryNoNewArray_lf_arrayAccessContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMultiplicativeExpressionM(@NotNull Java8Parser.MultiplicativeExpressionMContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMultiplicativeExpressionM(@NotNull Java8Parser.MultiplicativeExpressionMContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -1274,6 +1443,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitEnumBody(@NotNull Java8Parser.EnumBodyContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelationalExpressionGT(@NotNull Java8Parser.RelationalExpressionGTContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelationalExpressionGT(@NotNull Java8Parser.RelationalExpressionGTContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -1943,6 +2125,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAdditiveExpressionM(@NotNull Java8Parser.AdditiveExpressionMContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAdditiveExpressionM(@NotNull Java8Parser.AdditiveExpressionMContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterPostIncrementExpression_lf_postfixExpression(@NotNull Java8Parser.PostIncrementExpression_lf_postfixExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1950,6 +2145,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPostIncrementExpression_lf_postfixExpression(@NotNull Java8Parser.PostIncrementExpression_lf_postfixExpressionContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAdditiveExpressionP(@NotNull Java8Parser.AdditiveExpressionPContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAdditiveExpressionP(@NotNull Java8Parser.AdditiveExpressionPContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -2106,6 +2314,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLabeledStatement(@NotNull Java8Parser.LabeledStatementContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelationalExpressionGTE(@NotNull Java8Parser.RelationalExpressionGTEContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelationalExpressionGTE(@NotNull Java8Parser.RelationalExpressionGTEContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -2288,6 +2509,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitDoStatement(@NotNull Java8Parser.DoStatementContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUnaryExpressionNotPlusMinusBN(@NotNull Java8Parser.UnaryExpressionNotPlusMinusBNContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnaryExpressionNotPlusMinusBN(@NotNull Java8Parser.UnaryExpressionNotPlusMinusBNContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -2548,6 +2782,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitResourceSpecification(@NotNull Java8Parser.ResourceSpecificationContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEqualityExpressionNotEqualToSymbol(@NotNull Java8Parser.EqualityExpressionNotEqualToSymbolContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEqualityExpressionNotEqualToSymbol(@NotNull Java8Parser.EqualityExpressionNotEqualToSymbolContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

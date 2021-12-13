@@ -20,9 +20,9 @@ import static org.architectdrone.java.with.antlr.JavaNode.QUALIFIER;
 import static org.architectdrone.java.with.antlr.JavaNode.QUALIFIER_ELEMENT;
 
 public class JavaTree extends DiffTree<JavaNode> {
-    public JavaTree(JavaNode label, String value, List<DiffTree<JavaNode>> children, boolean isOriginal)
+    public JavaTree(JavaNode label, String value, List<JavaTree> children, boolean isOriginal)
     {
-        super(label, value, children, isOriginal);
+        super(label, value, children.stream().map(a -> (DiffTree<JavaNode>)a).collect(Collectors.toList()), isOriginal);
     }
 
 

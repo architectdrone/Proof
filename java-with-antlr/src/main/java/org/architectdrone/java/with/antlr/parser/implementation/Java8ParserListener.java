@@ -132,6 +132,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitRelationalExpressionLTE(@NotNull Java8Parser.RelationalExpressionLTEContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#annotatedDim}.
+	 * @param ctx the parse tree
+	 */
+	void enterAnnotatedDim(@NotNull Java8Parser.AnnotatedDimContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#annotatedDim}.
+	 * @param ctx the parse tree
+	 */
+	void exitAnnotatedDim(@NotNull Java8Parser.AnnotatedDimContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#classBodyDeclaration}.
 	 * @param ctx the parse tree
 	 */
@@ -240,6 +251,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpressionName(@NotNull Java8Parser.ExpressionNameContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#continuedClassOrInterfaceType}.
+	 * @param ctx the parse tree
+	 */
+	void enterContinuedClassOrInterfaceType(@NotNull Java8Parser.ContinuedClassOrInterfaceTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#continuedClassOrInterfaceType}.
+	 * @param ctx the parse tree
+	 */
+	void exitContinuedClassOrInterfaceType(@NotNull Java8Parser.ContinuedClassOrInterfaceTypeContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#statementWithoutTrailingSubstatement}.
@@ -836,6 +858,28 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitMethodDeclarator(@NotNull Java8Parser.MethodDeclaratorContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#dim}.
+	 * @param ctx the parse tree
+	 */
+	void enterDim(@NotNull Java8Parser.DimContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#dim}.
+	 * @param ctx the parse tree
+	 */
+	void exitDim(@NotNull Java8Parser.DimContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#superKeyword}.
+	 * @param ctx the parse tree
+	 */
+	void enterSuperKeyword(@NotNull Java8Parser.SuperKeywordContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#superKeyword}.
+	 * @param ctx the parse tree
+	 */
+	void exitSuperKeyword(@NotNull Java8Parser.SuperKeywordContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#annotationTypeMemberDeclaration}.
 	 * @param ctx the parse tree
 	 */
@@ -1188,6 +1232,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitTypeArgument(@NotNull Java8Parser.TypeArgumentContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#classKeyword}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassKeyword(@NotNull Java8Parser.ClassKeywordContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#classKeyword}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassKeyword(@NotNull Java8Parser.ClassKeywordContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#unannPrimitiveType}.
 	 * @param ctx the parse tree
 	 */
@@ -1395,6 +1450,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArrayAccess_lfno_primary(@NotNull Java8Parser.ArrayAccess_lfno_primaryContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#wildcardExtends}.
+	 * @param ctx the parse tree
+	 */
+	void enterWildcardExtends(@NotNull Java8Parser.WildcardExtendsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#wildcardExtends}.
+	 * @param ctx the parse tree
+	 */
+	void exitWildcardExtends(@NotNull Java8Parser.WildcardExtendsContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#staticInitializer}.
@@ -2057,6 +2123,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitForStatement(@NotNull Java8Parser.ForStatementContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#postfixExpressionSymbol}.
+	 * @param ctx the parse tree
+	 */
+	void enterPostfixExpressionSymbol(@NotNull Java8Parser.PostfixExpressionSymbolContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#postfixExpressionSymbol}.
+	 * @param ctx the parse tree
+	 */
+	void exitPostfixExpressionSymbol(@NotNull Java8Parser.PostfixExpressionSymbolContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#typeArgumentList}.
 	 * @param ctx the parse tree
 	 */
@@ -2286,6 +2363,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFloatingPointType(@NotNull Java8Parser.FloatingPointTypeContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link Java8Parser#unannContinuedClassOrInterfaceType}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnannContinuedClassOrInterfaceType(@NotNull Java8Parser.UnannContinuedClassOrInterfaceTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#unannContinuedClassOrInterfaceType}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnannContinuedClassOrInterfaceType(@NotNull Java8Parser.UnannContinuedClassOrInterfaceTypeContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link Java8Parser#dimExpr}.

@@ -32,11 +32,20 @@ public enum JavaNode {
      *
      * Value: The non-qualified name of the type
      * Children:
-     *  - QUALIFIER? (For the name, if needed)
-     *  - ANNOTATION*
-     *  - DIM* (If an array)
+     *  - TYPE_QUALIFIER_ELEMENT
+     *  - DIM* (If an array type)
      */
     TYPE,
+
+    /**
+     * A qualifier element for type.
+     *
+     * Value: The value of the qualifier
+     * Children:
+     *  - ANNOTATION*
+     *  - TYPE_ARGUMENT_LIST?
+     */
+    TYPE_QUALIFIER_ELEMENT,
 
     /**
      * Just the characters '[]'. Can be annotated
@@ -631,6 +640,7 @@ public enum JavaNode {
      *  - ASSIGNMENT
      *  - UNARY_expression
      *  - METHOD_INVOCATION
+     *  - SUPER_METHOD_INVOCATION
      *  - CLASS_INSTANCE_CREATION_expression
      *  - ASSERT_STATEMENT
      *  - SWITCH_STATEMENT
@@ -769,6 +779,7 @@ public enum JavaNode {
      *  - ARRAY_ACCESS
      *  - expression
      *  - METHOD_INVOCATION
+     *  - SUPER_METHOD_INVOCATION
      *  - {method_reference_element}
      *
      * Value: Empty String
@@ -826,11 +837,20 @@ public enum JavaNode {
     FIELD_ACCESS,
 
     /**
+     * Accesses a field.
+     *
+     * Value: Name of the field
+     * Children:
+     *  - (QUALIFIER | PRIMARY)?
+    */
+    SUPER_FIELD_ACCESS,
+
+    /**
      * Accesses elements from an array.
      *
      * Value: Empty String
      * Children:
-     *  - QUALIFIER?
+     *  - (QUALIFIER | PRIMARY)?
      *  - expression
      *  - ARRAY_ACCESS_ELEMENT*
     */
@@ -856,6 +876,17 @@ public enum JavaNode {
      *  - ARGUMENT_LIST?
     */
     METHOD_INVOCATION,
+
+    /**
+     * Invokes a method, super
+     *
+     * Value: The name of the method to invoke
+     * Children:
+     *  - (QUALIFIER)?
+     *  - TYPE_ARGUMENT_LIST?
+     *  - ARGUMENT_LIST?
+    */
+    SUPER_METHOD_INVOCATION,
 
     /**
      * References a method
@@ -1026,7 +1057,7 @@ public enum JavaNode {
      *
      * Value: Empty String
      * Children:
-     *  - {switch_label}
+     *  - {switch_label}*
      *  - BLOCK?
     */
     SWITCH_GROUP,
@@ -1424,7 +1455,7 @@ public enum JavaNode {
      * Value: Empty String
      * Children: None
      */
-    LOGICAL_NOT_SYMBOL,
+    NOT_SYMBOL,
 
     /**
      * Casts something to something else.

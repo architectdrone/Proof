@@ -117,23 +117,27 @@ classOrInterfaceType
 	:	(	classType_lfno_classOrInterfaceType
 		|	interfaceType_lfno_classOrInterfaceType
 		)
-		(	classType_lf_classOrInterfaceType
-		|	interfaceType_lf_classOrInterfaceType
+		(	continuedClassOrInterfaceType
 		)*
 	;
 
-//TYPE
+continuedClassOrInterfaceType
+    : classType_lf_classOrInterfaceType
+    | interfaceType_lf_classOrInterfaceType
+    ;
+
+//TYPE_QUALIFIER_ELEMENT (or TYPE)
 classType
 	:	annotation* Identifier typeArguments?
 	|	classOrInterfaceType '.' annotation* Identifier typeArguments?
 	;
 
-//TYPE
+//TYPE_QUALIFIER_ELEMENT
 classType_lf_classOrInterfaceType
 	:	'.' annotation* Identifier typeArguments?
 	;
 
-//TYPE
+//TYPE_QUALIFIER_ELEMENT
 classType_lfno_classOrInterfaceType
 	:	annotation* Identifier typeArguments?
 	;
@@ -143,17 +147,17 @@ interfaceType
 	:	classType
 	;
 
-//TYPE
+//TYPE_QUALIFIER_ELEMENT
 interfaceType_lf_classOrInterfaceType
 	:	classType_lf_classOrInterfaceType
 	;
 
-//TYPE
+//TYPE_QUALIFIER_ELEMENT
 interfaceType_lfno_classOrInterfaceType
 	:	classType_lfno_classOrInterfaceType
 	;
 
-//TYPE
+//TYPE_QUALIFIER_ELEMENT
 typeVariable
 	:	annotation* Identifier
 	;
@@ -167,8 +171,16 @@ arrayType
 
 //DIMS
 dims
-	:	annotation* '[' ']' (annotation* '[' ']')*
+	:	annotatedDim (annotatedDim)*
 	;
+
+annotatedDim
+    : annotation* dim
+    ;
+
+dim
+    :   '[' ']'
+    ;
 
 //TYPE_PARAMETER
 typeParameter
@@ -214,9 +226,13 @@ wildcard
 
 //WILDCARD_SUPER, WILDCARD_EXTENDS
 wildcardBounds
-	:	'extends' referenceType
+	:	wildcardExtends
 	|	'super' referenceType
 	;
+
+wildcardExtends
+    : 'extends' referenceType
+    ;
 
 /*
  * Productions from §6 (Names)
@@ -447,10 +463,13 @@ unannClassOrInterfaceType
 	:	(	unannClassType_lfno_unannClassOrInterfaceType
 		|	unannInterfaceType_lfno_unannClassOrInterfaceType
 		)
-		(	unannClassType_lf_unannClassOrInterfaceType
-		|	unannInterfaceType_lf_unannClassOrInterfaceType
-		)*
+		unannContinuedClassOrInterfaceType*
 	;
+
+unannContinuedClassOrInterfaceType
+    : unannClassType_lf_unannClassOrInterfaceType
+    |	unannInterfaceType_lf_unannClassOrInterfaceType
+    ;
 
 //TYPE
 unannClassType
@@ -1142,8 +1161,8 @@ primary
 //misc
 primaryNoNewArray
 	:	literal //TYPE
-	|	typeName ('[' ']')* '.' 'class' //PRIMARY_TYPE_DOT_CLASS
-	|	'void' '.' 'class' //PRIMARY_TYPE_DOT_CLASS
+	|	typeName (dim)* '.' classKeyword //PRIMARY_TYPE_DOT_CLASS
+	|	'void' '.' classKeyword //PRIMARY_TYPE_DOT_CLASS
 	|	'this' //PRIMARY_TYPE_DOT_THIS
 	|	typeName '.' 'this' //PRIMARY_TYPE_DOT_THIS
 	|	'(' expression ')' //EXPRESSION
@@ -1154,6 +1173,10 @@ primaryNoNewArray
 	|	methodReference //NORMAL_METHOD_REFERENCE, SUPER_METHOD_REFERENCE, NEW_METHOD_REFERENCE
 	;
 
+classKeyword
+    : 'class'
+    ;
+
 //misc
 primaryNoNewArray_lf_arrayAccess
 	:
@@ -1162,10 +1185,10 @@ primaryNoNewArray_lf_arrayAccess
 //misc
 primaryNoNewArray_lfno_arrayAccess
 	:	literal
-	|	typeName ('[' ']')* '.' 'class'
-	|	'void' '.' 'class'
+	|	typeName (dim)* '.' classKeyword
+	|	'void' '.' classKeyword
 	|	'this'
-	|	typeName '.' 'this'
+	|	typeName '.' classKeyword
 	|	'(' expression ')'
 	|	classInstanceCreationExpression
 	|	fieldAccess
@@ -1198,9 +1221,9 @@ primaryNoNewArray_lf_primary_lfno_arrayAccess_lf_primary
 //misc
 primaryNoNewArray_lfno_primary
 	:	literal
-	|	typeName ('[' ']')* '.' 'class'
-	|	unannPrimitiveType ('[' ']')* '.' 'class'
-	|	'void' '.' 'class'
+	|	typeName (dim)* '.' classKeyword
+	|	unannPrimitiveType (dim)* '.' classKeyword
+	|	'void' '.' classKeyword
 	|	'this'
 	|	typeName '.' 'this'
 	|	'(' expression ')'
@@ -1219,9 +1242,9 @@ primaryNoNewArray_lfno_primary_lf_arrayAccess_lfno_primary
 //misc
 primaryNoNewArray_lfno_primary_lfno_arrayAccess_lfno_primary
 	:	literal
-	|	typeName ('[' ']')* '.' 'class'
-	|	unannPrimitiveType ('[' ']')* '.' 'class'
-	|	'void' '.' 'class'
+	|	typeName (dim)* '.' classKeyword
+	|	unannPrimitiveType (dim)* '.' classKeyword
+	|	'void' '.' classKeyword
 	|	'this'
 	|	typeName '.' 'this'
 	|	'(' expression ')'
@@ -1258,8 +1281,8 @@ typeArgumentsOrDiamond
 //FIELD_ACCESS
 fieldAccess
 	:	primary '.' Identifier
-	|	'super' '.' Identifier
-	|	typeName '.' 'super' '.' Identifier
+	|	superKeyword '.' Identifier
+	|	typeName '.' superKeyword '.' Identifier
 	;
 
 //FIELD_ACCESS
@@ -1269,8 +1292,8 @@ fieldAccess_lf_primary
 
 //FIELD_ACCESS
 fieldAccess_lfno_primary
-	:	'super' '.' Identifier
-	|	typeName '.' 'super' '.' Identifier
+	:	superKeyword '.' Identifier
+	|	typeName '.' superKeyword '.' Identifier
 	;
 
 //ARRAY_ACCESS
@@ -1305,9 +1328,13 @@ methodInvocation
 	|	typeName '.' typeArguments? Identifier '(' argumentList? ')'
 	|	expressionName '.' typeArguments? Identifier '(' argumentList? ')'
 	|	primary '.' typeArguments? Identifier '(' argumentList? ')'
-	|	'super' '.' typeArguments? Identifier '(' argumentList? ')'
-	|	typeName '.' 'super' '.' typeArguments? Identifier '(' argumentList? ')'
+	|	superKeyword '.' typeArguments? Identifier '(' argumentList? ')'
+	|	typeName '.' superKeyword '.' typeArguments? Identifier '(' argumentList? ')'
 	;
+
+superKeyword
+    : 'super'
+    ;
 
 //METHOD_INVOCATION
 methodInvocation_lf_primary
@@ -1643,10 +1670,14 @@ postfixExpression
 	:	(	primary
 		|	expressionName
 		)
-		(	postIncrementExpression_lf_postfixExpression
-		|	postDecrementExpression_lf_postfixExpression
-		)*
+		(postfixExpressionSymbol)*
 	;
+
+//I added this
+postfixExpressionSymbol
+    :   postIncrementExpression_lf_postfixExpression
+    |	postDecrementExpression_lf_postfixExpression
+    ;
 
 //UNARY_EXPRESSION
 postIncrementExpression

@@ -162,6 +162,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAnnotatedDim(@NotNull Java8Parser.AnnotatedDimContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAnnotatedDim(@NotNull Java8Parser.AnnotatedDimContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterClassBodyDeclaration(@NotNull Java8Parser.ClassBodyDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -286,6 +299,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitExpressionName(@NotNull Java8Parser.ExpressionNameContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterContinuedClassOrInterfaceType(@NotNull Java8Parser.ContinuedClassOrInterfaceTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitContinuedClassOrInterfaceType(@NotNull Java8Parser.ContinuedClassOrInterfaceTypeContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -994,6 +1020,32 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterDim(@NotNull Java8Parser.DimContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDim(@NotNull Java8Parser.DimContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSuperKeyword(@NotNull Java8Parser.SuperKeywordContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSuperKeyword(@NotNull Java8Parser.SuperKeywordContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAnnotationTypeMemberDeclaration(@NotNull Java8Parser.AnnotationTypeMemberDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1410,6 +1462,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterClassKeyword(@NotNull Java8Parser.ClassKeywordContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitClassKeyword(@NotNull Java8Parser.ClassKeywordContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterUnannPrimitiveType(@NotNull Java8Parser.UnannPrimitiveTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1651,6 +1716,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitArrayAccess_lfno_primary(@NotNull Java8Parser.ArrayAccess_lfno_primaryContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterWildcardExtends(@NotNull Java8Parser.WildcardExtendsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitWildcardExtends(@NotNull Java8Parser.WildcardExtendsContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -2437,6 +2515,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPostfixExpressionSymbol(@NotNull Java8Parser.PostfixExpressionSymbolContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPostfixExpressionSymbol(@NotNull Java8Parser.PostfixExpressionSymbolContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterTypeArgumentList(@NotNull Java8Parser.TypeArgumentListContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -2704,6 +2795,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFloatingPointType(@NotNull Java8Parser.FloatingPointTypeContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUnannContinuedClassOrInterfaceType(@NotNull Java8Parser.UnannContinuedClassOrInterfaceTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnannContinuedClassOrInterfaceType(@NotNull Java8Parser.UnannContinuedClassOrInterfaceTypeContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

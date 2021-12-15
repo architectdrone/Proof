@@ -2332,6 +2332,17 @@ public interface Java8ParserListener extends ParseTreeListener {
 	void exitConditionalOrExpression(@NotNull Java8Parser.ConditionalOrExpressionContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link Java8Parser#annotatedQualifierElement}.
+	 * @param ctx the parse tree
+	 */
+	void enterAnnotatedQualifierElement(@NotNull Java8Parser.AnnotatedQualifierElementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link Java8Parser#annotatedQualifierElement}.
+	 * @param ctx the parse tree
+	 */
+	void exitAnnotatedQualifierElement(@NotNull Java8Parser.AnnotatedQualifierElementContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link Java8Parser#typeParameterModifier}.
 	 * @param ctx the parse tree
 	 */

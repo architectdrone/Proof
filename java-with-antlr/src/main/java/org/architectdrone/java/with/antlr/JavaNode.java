@@ -149,7 +149,7 @@ public enum JavaNode {
      * 
      * Value: The value of the qualifier element
      * Children:
-     *  - ANNOTATION?
+     *  - ANNOTATION*
     */
     QUALIFIER_ELEMENT,
 
@@ -330,7 +330,7 @@ public enum JavaNode {
      *  - (TYPE | VOID_MODIFIER_KEYWORD) (return type)
      *  - (METHOD_RECEIVER_PARAMETER, METHOD_PARAMETER, METHOD_ELLIPSIS_PARAMETER) (The parameters)
      *  - DIM* (Not sure why)
-     *  - THROWS*
+     *  - THROWS_EXCEPTION*
      *  - BLOCK? (the code block)
     */
     METHOD_DECLARATION,
@@ -442,7 +442,7 @@ public enum JavaNode {
      * Children:
      *  - TYPE
     */
-    THROWS,
+    THROWS_EXCEPTION,
 
     /**
      * Part of a variable declaration.
@@ -574,6 +574,7 @@ public enum JavaNode {
      *
      * Value: The text of the annotation (If "@Foo", then "Foo")
      * Children: Depends on the annotation type.
+     *  - QUALIFIER
      *  - Normal:
      *      - ELEMENT_PAIR*
      *  - Marker: None

@@ -648,9 +648,9 @@ constructorBody
 //SUPER_EXPLICIT_CONSTRUCTOR_INVOCATION, THIS_EXPLICIT_CONSTRUCTOR_INVOCATION
 explicitConstructorInvocation
 	:	typeArguments? 'this' '(' argumentList? ')' ';'
-	|	typeArguments? 'super' '(' argumentList? ')' ';'
-	|	expressionName '.' typeArguments? 'super' '(' argumentList? ')' ';'
-	|	primary '.' typeArguments? 'super' '(' argumentList? ')' ';'
+	|	typeArguments? superKeyword '(' argumentList? ')' ';'
+	|	expressionName '.' typeArguments? superKeyword '(' argumentList? ')' ';'
+	|	primary '.' typeArguments? superKeyword '(' argumentList? ')' ';'
 	;
 
 //ENUM_DECLARATION
@@ -1256,21 +1256,25 @@ primaryNoNewArray_lfno_primary_lfno_arrayAccess_lfno_primary
 
 //CLASS_INSTANCE_CREATION_EXPRESSION
 classInstanceCreationExpression
-	:	'new' typeArguments? annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	expressionName '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	primary '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	'new' typeArguments? annotatedQualifierElement ('.' annotatedQualifierElement)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	|	expressionName '.' 'new' typeArguments? annotatedQualifierElement typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	|	primary '.' 'new' typeArguments? annotatedQualifierElement typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
 	;
 
 //CLASS_INSTANCE_CREATION_EXPRESSION
 classInstanceCreationExpression_lf_primary
-	:	'.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	'.' 'new' typeArguments? annotatedQualifierElement typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
 	;
 
 //CLASS_INSTANCE_CREATION_EXPRESSION
 classInstanceCreationExpression_lfno_primary
-	:	'new' typeArguments? annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	expressionName '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	'new' typeArguments? annotatedQualifierElement ('.' annotatedQualifierElement)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	|	expressionName '.' 'new' typeArguments? annotatedQualifierElement typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
 	;
+
+annotatedQualifierElement
+    : annotation* Identifier
+    ;
 
 //TYPE_ARGUMENT_LIST
 typeArgumentsOrDiamond

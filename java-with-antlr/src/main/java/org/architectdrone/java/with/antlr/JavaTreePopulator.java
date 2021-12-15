@@ -23,9 +23,13 @@ import org.architectdrone.java.with.antlr.parser.implementation.Java8Parser;
 import org.architectdrone.javacodereviewprototype.tree.DiffTree;
 import org.architectdrone.javacodereviewprototype.tree.ReferenceType;
 
+import static org.architectdrone.java.with.antlr.JavaNode.ABSTRACT_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.ADD_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.AND_ASSIGNMENT_EQUALS;
 import static org.architectdrone.java.with.antlr.JavaNode.AND_SYMBOL;
+import static org.architectdrone.java.with.antlr.JavaNode.ANNOTATION;
+import static org.architectdrone.java.with.antlr.JavaNode.ANNOTATION_DECLARATION;
+import static org.architectdrone.java.with.antlr.JavaNode.ANNOTATION_TYPE_ELEMENT_DECLARATION;
 import static org.architectdrone.java.with.antlr.JavaNode.ARGUMENT_LIST;
 import static org.architectdrone.java.with.antlr.JavaNode.ARRAY_ACCESS;
 import static org.architectdrone.java.with.antlr.JavaNode.ARRAY_ACCESS_ELEMENT;
@@ -41,6 +45,9 @@ import static org.architectdrone.java.with.antlr.JavaNode.BINARY_OR_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.BLOCK;
 import static org.architectdrone.java.with.antlr.JavaNode.BREAK_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.CAST_EXPRESSION;
+import static org.architectdrone.java.with.antlr.JavaNode.CLASS_DECLARATION;
+import static org.architectdrone.java.with.antlr.JavaNode.CLASS_INSTANCE_CREATION_EXPRESSION;
+import static org.architectdrone.java.with.antlr.JavaNode.COMPILATION_UNIT;
 import static org.architectdrone.java.with.antlr.JavaNode.CONTINUE_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.DECREMENT_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.DEFAULT_KEYWORD;
@@ -49,9 +56,16 @@ import static org.architectdrone.java.with.antlr.JavaNode.DIM_EXPRESSION;
 import static org.architectdrone.java.with.antlr.JavaNode.DIVIDE_ASSIGNMENT_EQUALS;
 import static org.architectdrone.java.with.antlr.JavaNode.DIVIDE_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.DO_STATEMENT;
+import static org.architectdrone.java.with.antlr.JavaNode.ELEMENT_ARRAY;
+import static org.architectdrone.java.with.antlr.JavaNode.ELEMENT_PAIR;
 import static org.architectdrone.java.with.antlr.JavaNode.EMPTY_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.ENHANCED_FOR_STATEMENT;
+import static org.architectdrone.java.with.antlr.JavaNode.ENUM_BODY;
+import static org.architectdrone.java.with.antlr.JavaNode.ENUM_CONSTANT;
+import static org.architectdrone.java.with.antlr.JavaNode.ENUM_DECLARATION;
 import static org.architectdrone.java.with.antlr.JavaNode.EQUAL_TO_SYMBOL;
+import static org.architectdrone.java.with.antlr.JavaNode.EXTENDS_CLASS;
+import static org.architectdrone.java.with.antlr.JavaNode.EXTENDS_INTERFACE;
 import static org.architectdrone.java.with.antlr.JavaNode.FIELD_ACCESS;
 import static org.architectdrone.java.with.antlr.JavaNode.FINAL_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.FOR_INIT;
@@ -59,8 +73,11 @@ import static org.architectdrone.java.with.antlr.JavaNode.FOR_UPDATE;
 import static org.architectdrone.java.with.antlr.JavaNode.GREATER_THAN_OR_EQUAL_TO_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.GREATER_THAN_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.IF_STATEMENT;
+import static org.architectdrone.java.with.antlr.JavaNode.IMPLEMENTS_INTERFACE;
 import static org.architectdrone.java.with.antlr.JavaNode.INCREMENT_SYMBOL;
+import static org.architectdrone.java.with.antlr.JavaNode.INITIALIZER;
 import static org.architectdrone.java.with.antlr.JavaNode.INSTANCEOF_SYMBOL;
+import static org.architectdrone.java.with.antlr.JavaNode.INTERFACE_DECLARATION;
 import static org.architectdrone.java.with.antlr.JavaNode.LABELED_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.LAMBDA_EXPRESSION;
 import static org.architectdrone.java.with.antlr.JavaNode.LAMBDA_EXPRESSION_FORMAL_PARAMETER_LIST;
@@ -68,6 +85,7 @@ import static org.architectdrone.java.with.antlr.JavaNode.LAMBDA_EXPRESSION_INFE
 import static org.architectdrone.java.with.antlr.JavaNode.LESS_THAN_OR_EQUAL_TO_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.LESS_THAN_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.LITERAL;
+import static org.architectdrone.java.with.antlr.JavaNode.METHOD_DECLARATION;
 import static org.architectdrone.java.with.antlr.JavaNode.METHOD_ELLIPSIS_PARAMETER;
 import static org.architectdrone.java.with.antlr.JavaNode.METHOD_INVOCATION;
 import static org.architectdrone.java.with.antlr.JavaNode.METHOD_PARAMETER;
@@ -77,23 +95,32 @@ import static org.architectdrone.java.with.antlr.JavaNode.MOD_ASSIGNMENT_EQUALS;
 import static org.architectdrone.java.with.antlr.JavaNode.MULTIPLY_ASSIGNMENT_EQUALS;
 import static org.architectdrone.java.with.antlr.JavaNode.MULTIPLY_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.NEW_METHOD_REFERENCE;
+import static org.architectdrone.java.with.antlr.JavaNode.NORMAL_IMPORT_DECLARATION;
 import static org.architectdrone.java.with.antlr.JavaNode.NORMAL_METHOD_REFERENCE;
 import static org.architectdrone.java.with.antlr.JavaNode.NOT_ASSIGNMENT_EQUALS;
 import static org.architectdrone.java.with.antlr.JavaNode.NOT_EQUAL_TO_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.NOT_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.OR_ASSIGNMENT_EQUALS;
 import static org.architectdrone.java.with.antlr.JavaNode.OR_SYMBOL;
+import static org.architectdrone.java.with.antlr.JavaNode.PACKAGE_DECLARATION;
 import static org.architectdrone.java.with.antlr.JavaNode.PLUS_ASSIGNMENT_EQUALS;
 import static org.architectdrone.java.with.antlr.JavaNode.PRIMARY;
 import static org.architectdrone.java.with.antlr.JavaNode.PRIMARY_TYPE_DOT_CLASS;
 import static org.architectdrone.java.with.antlr.JavaNode.PRIMARY_TYPE_DOT_THIS;
+import static org.architectdrone.java.with.antlr.JavaNode.PRIVATE_MODIFIER_KEYWORD;
+import static org.architectdrone.java.with.antlr.JavaNode.PROTECTED_MODIFIER_KEYWORD;
+import static org.architectdrone.java.with.antlr.JavaNode.PUBLIC_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.QUALIFIER;
 import static org.architectdrone.java.with.antlr.JavaNode.QUALIFIER_ELEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.RETURN_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.SHIFT_LEFT_LOGICAL_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.SHIFT_RIGHT_ARITMATIC_SYMBOL;
 import static org.architectdrone.java.with.antlr.JavaNode.SHIFT_RIGHT_LOGICAL_SYMBOL;
+import static org.architectdrone.java.with.antlr.JavaNode.STATIC_IMPORT_DECLARATION;
+import static org.architectdrone.java.with.antlr.JavaNode.STATIC_MODIFIER_KEYWORD;
+import static org.architectdrone.java.with.antlr.JavaNode.STRICTFP_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.SUBTRACT_SYMBOL;
+import static org.architectdrone.java.with.antlr.JavaNode.SUPER_EXPLICIT_CONSTRUCTOR_INVOCATION;
 import static org.architectdrone.java.with.antlr.JavaNode.SUPER_FIELD_ACCESS;
 import static org.architectdrone.java.with.antlr.JavaNode.SUPER_METHOD_INVOCATION;
 import static org.architectdrone.java.with.antlr.JavaNode.SUPER_METHOD_REFERENCE;
@@ -101,6 +128,8 @@ import static org.architectdrone.java.with.antlr.JavaNode.SWITCH_GROUP;
 import static org.architectdrone.java.with.antlr.JavaNode.SWITCH_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.SYNCHRONIZED_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.TERNARY_EXPRESSION;
+import static org.architectdrone.java.with.antlr.JavaNode.THIS_EXPLICIT_CONSTRUCTOR_INVOCATION;
+import static org.architectdrone.java.with.antlr.JavaNode.THROWS_EXCEPTION;
 import static org.architectdrone.java.with.antlr.JavaNode.THROW_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.TRY_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.TRY_STATEMENT_CATCH;
@@ -108,10 +137,14 @@ import static org.architectdrone.java.with.antlr.JavaNode.TRY_STATEMENT_FINALLY;
 import static org.architectdrone.java.with.antlr.JavaNode.TRY_STATEMENT_RESOURCE;
 import static org.architectdrone.java.with.antlr.JavaNode.TYPE;
 import static org.architectdrone.java.with.antlr.JavaNode.TYPE_ARGUMENT_LIST;
+import static org.architectdrone.java.with.antlr.JavaNode.TYPE_BODY;
+import static org.architectdrone.java.with.antlr.JavaNode.TYPE_PARAMETER;
+import static org.architectdrone.java.with.antlr.JavaNode.TYPE_PARAMETER_LIST;
 import static org.architectdrone.java.with.antlr.JavaNode.TYPE_QUALIFIER_ELEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.UNARY_EXPRESSION;
 import static org.architectdrone.java.with.antlr.JavaNode.VARIABLE_DECLARATION;
 import static org.architectdrone.java.with.antlr.JavaNode.VARIABLE_DECLARATOR;
+import static org.architectdrone.java.with.antlr.JavaNode.VOID_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.WHILE_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.WILDCARD;
 import static org.architectdrone.java.with.antlr.JavaNode.WILDCARD_EXTENDS;
@@ -127,29 +160,73 @@ public class JavaTreePopulator {
         this.isOriginal = isOriginal;
     }
 
-    private List<JavaTree> getChildren(ParseTree parseTree) {
+    JavaTree getChildren(ParseTree parseTree) {
         if (parseTree.getClass() == CompilationUnitContext.class)
         {
-
+            return parseCompilationUnit((CompilationUnitContext) parseTree);
+        } else {
+            throw new RuntimeException("Cannot parse this.");
         }
-        return null;
     }
 
-    private List<JavaTree> parseCompilationUnit(CompilationUnitContext compilationUnit)
+    private JavaTree parseCompilationUnit(CompilationUnitContext compilationUnit)
     {
         PackageDeclarationContext packageDeclarations = compilationUnit.packageDeclaration();
-        List<ImportDeclarationContext> importDeclarationContextss = compilationUnit.importDeclaration();
+        List<ImportDeclarationContext> importDeclarationContexts = compilationUnit.importDeclaration();
         List<TypeDeclarationContext> typeDeclarationContexts = compilationUnit.typeDeclaration();
 
-        return null;
+        List<JavaTree> children = new ArrayList<>();
+        if (compilationUnit.packageDeclaration() != null)
+        {
+            children.add(parsePackageDeclaration(compilationUnit.packageDeclaration()));
+        }
+
+        for (ImportDeclarationContext importDeclaration : compilationUnit.importDeclaration())
+        {
+            JavaNode importJavaNodeType;
+            List<String> qualifierElementStrings;
+            if (importDeclaration.singleTypeImportDeclaration() != null) {
+                importJavaNodeType = NORMAL_IMPORT_DECLARATION;
+                qualifierElementStrings = typeNameToStrings(importDeclaration.singleTypeImportDeclaration().typeName());
+            } else if (importDeclaration.typeImportOnDemandDeclaration() != null) {
+                importJavaNodeType = NORMAL_IMPORT_DECLARATION;
+                qualifierElementStrings = packageOrTypeNameToStrings(importDeclaration.typeImportOnDemandDeclaration().packageOrTypeName());
+                qualifierElementStrings.add("*");
+            } else if (importDeclaration.singleStaticImportDeclaration() != null) {
+                importJavaNodeType = STATIC_IMPORT_DECLARATION;
+                qualifierElementStrings = typeNameToStrings(importDeclaration.singleStaticImportDeclaration().typeName());
+            } else {
+                importJavaNodeType = STATIC_IMPORT_DECLARATION;
+                qualifierElementStrings = typeNameToStrings(importDeclaration.staticImportOnDemandDeclaration().typeName());
+                qualifierElementStrings.add("*");
+            }
+            children.add(getJavaTree(importJavaNodeType, Collections.singletonList(createQualifier(qualifierElementStrings))));
+        }
+
+        for (TypeDeclarationContext typeDeclaration : compilationUnit.typeDeclaration())
+        {
+            if (typeDeclaration.classDeclaration() != null)
+            {
+                children.add(parseClassDeclaration(typeDeclaration.classDeclaration()));
+            } else
+            {
+                children.add(parseInterfaceDeclaration(typeDeclaration.interfaceDeclaration()));
+            }
+        }
+
+        return getJavaTree(COMPILATION_UNIT, children);
     }
 
-    private List<JavaTree> parsePackageDeclaration(PackageDeclarationContext packageDeclarationContext)
+    private JavaTree parsePackageDeclaration(PackageDeclarationContext packageDeclarationContext)
     {
         List<AnnotationContext> annotations = packageDeclarationContext.packageModifier().stream().map(a -> a.annotation()).collect(Collectors.toList());
         List<String> packageNameElements = getRecursive(packageDeclarationContext.packageName(), a -> a.Identifier().toString(), a -> a.packageName());
 
-        return null;
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseAnnotations(annotations));
+        children.add(createQualifier(packageNameElements));
+
+        return getJavaTree(PACKAGE_DECLARATION, children);
     }
 
     JavaTree createQualifier(List<String> strings)
@@ -167,24 +244,51 @@ public class JavaTreePopulator {
         if (annotationContext.normalAnnotation() != null)
         {
             return parseNormalAnnotation(annotationContext.normalAnnotation());
+        } else if (annotationContext.singleElementAnnotation() != null)
+        {
+            return parseSingleElementAnnotation(annotationContext.singleElementAnnotation());
+        } else
+        {
+            return parseMarkerAnnotation(annotationContext.markerAnnotation());
         }
+    }
 
-        return null;
+    private JavaTree parseMarkerAnnotation(final MarkerAnnotationContext markerAnnotation) {
+        List<JavaTree> children = new ArrayList<>();
+        children.add(parseTypeName(markerAnnotation.typeName()));
+        return getJavaTree(ANNOTATION, children);
+    }
+
+    private JavaTree parseSingleElementAnnotation(final SingleElementAnnotationContext singleElementAnnotation) {
+        List<JavaTree> children = new ArrayList<>();
+        children.add(parseTypeName(singleElementAnnotation.typeName()));
+        children.add(parseElementValue(singleElementAnnotation.elementValue()));
+        return getJavaTree(ANNOTATION, children);
     }
 
     JavaTree parseNormalAnnotation(NormalAnnotationContext normalAnnotationContext)
     {
-        JavaTree typeName = parseTypeName(normalAnnotationContext.typeName());
+        List<JavaTree> children = new ArrayList<>();
+        children.add(parseTypeName(normalAnnotationContext.typeName()));
+        children.addAll(normalAnnotationContext
+                .elementValuePairList()
+                .elementValuePair()
+                .stream()
+                .map(this::parseElementValuePair)
+                .collect(Collectors.toList()));
 
-        return null;
+        return getJavaTree(ANNOTATION, children);
     }
 
     JavaTree parseElementValuePair(ElementValuePairContext elementValuePair)
     {
-        String annotationName = elementValuePair.Identifier().toString();
+        String elementName = elementValuePair.Identifier().toString();
         ElementValueContext elementValue = elementValuePair.elementValue();
 
-        return null;
+        List<JavaTree> children = new ArrayList<>();
+        children.add(parseElementValue(elementValuePair.elementValue()));
+
+        return new JavaTree(ELEMENT_PAIR, elementName, children, isOriginal);
     }
 
     JavaTree parseConditionalExpression(Object someConditionalExpression)
@@ -275,6 +379,25 @@ public class JavaTreePopulator {
         }
     }
 
+    private JavaTree parseUnaryExpression(final UnaryExpressionNotPlusMinusContext unaryExpressionNotPlusMinus) {
+        JavaNode symbol;
+        UnaryExpressionContext nextUnaryExpression;
+        if (unaryExpressionNotPlusMinus.unaryExpressionNotPlusMinusBN() != null) {
+            symbol = BINARY_NOT_SYMBOL;
+            nextUnaryExpression = unaryExpressionNotPlusMinus.unaryExpression();
+        } else if (unaryExpressionNotPlusMinus.unaryExpressionNotPlusMinusCN() != null) {
+            symbol = NOT_SYMBOL;
+            nextUnaryExpression = unaryExpressionNotPlusMinus.unaryExpression();
+        } else if (unaryExpressionNotPlusMinus.castExpression() != null)
+        {
+            return parseCastExpression(unaryExpressionNotPlusMinus.castExpression());
+        } else
+        {
+            return parsePostfixExpression(unaryExpressionNotPlusMinus.postfixExpression());
+        }
+        return new JavaTree(UNARY_EXPRESSION, "", Arrays.asList(getSymbol(symbol), parseUnaryExpression(nextUnaryExpression)), isOriginal);
+    }
+
     JavaTree parseUnaryExpression(UnaryExpressionContext unaryExpression) {
         JavaNode symbol;
         UnaryExpressionContext nextUnaryExpression;
@@ -295,20 +418,7 @@ public class JavaTreePopulator {
             symbol = SUBTRACT_SYMBOL;
             nextUnaryExpression = unaryExpression.unaryExpression();
         } else {
-            UnaryExpressionNotPlusMinusContext unaryExpressionNotPlusMinus = unaryExpression.unaryExpressionNotPlusMinus();
-            if (unaryExpressionNotPlusMinus.unaryExpressionNotPlusMinusBN() != null) {
-                symbol = BINARY_NOT_SYMBOL;
-                nextUnaryExpression = unaryExpressionNotPlusMinus.unaryExpression();
-            } else if (unaryExpressionNotPlusMinus.unaryExpressionNotPlusMinusCN() != null) {
-                symbol = NOT_SYMBOL;
-                nextUnaryExpression = unaryExpressionNotPlusMinus.unaryExpression();
-            } else if (unaryExpressionNotPlusMinus.castExpression() != null)
-            {
-                return parseCastExpression(unaryExpressionNotPlusMinus.castExpression());
-            } else
-            {
-                return parsePostfixExpression(unaryExpressionNotPlusMinus.postfixExpression());
-            }
+            return parseUnaryExpression(unaryExpression.unaryExpressionNotPlusMinus());
         }
 
         return new JavaTree(UNARY_EXPRESSION, "", Arrays.asList(getSymbol(symbol), parseUnaryExpression(nextUnaryExpression)), isOriginal);
@@ -444,7 +554,11 @@ public class JavaTreePopulator {
             first = extractClassTypeFromInterface.apply(extractInterfaceType.apply(input));
         }
 
-        firstElementChildren.addAll(parseAnnotations(extractAnnotationsFromFirstClass.apply(first)));
+        if (extractAnnotationsFromFirstClass.apply(first) != null)
+        {
+            firstElementChildren.addAll(parseAnnotations(extractAnnotationsFromFirstClass.apply(first)));
+        }
+
         if (extractTypeArgumentsFromFirstClass.apply(first) != null)
         {
             firstElementChildren.add(parseTypeArguments(extractTypeArgumentsFromFirstClass.apply(first)));
@@ -1274,16 +1388,101 @@ public class JavaTreePopulator {
                 a -> a.Identifier());
     }
 
-    JavaTree parseClassInstanceCreationExpression(ClassInstanceCreationExpressionContext classInstanceCreationExpressionContext) {
-        return null;
+    <I> JavaTree parseClassInstanceCreationExpression(
+            I classInstanceCreationExpression,
+            Function<I, ExpressionNameContext> extractExpressionName,
+            Function<I, PrimaryContext> extractPrimary,
+            Function<I, TypeArgumentsContext> extractTypeArguments,
+            Function<I, List<AnnotatedQualifierElementContext>> extractAnnotatedQualifierElements,
+            Function<I, TypeArgumentsOrDiamondContext> extractTypeArgumentsOrDiamond,
+            Function<I, ArgumentListContext> extractArgumentList,
+            Function<I, ClassBodyContext> extractClassBody
+            ) {
+        List<JavaTree> children = new ArrayList<>();
+        if (extractExpressionName.apply(classInstanceCreationExpression) != null)
+        {
+            children.add(parseExpressionName(extractExpressionName.apply(classInstanceCreationExpression)));
+        } else if (extractPrimary.apply(classInstanceCreationExpression) != null)
+        {
+            children.add(parsePrimary(extractPrimary.apply(classInstanceCreationExpression)));
+        }
+
+        if (extractTypeArguments.apply(classInstanceCreationExpression) != null)
+        {
+            children.add(parseTypeArguments(extractTypeArguments.apply(classInstanceCreationExpression)));
+        }
+
+        List<JavaTree> qualifierElements = new ArrayList<>();
+        for (AnnotatedQualifierElementContext annotatedQualifierElement : extractAnnotatedQualifierElements.apply(classInstanceCreationExpression))
+        {
+            List<JavaTree> qualifierElementChildren = new ArrayList<>();
+            qualifierElementChildren.addAll(parseAnnotations(annotatedQualifierElement.annotation()));
+            qualifierElements.add(new JavaTree(QUALIFIER_ELEMENT, annotatedQualifierElement.Identifier().toString(), qualifierElementChildren, isOriginal));
+        }
+        children.add(getJavaTree(QUALIFIER, qualifierElements));
+
+        if (extractTypeArgumentsOrDiamond.apply(classInstanceCreationExpression) != null)
+        {
+            children.add(parseTypeArgumentsOrDiamond(extractTypeArgumentsOrDiamond.apply(classInstanceCreationExpression)));
+        }
+        if (extractArgumentList.apply(classInstanceCreationExpression) != null)
+        {
+            children.add(parseArgumentList(extractArgumentList.apply(classInstanceCreationExpression)));
+        }
+        if (extractClassBody.apply(classInstanceCreationExpression) != null)
+        {
+            children.add(parseClassBody(extractClassBody.apply(classInstanceCreationExpression)));
+        }
+        return getJavaTree(CLASS_INSTANCE_CREATION_EXPRESSION, children);
     }
 
-    JavaTree parseClassInstanceCreationExpression(final ClassInstanceCreationExpression_lf_primaryContext classInstanceCreationExpression_lf_primaryContext) {
-        return null;
+    JavaTree parseClassInstanceCreationExpression(ClassInstanceCreationExpressionContext classInstanceCreationExpression) {
+        return parseClassInstanceCreationExpression(
+                classInstanceCreationExpression,
+                a -> a.expressionName(),
+                a -> a.primary(),
+                a -> a.typeArguments(),
+                a -> a.annotatedQualifierElement(),
+                a -> a.typeArgumentsOrDiamond(),
+                a -> a.argumentList(),
+                a -> a.classBody()
+        );
     }
 
-    JavaTree parseClassInstanceCreationExpression(ClassInstanceCreationExpression_lfno_primaryContext classInstanceCreationExpressionContext) {
-        return null;
+    private JavaTree parseTypeArgumentsOrDiamond(final TypeArgumentsOrDiamondContext typeArgumentsOrDiamond) {
+        if (typeArgumentsOrDiamond.typeArguments() != null)
+        {
+            return parseTypeArguments(typeArgumentsOrDiamond.typeArguments());
+        } else
+        {
+            return getSymbol(TYPE_ARGUMENT_LIST);
+        }
+    }
+
+    JavaTree parseClassInstanceCreationExpression(final ClassInstanceCreationExpression_lf_primaryContext classInstanceCreationExpression) {
+        return parseClassInstanceCreationExpression(
+                classInstanceCreationExpression,
+                a -> null,
+                a -> null,
+                a -> a.typeArguments(),
+                a -> Collections.singletonList(a.annotatedQualifierElement()),
+                a -> a.typeArgumentsOrDiamond(),
+                a -> a.argumentList(),
+                a -> a.classBody()
+        );
+    }
+
+    JavaTree parseClassInstanceCreationExpression(ClassInstanceCreationExpression_lfno_primaryContext classInstanceCreationExpression) {
+        return parseClassInstanceCreationExpression(
+                classInstanceCreationExpression,
+                a -> a.expressionName(),
+                a -> null,
+                a -> a.typeArguments(),
+                a -> a.annotatedQualifierElement(),
+                a -> a.typeArgumentsOrDiamond(),
+                a -> a.argumentList(),
+                a -> a.classBody()
+        );
     }
 
     JavaTree parseLiteral(LiteralContext literal)
@@ -1609,6 +1808,9 @@ public class JavaTreePopulator {
         } else if (statementExpressionContext.postDecrementExpression() != null)
         {
             return parsePostDecrementExpression(statementExpressionContext.postDecrementExpression());
+        } else if (statementExpressionContext.methodInvocation() != null)
+        {
+            return parseMethodInvocation(statementExpressionContext.methodInvocation());
         } else
         {
             return parseClassInstanceCreationExpression(statementExpressionContext.classInstanceCreationExpression());
@@ -1835,7 +2037,9 @@ public class JavaTreePopulator {
     }
 
     private JavaTree parseSynchronizedStatement(final SynchronizedStatementContext synchronizedStatement) {
-        return getJavaTree(SYNCHRONIZED_STATEMENT, Arrays.asList(parseExpression(synchronizedStatement.expression()), parseBlock(synchronizedStatement.block()))));
+        return getJavaTree(SYNCHRONIZED_STATEMENT, Arrays.asList(
+                parseExpression(synchronizedStatement.expression()),
+                parseBlock(synchronizedStatement.block())));
 
     }
 
@@ -1904,7 +2108,7 @@ public class JavaTreePopulator {
         if (switchStatement.switchBlock().switchLabel() != null)
         {
             List<JavaTree> groupChildren = new ArrayList<>();
-            groupChildren.addAll(switchStatement.switchBlock().switchLabel().stream().map(a -> parseSwitchLabel(a)).collect(Collectors.toList()))
+            groupChildren.addAll(switchStatement.switchBlock().switchLabel().stream().map(a -> parseSwitchLabel(a)).collect(Collectors.toList()));
             children.add(getJavaTree(SWITCH_GROUP, groupChildren));
         }
 
@@ -1913,6 +2117,11 @@ public class JavaTreePopulator {
 
     JavaTree parseBlockStatements(BlockStatementsContext blockStatements) {
         return getJavaTree(BLOCK, blockStatements.blockStatement().stream().map(a -> parseBlockStatement(a)).collect(Collectors.toList()));
+    }
+
+    List<JavaTree> parseBlockStatements(List<BlockStatementContext> blockStatements)
+    {
+        return blockStatements.stream().map(a -> parseBlockStatement(a)).collect(Collectors.toList());
     }
 
     JavaTree parseSwitchLabel(SwitchLabelContext switchLabel)
@@ -1941,11 +2150,517 @@ public class JavaTreePopulator {
     }
 
     private JavaTree parseClassDeclaration(final ClassDeclarationContext classDeclaration) {
-        return null;
+        if (classDeclaration.normalClassDeclaration() != null)
+        {
+            return parseNormalClassDeclaration(classDeclaration.normalClassDeclaration());
+        }
+        else {
+            return parseEnumDeclaration(classDeclaration.enumDeclaration());
+        }
+    }
+
+    private JavaTree parseEnumDeclaration(final EnumDeclarationContext enumDeclaration) {
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseClassModifier(enumDeclaration.classModifier()));
+        children.addAll(parseSuperinterfaces(enumDeclaration.superinterfaces()));
+        List<JavaTree> enumBodyChildren = new ArrayList<>();
+        for (EnumConstantContext enumConstant : enumDeclaration.enumBody().enumConstantList().enumConstant())
+        {
+            List<JavaTree> enumConstantChildren = new ArrayList<>();
+            enumConstantChildren.addAll(parseAnnotations(enumConstant.enumConstantModifier().stream().map(a -> a.annotation()).collect(Collectors.toList())));
+            if (enumConstant.argumentList() != null)
+            {
+                enumConstantChildren.add(parseArgumentList(enumConstant.argumentList()));
+            }
+            if (enumConstant.classBody() != null)
+            {
+                enumConstantChildren.add(parseClassBody(enumConstant.classBody()));
+            }
+            enumBodyChildren.add(new JavaTree(ENUM_CONSTANT, enumConstant.Identifier().toString(), enumConstantChildren, isOriginal));
+        }
+        enumBodyChildren.add(parseClassBodyDeclaration(enumDeclaration.enumBody().enumBodyDeclarations().classBodyDeclaration()));
+        children.add(getJavaTree(ENUM_BODY, enumBodyChildren));
+        return getJavaTree(ENUM_DECLARATION, children);
+    }
+
+    private JavaTree parseNormalClassDeclaration(final NormalClassDeclarationContext normalClassDeclaration) {
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseClassModifier(normalClassDeclaration.classModifier()));
+        if (normalClassDeclaration.typeParameters() != null)
+        {
+            children.add(parseTypeParameters(normalClassDeclaration.typeParameters()));
+        }
+        if (normalClassDeclaration.superclass() != null)
+        {
+            children.add(parseSuperclass(normalClassDeclaration.superclass()));
+        }
+        if (normalClassDeclaration.superinterfaces() != null)
+        {
+            children.addAll(parseSuperinterfaces(normalClassDeclaration.superinterfaces()));
+        }
+        if (normalClassDeclaration.classBody() != null)
+        {
+            children.add(parseClassBody(normalClassDeclaration.classBody()));
+        }
+        return new JavaTree(CLASS_DECLARATION, normalClassDeclaration.Identifier().toString(), children, isOriginal);
+    }
+
+    private JavaTree parseInterfaceDeclaration(final InterfaceDeclarationContext interfaceDeclaration) {
+        if (interfaceDeclaration.annotationTypeDeclaration() != null)
+        {
+            return parseAnnotationTypeDeclaration(interfaceDeclaration.annotationTypeDeclaration());
+        } else {
+            NormalInterfaceDeclarationContext normal = interfaceDeclaration.normalInterfaceDeclaration();
+            List<JavaTree> children = new ArrayList<>();
+            children.addAll(parseInterfaceModifier(normal.interfaceModifier()));
+            if (normal.typeParameters() != null)
+            {
+                children.add(parseTypeParameters(normal.typeParameters()));
+            }
+            if (normal.extendsInterfaces() != null)
+            {
+                children.addAll(parseExtendsInterfaces(normal.extendsInterfaces()));
+            }
+            if (normal.interfaceBody() != null)
+            {
+                children.add(parseInterfaceBody(normal.interfaceBody()));
+            }
+            return new JavaTree(INTERFACE_DECLARATION, normal.Identifier().toString(), children, isOriginal);
+        }
+    }
+
+    private JavaTree parseInterfaceBody(final InterfaceBodyContext interfaceBody) {
+        List<JavaTree> children = new ArrayList<>();
+        for (InterfaceMemberDeclarationContext interfaceMemberDeclaration : interfaceBody.interfaceMemberDeclaration())
+        {
+            if (interfaceMemberDeclaration.constantDeclaration() != null)
+            {
+                children.add(parseConstantDeclaration(interfaceMemberDeclaration.constantDeclaration()));
+            } else if (interfaceMemberDeclaration.interfaceMethodDeclaration() != null)
+            {
+                children.add(parseInterfaceMethodDeclaration(interfaceMemberDeclaration.interfaceMethodDeclaration()));
+            } else if (interfaceMemberDeclaration.classDeclaration() != null)
+            {
+                children.add(parseClassDeclaration(interfaceMemberDeclaration.classDeclaration()));
+            } else if (interfaceMemberDeclaration.interfaceDeclaration() != null)
+            {
+                children.add(parseInterfaceDeclaration(interfaceMemberDeclaration.interfaceDeclaration()));
+            } else {
+                children.add(getSymbol(EMPTY_STATEMENT));
+            }
+        }
+        return getJavaTree(TYPE_BODY, children);
+    }
+
+    private JavaTree parseConstantDeclaration(final ConstantDeclarationContext constantDeclaration) {
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseConstantModifier(constantDeclaration.constantModifier()));
+        children.add(parseUnannType(constantDeclaration.unannType()));
+        children.addAll(parseVariableDeclaratorList(constantDeclaration.variableDeclaratorList()));
+        return getJavaTree(VARIABLE_DECLARATION, children);
+    }
+
+    private List<JavaTree> parseVariableDeclaratorList(final VariableDeclaratorListContext variableDeclaratorList) {
+        List<JavaTree> children = new ArrayList<>();
+        for (VariableDeclaratorContext variableDeclarator : variableDeclaratorList.variableDeclarator())
+        {
+            List<JavaTree> variableDeclaratorChildren = new ArrayList<>();
+            variableDeclaratorChildren.addAll(getDims(variableDeclarator.variableDeclaratorId().dims()));
+            if (variableDeclarator.variableInitializer() != null)
+            {
+                VariableInitializerContext variableInitializer = variableDeclarator.variableInitializer();
+                if (variableInitializer.expression() != null)
+                {
+                    variableDeclaratorChildren.add(parseExpression(variableInitializer.expression()));
+                } else {
+                    variableDeclaratorChildren.add(parseArrayInitializer(variableInitializer.arrayInitializer()));
+                }
+            }
+            children.add(new JavaTree(VARIABLE_DECLARATOR, variableDeclarator.variableDeclaratorId().Identifier().toString(), variableDeclaratorChildren, isOriginal));
+        }
+        return children;
+    }
+
+    private Collection<? extends JavaTree> parseConstantModifier(final List<ConstantModifierContext> constantModifier) {
+        return constantModifier
+                .stream().map(a -> parseModifier(a, ConstantModifierContext::annotation, ConstantModifierContext::getText)).collect(Collectors.toList());
+    }
+
+    private <I, M> JavaTree parseMethodDeclaration(I input,
+            Function<I, List<M>> extractModifiers,
+            Function<List<M>, List<JavaTree>> parseModifier,
+            Function<I, MethodHeaderContext> extractMethodHeader,
+            Function<I, MethodBodyContext> extractMethodBody)
+    {
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseModifier.apply(extractModifiers.apply(input)));
+        MethodHeaderContext methodHeader = extractMethodHeader.apply(input);
+        if (methodHeader.typeParameters() != null)
+        {
+            children.add(parseTypeParameters(methodHeader.typeParameters()));
+        }
+        if (methodHeader.annotation() != null)
+        {
+            children.addAll(parseAnnotations(methodHeader.annotation()));
+        }
+        if (methodHeader.result() != null)
+        {
+            ResultContext result = methodHeader.result();
+            if (result.unannType() != null)
+            {
+                children.add(parseUnannType(result.unannType()));
+            } else
+            {
+                children.add(getSymbol(VOID_MODIFIER_KEYWORD));
+            }
+        }
+        MethodDeclaratorContext methodDeclarator = methodHeader.methodDeclarator();
+        if (methodDeclarator.formalParameterList() != null)
+        {
+            children.addAll(parseFormalParameterList(methodDeclarator.formalParameterList()));
+        }
+        if (methodDeclarator.dims() != null)
+        {
+            children.addAll(getDims(methodDeclarator.dims()));
+        }
+        if (methodHeader.throws_() != null)
+        {
+            children.addAll(parseThrows_(methodHeader.throws_()));
+        }
+
+        if (extractMethodBody.apply(input) != null)
+        {
+            children.add(parseBlock(extractMethodBody.apply(input).block()));
+        }
+        return new JavaTree(METHOD_DECLARATION, extractMethodHeader.apply(input).methodDeclarator().Identifier().toString(), children, isOriginal);
+    }
+
+    private JavaTree parseMethodDeclaration(final MethodDeclarationContext methodDeclaration) {
+        return parseMethodDeclaration(
+                methodDeclaration,
+                a -> a.methodModifier(),
+                m -> parseMethodModifier(m),
+                a -> a.methodHeader(),
+                a -> a.methodBody());
+    }
+
+    private List<JavaTree> parseMethodModifier(final List<MethodModifierContext> m) {
+        return m.stream().map(a -> parseModifier(a, MethodModifierContext::annotation, MethodModifierContext::getText)).collect(Collectors.toList());
+    }
+
+    private JavaTree parseInterfaceMethodDeclaration(final InterfaceMethodDeclarationContext interfaceMethodDeclaration) {
+        return parseMethodDeclaration(interfaceMethodDeclaration,
+                a -> a.interfaceMethodModifier(),
+                m -> parseInterfaceMethodModifier(m),
+                a -> a.methodHeader(),
+                a -> a.methodBody());
+    }
+
+    private List<JavaTree> parseInterfaceMethodModifier(final List<InterfaceMethodModifierContext> interfaceMethodModifier) {
+        return interfaceMethodModifier.stream().map(a -> parseModifier(a, InterfaceMethodModifierContext::annotation, InterfaceMethodModifierContext::getText)).collect(Collectors.toList());
+    }
+
+    private List<JavaTree> parseExtendsInterfaces(final ExtendsInterfacesContext extendsInterfaces) {
+        List<JavaTree> toReturn = new ArrayList<>();
+        for (InterfaceTypeContext interfaceTypeContext : extendsInterfaces.interfaceTypeList().interfaceType())
+        {
+            toReturn.add(getJavaTree(EXTENDS_INTERFACE, Collections.singletonList(parseClassType(interfaceTypeContext.classType()))));
+        }
+        return toReturn;
+    }
+
+    private Collection<? extends JavaTree> parseInterfaceModifier(final List<InterfaceModifierContext> interfaceModifier) {
+        return interfaceModifier.stream().map(a -> parseModifier(a, InterfaceModifierContext::annotation, InterfaceModifierContext::getText)).collect(Collectors.toList());
+    }
+
+    private JavaTree parseAnnotationTypeDeclaration(final AnnotationTypeDeclarationContext annotationTypeDeclaration) {
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseInterfaceModifier(annotationTypeDeclaration.interfaceModifier()));
+        children.add(parseAnnotationTypeBody(annotationTypeDeclaration.annotationTypeBody()));
+        return new JavaTree(ANNOTATION_DECLARATION, annotationTypeDeclaration.Identifier().toString(), children, isOriginal);
+    }
+
+    private JavaTree parseAnnotationTypeBody(final AnnotationTypeBodyContext annotationTypeBody) {
+        List<JavaTree> children = new ArrayList<>();
+        for (AnnotationTypeMemberDeclarationContext annotationType : annotationTypeBody.annotationTypeMemberDeclaration())
+        {
+            if (annotationType.annotationTypeElementDeclaration() != null)
+            {
+                children.add(parseAnnotationTypeElementDeclaration(annotationType.annotationTypeElementDeclaration()));
+            } else if (annotationType.constantDeclaration() != null)
+            {
+                children.add(parseConstantDeclaration(annotationType.constantDeclaration()));
+            } else if (annotationType.classDeclaration() != null)
+            {
+                children.add(parseClassDeclaration(annotationType.classDeclaration()));
+            } else if (annotationType.interfaceDeclaration() != null)
+            {
+                children.add(parseInterfaceDeclaration(annotationType.interfaceDeclaration()));
+            } else {
+                children.add(getSymbol(EMPTY_STATEMENT));
+            }
+        }
+        return getJavaTree(BLOCK, children);
+    }
+
+    private JavaTree parseAnnotationTypeElementDeclaration(final AnnotationTypeElementDeclarationContext annotationTypeElementDeclaration) {
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseAnnotationTypeElementModifier(annotationTypeElementDeclaration.annotationTypeElementModifier()));
+        children.add(parseUnannType(annotationTypeElementDeclaration.unannType()));
+        if (annotationTypeElementDeclaration.dims() != null)
+        {
+            children.addAll(getDims(annotationTypeElementDeclaration.dims()));
+        }
+        children.add(parseElementValue(annotationTypeElementDeclaration.defaultValue().elementValue()));
+        return new JavaTree(ANNOTATION_TYPE_ELEMENT_DECLARATION, annotationTypeElementDeclaration.Identifier().toString(), children, isOriginal);
+    }
+
+    private Collection<? extends JavaTree> parseAnnotationTypeElementModifier(final List<AnnotationTypeElementModifierContext> annotationTypeElementModifier) {
+        return annotationTypeElementModifier.stream().map(a -> parseModifier(a, AnnotationTypeElementModifierContext::annotation, AnnotationTypeElementModifierContext::getText)).collect(Collectors.toList());
+    }
+
+    private JavaTree parseElementValue(final ElementValueContext elementValue) {
+        if (elementValue.conditionalExpression() != null)
+        {
+            return parseConditionalExpression(elementValue.conditionalExpression());
+        } else if (elementValue.elementValueArrayInitializer() != null)
+        {
+            return parseElementValueArrayInitializer(elementValue.elementValueArrayInitializer());
+        } else {
+            return parseAnnotation(elementValue.annotation());
+        }
+    }
+
+    private JavaTree parseElementValueArrayInitializer(final ElementValueArrayInitializerContext elementValueArrayInitializer) {
+        List<JavaTree> children = new ArrayList<>();
+        for (ElementValueContext elementValue : elementValueArrayInitializer.elementValueList().elementValue())
+        {
+            children.add(parseElementValue(elementValue));
+        }
+        return getJavaTree(ELEMENT_ARRAY, children);
+    }
+
+    JavaTree parseClassBodyDeclaration(List<ClassBodyDeclarationContext> contexts)
+    {
+        List<JavaTree> children = new ArrayList<>();
+        for (ClassBodyDeclarationContext classBodyDeclaration : contexts)
+        {
+            if (classBodyDeclaration.classMemberDeclaration() != null)
+            {
+                ClassMemberDeclarationContext classMemberDeclaration = classBodyDeclaration.classMemberDeclaration();
+                if (classMemberDeclaration.fieldDeclaration() != null)
+                {
+                    children.add(parseFieldDeclaration(classMemberDeclaration.fieldDeclaration()));
+                } else if (classMemberDeclaration.methodDeclaration() != null)
+                {
+                    children.add(parseMethodDeclaration(classMemberDeclaration.methodDeclaration()));
+                } else if (classMemberDeclaration.classDeclaration() != null)
+                {
+                    children.add(parseClassDeclaration(classMemberDeclaration.classDeclaration()));
+                } else if (classMemberDeclaration.interfaceDeclaration() != null)
+                {
+                    children.add(parseInterfaceDeclaration(classMemberDeclaration.interfaceDeclaration()));
+                } else {
+                    children.add(getSymbol(EMPTY_STATEMENT));
+                }
+            } else if (classBodyDeclaration.instanceInitializer() != null)
+            {
+                children.add(parseInstanceInitializer(classBodyDeclaration.instanceInitializer()));
+            } else if (classBodyDeclaration.staticInitializer() != null)
+            {
+                children.add(parseStaticInitializer(classBodyDeclaration.staticInitializer()));
+            } else
+            {
+                children.add(parseConstructorDeclaration(classBodyDeclaration.constructorDeclaration()));
+            }
+        }
+        return getJavaTree(TYPE_BODY, children);
+    }
+
+    private JavaTree parseClassBody(final ClassBodyContext classBody) {
+        return parseClassBodyDeclaration(classBody.classBodyDeclaration());
+    }
+
+    private JavaTree parseConstructorDeclaration(final ConstructorDeclarationContext constructorDeclaration) {
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseConstructorModifier(constructorDeclaration.constructorModifier()));
+        ConstructorDeclaratorContext constructorDeclarator = constructorDeclaration.constructorDeclarator();
+        if (constructorDeclarator.typeParameters() != null)
+        {
+            children.add(parseTypeParameters(constructorDeclarator.typeParameters()));
+        }
+        if (constructorDeclarator.formalParameterList() != null)
+        {
+            children.addAll(parseFormalParameterList(constructorDeclarator.formalParameterList()));
+        }
+        if (constructorDeclaration.throws_() != null)
+        {
+            children.addAll(parseThrows_(constructorDeclaration.throws_()));
+        }
+        if (constructorDeclaration.constructorBody() != null)
+        {
+            children.add(parseConstructorBody(constructorDeclaration.constructorBody()));
+        }
+        return new JavaTree(METHOD_DECLARATION, constructorDeclarator.simpleTypeName().Identifier().toString(), children, isOriginal);
+    }
+
+    private JavaTree parseConstructorBody(final ConstructorBodyContext constructorBody) {
+        List<JavaTree> children = new ArrayList<>();
+        if (constructorBody.explicitConstructorInvocation() != null)
+        {
+            ExplicitConstructorInvocationContext explicitConstructorInvocation = constructorBody.explicitConstructorInvocation();
+            List<JavaTree> explicitChildren = new ArrayList<>();
+            if (explicitConstructorInvocation.expressionName() != null)
+            {
+                children.add(parseExpressionName(explicitConstructorInvocation.expressionName()));
+            } else if (explicitConstructorInvocation.primary() != null)
+            {
+                children.add(parsePrimary(explicitConstructorInvocation.primary()));
+            }
+
+            children.add(parseTypeArguments(explicitConstructorInvocation.typeArguments()));
+            children.add(parseArgumentList(explicitConstructorInvocation.argumentList()));
+            children.add(getJavaTree(explicitConstructorInvocation.superKeyword() == null ? THIS_EXPLICIT_CONSTRUCTOR_INVOCATION : SUPER_EXPLICIT_CONSTRUCTOR_INVOCATION, explicitChildren));
+        }
+        children.addAll(parseBlockStatements(constructorBody.blockStatements().blockStatement()));
+        return getJavaTree(BLOCK, children);
+    }
+
+    private List<JavaTree> parseConstructorModifier(final List<ConstructorModifierContext> constructorModifier) {
+        return constructorModifier.stream().map(a -> parseModifier(a, b -> a.annotation(), b -> a.getText())).collect(Collectors.toList());
+    }
+
+    private List<JavaTree> parseThrows_(final Throws_Context throws_) {
+        List<JavaTree> toReturn = new ArrayList<>();
+        for (ExceptionTypeContext exceptionType : throws_.exceptionTypeList().exceptionType())
+        {
+            JavaTree type;
+            if (exceptionType.classType() != null)
+            {
+                type = parseClassType(exceptionType.classType());
+            } else {
+                type = parseTypeVariable(exceptionType.typeVariable());
+            }
+            toReturn.add(getJavaTree(THROWS_EXCEPTION, Collections.singletonList(type)));
+        }
+        return toReturn;
+    }
+
+    private JavaTree parseStaticInitializer(final StaticInitializerContext staticInitializer) {
+        List<JavaTree> children = new ArrayList<>();
+        children.add(getSymbol(STATIC_MODIFIER_KEYWORD));
+        children.add(parseBlock(staticInitializer.block()));
+        return getJavaTree(INITIALIZER, children);
+    }
+
+    private JavaTree parseInstanceInitializer(final InstanceInitializerContext instanceInitializer) {
+        List<JavaTree> children = new ArrayList<>();
+        children.add(parseBlock(instanceInitializer.block()));
+        return getJavaTree(INITIALIZER, children);
+    }
+
+
+
+    private JavaTree parseFieldDeclaration(final FieldDeclarationContext fieldDeclaration) {
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseFieldModifier(fieldDeclaration.fieldModifier()));
+        children.add(parseUnannType(fieldDeclaration.unannType()));
+        children.addAll(parseVariableDeclaratorList(fieldDeclaration.variableDeclaratorList()));
+        return getJavaTree(VARIABLE_DECLARATION, children);
+    }
+
+    private List<JavaTree> parseFieldModifier(final List<FieldModifierContext> fieldModifier) {
+        return fieldModifier
+                .stream().map(a -> parseModifier(a, FieldModifierContext::annotation, FieldModifierContext::getText)).collect(Collectors.toList());
+    }
+
+    private List<JavaTree> parseSuperinterfaces(final SuperinterfacesContext superinterfaces) {
+        List<JavaTree> toReturn = new ArrayList<>();
+        for (InterfaceTypeContext interfaceTypeContext : superinterfaces.interfaceTypeList().interfaceType())
+        {
+            toReturn.add(getJavaTree(IMPLEMENTS_INTERFACE, Collections.singletonList(parseClassType(interfaceTypeContext.classType()))));
+        }
+        return toReturn;
+    }
+
+    private JavaTree parseSuperclass(final SuperclassContext superclass) {
+        return getJavaTree(EXTENDS_CLASS, Collections.singletonList(parseClassType(superclass.classType())));
+    }
+
+    private JavaTree parseTypeParameters(final TypeParametersContext typeParameters) {
+        List<JavaTree> children = new ArrayList<>();
+        for (TypeParameterContext typeParameterContext : typeParameters.typeParameterList().typeParameter())
+        {
+            children.add(parseTypeParameter(typeParameterContext));
+        }
+        return getJavaTree(TYPE_PARAMETER_LIST, children);
+    }
+
+    private JavaTree parseTypeParameter(final TypeParameterContext typeParameterContext) {
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(typeParameterContext.typeParameterModifier().stream().map(a -> parseModifier(a, TypeParameterModifierContext::annotation, TypeParameterModifierContext::getText)).collect(
+                Collectors.toList()));
+        if (typeParameterContext.typeBound() != null)
+        {
+            TypeBoundContext typeBound = typeParameterContext.typeBound();
+            if (typeBound.typeVariable() != null)
+            {
+                children.add(parseTypeVariable(typeBound.typeVariable()));
+            } else {
+                children.add(parseClassOrInterfaceType(typeBound.classOrInterfaceType()));
+                children.addAll(typeBound.additionalBound().stream().map(AdditionalBoundContext::interfaceType).map(InterfaceTypeContext::classType).map(this::parseClassType).collect(Collectors.toList()));
+            }
+        }
+        return new JavaTree(TYPE_PARAMETER, typeParameterContext.getText(), children, isOriginal);
+    }
+
+    List<JavaTree> parseClassModifier(List<ClassModifierContext> classModifiers)
+    {
+        return classModifiers.stream().map(a -> parseClassModifier(a)).collect(Collectors.toList());
+    }
+
+    <I> JavaTree parseModifier(I modifier, Function<I, AnnotationContext> extractAnnotation, Function<I, String> extractString)
+    {
+        if (extractAnnotation.apply(modifier) != null)
+        {
+            return parseAnnotation(extractAnnotation.apply(modifier));
+        } else {
+            JavaNode keyword;
+            switch (extractString.apply(modifier))
+            {
+                case "public":
+                    keyword = PUBLIC_MODIFIER_KEYWORD;
+                case "protected":
+                    keyword = PROTECTED_MODIFIER_KEYWORD;
+                case "private":
+                    keyword = PRIVATE_MODIFIER_KEYWORD;
+                case "default":
+                    keyword = DEFAULT_KEYWORD;
+                case "abstract":
+                    keyword = ABSTRACT_MODIFIER_KEYWORD;
+                case "static":
+                    keyword = STATIC_MODIFIER_KEYWORD;
+                case "final":
+                    keyword = FINAL_MODIFIER_KEYWORD;
+                case "strictfp":
+                default:
+                    keyword = STRICTFP_MODIFIER_KEYWORD;
+            }
+            return getSymbol(keyword);
+        }
+    }
+
+    JavaTree parseClassModifier(ClassModifierContext classModifier)
+    {
+        return parseModifier(classModifier, a -> a.annotation(), a -> a.getText());
     }
 
     private JavaTree parseLocalVariableStatement(final LocalVariableDeclarationContext localVariableDeclaration) {
-        return null;
+        List<JavaTree> children = new ArrayList<>();
+        children.addAll(parseVariableModifier(localVariableDeclaration.variableModifier()));
+        children.add(parseUnannType(localVariableDeclaration.unannType()));
+        children.addAll(parseVariableDeclaratorList(localVariableDeclaration.variableDeclaratorList()));
+        return getJavaTree(VARIABLE_DECLARATION, children);
     }
 
     JavaTree getQualifier(TerminalNode identifier)
@@ -2017,7 +2732,7 @@ public class JavaTreePopulator {
         {
             children.addAll(getDims(extractVariableDeclaratorId.apply(input).dims()));
         }
-        return new JavaTree(METHOD_PARAMETER, extractVariableDeclaratorId.apply(input).Identifier().toString(), children, isOriginal);
+        return new JavaTree(node, extractVariableDeclaratorId.apply(input).Identifier().toString(), children, isOriginal);
     }
 
     JavaTree parseFormalParameter(FormalParameterContext formalParameter) {
@@ -2048,18 +2763,37 @@ public class JavaTreePopulator {
         return getJavaTree(METHOD_RECEIVER_PARAMETER, receiverParameterChildren);
     }
 
-    private JavaTree parseUnaryExpression(final UnaryExpressionNotPlusMinusContext unaryExpressionNotPlusMinus) {
-        return null;
-    }
-
     JavaTree parseExpression(ExpressionContext expressionContext)
     {
-        return null;
+        if (expressionContext.lambdaExpression() != null)
+        {
+            return parseLambdaExpression(expressionContext.lambdaExpression());
+        } else
+        {
+            AssignmentExpressionContext assignmentExpressionContext = expressionContext.assignmentExpression();
+            if (assignmentExpressionContext.conditionalExpression() != null)
+            {
+                return parseConditionalExpression(assignmentExpressionContext.conditionalExpression());
+            } else
+            {
+                return parseAssignment(assignmentExpressionContext.assignment());
+            }
+        }
+    }
+
+    List<String> packageOrTypeNameToStrings(PackageOrTypeNameContext packageOrTypeName)
+    {
+        return getRecursive(packageOrTypeName, a -> a.Identifier().toString(), PackageOrTypeNameContext::packageOrTypeName);
+    }
+
+    List<String> typeNameToStrings(TypeNameContext typeName)
+    {
+        return getRecursive(typeName.packageOrTypeName(), a -> a.Identifier().toString(), PackageOrTypeNameContext::packageOrTypeName);
     }
 
     JavaTree parseTypeName(TypeNameContext typeName)
     {
-        List<String> nameElements = getRecursive(typeName.packageOrTypeName(), a -> a.Identifier().toString(), PackageOrTypeNameContext::packageOrTypeName);
+        List<String> nameElements = typeNameToStrings(typeName);
         nameElements.add(typeName.Identifier().toString());
         return new JavaTree(QUALIFIER, "", Collections.singletonList(createQualifier(nameElements)), isOriginal);
     }
@@ -2098,6 +2832,10 @@ public class JavaTreePopulator {
 
     List<JavaTree> getDims(DimsContext dims)
     {
+        if (dims == null)
+        {
+            return Collections.emptyList();
+        }
         List<JavaTree> children = new ArrayList<>();
         for (AnnotatedDimContext annotatedDim : dims.annotatedDim())
         {
@@ -2156,13 +2894,19 @@ public class JavaTreePopulator {
      * @param <C> Cliff type
      * @return A javatree
      */
-    <I, P, C> JavaTree drillParseBinaryExpressionSingle(I input, Function<I, P> getPlateau, Function<I, C> getCliff, JavaNode operator, Function<C, JavaTree> drillDeeper)
+    <I, P, C> JavaTree drillParseBinaryExpressionSingle(I input,
+            Function<I, P> getPlateau,
+            Function<I, C> getCliff,
+            JavaNode operator,
+            Function<C, JavaTree> drillDeeper)
     {
-        JavaTree left = parseConditionalExpression(getPlateau.apply(input));
-        JavaTree right = parseConditionalExpression(getCliff.apply(input));
-        List<JavaTree> children = Arrays.asList(left, getSymbol(operator), right);
-        JavaTree theJavaTree = new JavaTree(BINARY_EXPRESSION, "", children, isOriginal);
-        return drillParse(input, getPlateau, getCliff, (a) -> theJavaTree, drillDeeper);
+        Function<I, JavaTree> getJavaTree = (a) -> {
+            JavaTree left = parseConditionalExpression(getPlateau.apply(a));
+            JavaTree right = parseConditionalExpression(getCliff.apply(a));
+            List<JavaTree> children = Arrays.asList(left, getSymbol(operator), right);
+            return new JavaTree(BINARY_EXPRESSION, "", children, isOriginal);
+        };
+        return drillParse(input, getPlateau, getCliff, getJavaTree, drillDeeper);
     }
 
     /**

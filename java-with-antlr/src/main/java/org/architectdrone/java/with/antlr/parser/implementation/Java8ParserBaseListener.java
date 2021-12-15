@@ -2762,6 +2762,19 @@ public class Java8ParserBaseListener implements Java8ParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAnnotatedQualifierElement(@NotNull Java8Parser.AnnotatedQualifierElementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAnnotatedQualifierElement(@NotNull Java8Parser.AnnotatedQualifierElementContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterTypeParameterModifier(@NotNull Java8Parser.TypeParameterModifierContext ctx) { }
 	/**
 	 * {@inheritDoc}

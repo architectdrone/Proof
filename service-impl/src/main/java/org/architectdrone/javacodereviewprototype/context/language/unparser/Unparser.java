@@ -27,7 +27,7 @@ public class Unparser {
                 .stream()
                 .map(a -> new DisplayElementAccessor<L>(a.getChildNumber(), a.getLabel(), unparse(discriminatorRetriever, diffTree)))
                 .collect(Collectors.toSet());
-        DisplayElementAccessor<L> displayElementAccessor = new DisplayElementAccessor<>(displayElementAccessors);
+        DisplayElementAccessor<L> displayElementAccessor = DisplayElementAccessor.create(displayElementAccessors);
         DisplayElement label;
         if (!diffTree.getOldValue().equals(diffTree.getValue()))
         {

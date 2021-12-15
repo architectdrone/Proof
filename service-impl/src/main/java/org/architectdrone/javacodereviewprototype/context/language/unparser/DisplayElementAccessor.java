@@ -17,7 +17,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.architectdrone.javacodereviewprototype.context.language.display.DisplayElement;
 
-@Builder(access = AccessLevel.PRIVATE)
 public class DisplayElementAccessor<L> {
     Set<DisplayElementAccessorElement<L>> displayElementAccessorElements;
 
@@ -31,13 +30,18 @@ public class DisplayElementAccessor<L> {
                 .build());
     }
 
-    public DisplayElementAccessor(Set<DisplayElementAccessor<L>> displayElementAccessors)
+    public DisplayElementAccessor(Set<DisplayElementAccessorElement<L>> displayElementAccessorElements)
     {
-        displayElementAccessorElements = new HashSet<>();
-        for (DisplayElementAccessor<L> displayElementAccessor : displayElementAccessors)
+        this.displayElementAccessorElements = displayElementAccessorElements;
+    }
+
+    public static <A> DisplayElementAccessor<A> create(Set<DisplayElementAccessor<A>> displayElementAccessors) {
+        Set<DisplayElementAccessorElement<A>> displayElementAccessorElements = new HashSet<>();
+        for (DisplayElementAccessor<A> displayElementAccessor : displayElementAccessors)
         {
             displayElementAccessorElements.addAll(displayElementAccessor.getDisplayElementAccessorElements());
         }
+        return new DisplayElementAccessor<>(displayElementAccessorElements);
     }
 
     public DisplayElementAccessor<L> withLabel(L label)
@@ -61,14 +65,10 @@ public class DisplayElementAccessor<L> {
 
     private DisplayElementAccessor<L> withFilter(Predicate<DisplayElementAccessorElement<L>> predicate)
     {
-        return DisplayElementAccessor
-                .<L>builder()
-                .displayElementAccessorElements(
-                        displayElementAccessorElements
-                                .stream()
-                                .filter(predicate)
-                                .collect(Collectors.toSet()))
-                .build();
+        return new DisplayElementAccessor(displayElementAccessorElements
+                .stream()
+                .filter(predicate)
+                .collect(Collectors.toSet()));
     }
 
     protected Set<DisplayElementAccessorElement<L>> getDisplayElementAccessorElements() {

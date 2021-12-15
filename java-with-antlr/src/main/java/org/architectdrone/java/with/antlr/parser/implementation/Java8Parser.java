@@ -15553,7 +15553,7 @@ public class Java8Parser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(2760); match(GE);
+			setState(2760); match(INSTANCEOF);
 			}
 		}
 		catch (RecognitionException re) {
@@ -18260,7 +18260,7 @@ public class Java8Parser extends Parser {
 		"\u0ac1\3\2\2\2\u0abf\u0abd\3\2\2\2\u0abf\u0ac0\3\2\2\2\u0ac0\u01d3\3\2"+
 		"\2\2\u0ac1\u0abf\3\2\2\2\u0ac2\u0ac3\7F\2\2\u0ac3\u01d5\3\2\2\2\u0ac4"+
 		"\u0ac5\7E\2\2\u0ac5\u01d7\3\2\2\2\u0ac6\u0ac7\7L\2\2\u0ac7\u01d9\3\2\2"+
-		"\2\u0ac8\u0ac9\7M\2\2\u0ac9\u01db\3\2\2\2\u0aca\u0acb\7M\2\2\u0acb\u01dd"+
+		"\2\u0ac8\u0ac9\7M\2\2\u0ac9\u01db\3\2\2\2\u0aca\u0acb\7\34\2\2\u0acb\u01dd"+
 		"\3\2\2\2\u0acc\u0acd\b\u00f0\1\2\u0acd\u0ace\5\u01e6\u00f4\2\u0ace\u0add"+
 		"\3\2\2\2\u0acf\u0ad0\f\5\2\2\u0ad0\u0ad1\5\u01e0\u00f1\2\u0ad1\u0ad2\5"+
 		"\u01e6\u00f4\2\u0ad2\u0adc\3\2\2\2\u0ad3\u0ad4\f\4\2\2\u0ad4\u0ad5\5\u01e2"+

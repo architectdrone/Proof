@@ -1,7 +1,5 @@
 package org.architectdrone.java.with.antlr;
 
-import com.github.javaparser.ast.stmt.CatchClause;
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,13 +13,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
-import lombok.Builder;
-import lombok.Getter;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.architectdrone.java.with.antlr.parser.implementation.Java8Parser;
-import org.architectdrone.javacodereviewprototype.tree.DiffTree;
-import org.architectdrone.javacodereviewprototype.tree.ReferenceType;
 
 import static org.architectdrone.java.with.antlr.JavaNode.ABSTRACT_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.ADD_SYMBOL;
@@ -332,8 +325,9 @@ public class JavaTreePopulator {
         Function<MultiplicativeExpressionContext, JavaTree> MultiplyToJT = a -> drillParseBinaryExpressionMultiple(a, b -> b.multiplicativeExpression(), b -> b.unaryExpression(), multiplyExpressionOperatorMap, this::parseUnaryExpression);
         Function<AdditiveExpressionContext, JavaTree> AddToJT = a -> drillParseBinaryExpressionMultiple(a, b -> b.additiveExpression(), b -> b.multiplicativeExpression(), additiveExpressionOperatorMap, MultiplyToJT);
         Function<ShiftExpressionContext, JavaTree> ShiftToJT = a -> drillParseBinaryExpressionMultiple(a, b -> b.shiftExpression(), b -> b.additiveExpression(), shiftExpressionOperatorMap, AddToJT);
-        Function<RelationalExpressionContext, JavaTree> RelationalToJT = a -> drillParseBinaryExpressionMultiple(a, b -> b.relationalExpression(), b -> b.shiftExpression(), relationalExpressionOperatorMap, ShiftToJT);
-        Function<EqualityExpressionContext, JavaTree> EqualityToJT = a -> drillParseBinaryExpressionMultiple(a, b -> b.equalityExpression(), b -> b.relationalExpression(), equalityExpressionOperatorMap, RelationalToJT);
+        Function<RelationalExpressionContext, JavaTree> RelationalToJT = a -> parseRelationalExpression(a, ShiftToJT);
+        Function<EqualityExpressionContext, JavaTree> EqualityToJT = a -> drillParseBinaryExpressionMultiple(a, b -> b.equalityExpression(), b -> b.relationalExpression(), equalityExpressionOperatorMap,
+                RelationalToJT);
         Function<AndExpressionContext, JavaTree> AndToJT = a -> drillParseBinaryExpressionSingle(a, b -> b.andExpression(), b -> b.equalityExpression(), BINARY_AND_SYMBOL, EqualityToJT);
         Function<ExclusiveOrExpressionContext, JavaTree> EOrToJT = a -> drillParseBinaryExpressionSingle(a, b -> b.exclusiveOrExpression(), b -> b.andExpression(), XOR_SYMBOL, AndToJT);
         Function<InclusiveOrExpressionContext, JavaTree> IOrToJT = a -> drillParseBinaryExpressionSingle(a, b -> b.inclusiveOrExpression(), b -> b.exclusiveOrExpression(), BINARY_OR_SYMBOL, EOrToJT);
@@ -377,6 +371,39 @@ public class JavaTreePopulator {
         else {
             throw new RuntimeException("Given unknown expression type");
         }
+    }
+
+    JavaTree parseRelationalExpression(RelationalExpressionContext relationalExpression, Function<ShiftExpressionContext, JavaTree> drillDeeper)
+    {
+        JavaNode operator;
+        JavaTree right;
+        if (relationalExpression.relationalExpression() == null)
+            return drillDeeper.apply(relationalExpression.shiftExpression());
+        if (relationalExpression.relationalExpressionLTE() != null)
+        {
+            operator = LESS_THAN_OR_EQUAL_TO_SYMBOL;
+            right = drillDeeper.apply(relationalExpression.shiftExpression());
+        } else if (relationalExpression.relationalExpressionLT() != null)
+        {
+            operator = LESS_THAN_SYMBOL;
+            right = drillDeeper.apply(relationalExpression.shiftExpression());
+        } else if (relationalExpression.relationalExpressionGTE() != null)
+        {
+            operator = GREATER_THAN_OR_EQUAL_TO_SYMBOL;
+            right = drillDeeper.apply(relationalExpression.shiftExpression());
+        } else if (relationalExpression.relationalExpressionGT() != null)
+        {
+            operator = GREATER_THAN_SYMBOL;
+            right = drillDeeper.apply(relationalExpression.shiftExpression());
+        } else
+        {
+            operator = INSTANCEOF_SYMBOL;
+            right = parseReferenceType(relationalExpression.referenceType());
+        }
+
+        return getJavaTree(BINARY_EXPRESSION, Arrays.asList(parseRelationalExpression(relationalExpression.relationalExpression(), drillDeeper),
+                getSymbol(operator),
+                right));
     }
 
     private JavaTree parseUnaryExpression(final UnaryExpressionNotPlusMinusContext unaryExpressionNotPlusMinus) {
@@ -434,6 +461,11 @@ public class JavaTreePopulator {
         else {
             next = parseExpressionName(postfixExpressionContext.expressionName());
         }
+        if (postfixExpressionContext.postfixExpressionSymbol().isEmpty())
+        {
+            return next;
+        }
+
         for (PostfixExpressionSymbolContext symbol : postfixExpressionContext.postfixExpressionSymbol())
         {
             if (symbol.postDecrementExpression_lf_postfixExpression() != null)
@@ -638,26 +670,29 @@ public class JavaTreePopulator {
                 WildcardContext wildcard = typeArgument.wildcard();
                 List<JavaTree> wildcardChildren = new ArrayList<>();
                 wildcardChildren.addAll(parseAnnotations(typeArgument.wildcard().annotation()));
-                if (wildcard.wildcardBounds().wildcardExtends() != null)
+                if (wildcard.wildcardBounds() != null)
                 {
-                    ReferenceTypeContext referenceType = wildcard
-                            .wildcardBounds()
-                            .wildcardExtends()
-                            .referenceType();
-                    wildcardChildren.add(
-                            getJavaTree(
-                                    WILDCARD_EXTENDS,
-                                    Arrays.asList(parseReferenceType(referenceType))));
-                }
-                else
-                {
-                    ReferenceTypeContext referenceType = wildcard
-                            .wildcardBounds()
-                            .referenceType();
-                    wildcardChildren.add(
-                            getJavaTree(
-                                    WILDCARD_SUPER,
-                                    Arrays.asList(parseReferenceType(referenceType))));
+                    if (wildcard.wildcardBounds().wildcardExtends() != null)
+                    {
+                        ReferenceTypeContext referenceType = wildcard
+                                .wildcardBounds()
+                                .wildcardExtends()
+                                .referenceType();
+                        wildcardChildren.add(
+                                getJavaTree(
+                                        WILDCARD_EXTENDS,
+                                        Arrays.asList(parseReferenceType(referenceType))));
+                    }
+                    else
+                    {
+                        ReferenceTypeContext referenceType = wildcard
+                                .wildcardBounds()
+                                .referenceType();
+                        wildcardChildren.add(
+                                getJavaTree(
+                                        WILDCARD_SUPER,
+                                        Arrays.asList(parseReferenceType(referenceType))));
+                    }
                 }
                 children.add(getJavaTree(WILDCARD, wildcardChildren));
             }
@@ -777,7 +812,10 @@ public class JavaTreePopulator {
             Function<I, NumericTypeContext> extractNumericType)
     {
         List<JavaTree> children = new ArrayList<>();
-        children.addAll(parseAnnotations(extractAnnotation.apply(input)));
+        if (extractAnnotation.apply(input) != null)
+        {
+            children.addAll(parseAnnotations(extractAnnotation.apply(input)));
+        }
         String label;
         if (extractNumericType.apply(input) != null)
         {
@@ -1062,7 +1100,16 @@ public class JavaTreePopulator {
             label = METHOD_INVOCATION;
         }
 
-        return new JavaTree(label, extractIdentifier.apply(methodInvocation).toString(), children, isOriginal);
+        String name;
+        if (extractIdentifier.apply(methodInvocation) != null)
+        {
+            name = extractIdentifier.apply(methodInvocation).toString();
+        }
+        else {
+            name = "";
+        }
+
+        return new JavaTree(label, name, children, isOriginal);
     }
 
     private JavaTree parseMethodInvocation(final MethodInvocationContext methodInvocation) {
@@ -2788,21 +2835,21 @@ public class JavaTreePopulator {
 
     List<String> typeNameToStrings(TypeNameContext typeName)
     {
-        return getRecursive(typeName.packageOrTypeName(), a -> a.Identifier().toString(), PackageOrTypeNameContext::packageOrTypeName);
+        List<String> nameElements = getRecursive(typeName.packageOrTypeName(), a -> a.Identifier().toString(), PackageOrTypeNameContext::packageOrTypeName);
+        nameElements.add(typeName.Identifier().toString());
+        return nameElements;
     }
 
     JavaTree parseTypeName(TypeNameContext typeName)
     {
-        List<String> nameElements = typeNameToStrings(typeName);
-        nameElements.add(typeName.Identifier().toString());
-        return new JavaTree(QUALIFIER, "", Collections.singletonList(createQualifier(nameElements)), isOriginal);
+        return createQualifier(typeNameToStrings(typeName));
     }
 
     JavaTree parseExpressionName(ExpressionNameContext typeName)
     {
         List<String> annotationTypeNameElements = getRecursive(typeName.ambiguousName(), a -> a.Identifier().toString(), AmbiguousNameContext::ambiguousName);
         annotationTypeNameElements.add(typeName.Identifier().toString());
-        return new JavaTree(QUALIFIER, "", Collections.singletonList(createQualifier(annotationTypeNameElements)), isOriginal);
+        return createQualifier(annotationTypeNameElements);
     }
 
     <I, O> List<O> getRecursive(I input, Function<I, O> extractor, UnaryOperator<I> iterator, Predicate<I> checker)

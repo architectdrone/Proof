@@ -1556,7 +1556,7 @@ relationalExpressionGTE
 
 //Added by me
 relationalExpressionIO
-    : '>='
+    : 'instanceof'
     ;
 
 //BINARY_EXPRESSION

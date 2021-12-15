@@ -67,6 +67,7 @@ public enum JavaNode {
      *  - BINARY_expression
      *  - CAST_expression
      *  - QUALIFIER
+     *  - UNARY_EXPRESSION
      *  - PRIMARY
      *
      * Value: Empty String

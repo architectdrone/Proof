@@ -24,9 +24,9 @@ public class JavaContext implements LanguageContext {
 
     public static void main(String[] args) throws IOException {
         JavaContext javaContext = new JavaContext();
-        String filename = "C:\\dev\\personal\\JavaCodeReviewPrototype\\java-with-antlr\\src\\main\\java\\org\\architectdrone\\java\\with\\antlr\\JavaContext.java";
+        String filename = "C:\\dev\\personal\\JavaCodeReviewPrototype\\java-with-antlr\\src\\main\\java\\org\\architectdrone\\java\\with\\antlr\\JavaTreePopulator.java";
         String contents = new String(Files.readAllBytes(Paths.get(filename)));
-        System.out.println(javaContext.parse(contents, true));
+        javaContext.parse(contents, true).printFullReport();
     }
 
     public <L> DiffTree<L> parse(String file, Boolean isOriginal) {

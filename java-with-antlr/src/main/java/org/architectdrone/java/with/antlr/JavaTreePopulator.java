@@ -87,6 +87,7 @@ import static org.architectdrone.java.with.antlr.JavaNode.MINUS_ASSIGNMENT_EQUAL
 import static org.architectdrone.java.with.antlr.JavaNode.MOD_ASSIGNMENT_EQUALS;
 import static org.architectdrone.java.with.antlr.JavaNode.MULTIPLY_ASSIGNMENT_EQUALS;
 import static org.architectdrone.java.with.antlr.JavaNode.MULTIPLY_SYMBOL;
+import static org.architectdrone.java.with.antlr.JavaNode.NATIVE_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.NEW_METHOD_REFERENCE;
 import static org.architectdrone.java.with.antlr.JavaNode.NORMAL_IMPORT_DECLARATION;
 import static org.architectdrone.java.with.antlr.JavaNode.NORMAL_METHOD_REFERENCE;
@@ -119,11 +120,13 @@ import static org.architectdrone.java.with.antlr.JavaNode.SUPER_METHOD_INVOCATIO
 import static org.architectdrone.java.with.antlr.JavaNode.SUPER_METHOD_REFERENCE;
 import static org.architectdrone.java.with.antlr.JavaNode.SWITCH_GROUP;
 import static org.architectdrone.java.with.antlr.JavaNode.SWITCH_STATEMENT;
+import static org.architectdrone.java.with.antlr.JavaNode.SYNCHRONIZED_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.SYNCHRONIZED_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.TERNARY_EXPRESSION;
 import static org.architectdrone.java.with.antlr.JavaNode.THIS_EXPLICIT_CONSTRUCTOR_INVOCATION;
 import static org.architectdrone.java.with.antlr.JavaNode.THROWS_EXCEPTION;
 import static org.architectdrone.java.with.antlr.JavaNode.THROW_STATEMENT;
+import static org.architectdrone.java.with.antlr.JavaNode.TRANSIENT_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.TRY_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.TRY_STATEMENT_CATCH;
 import static org.architectdrone.java.with.antlr.JavaNode.TRY_STATEMENT_FINALLY;
@@ -138,6 +141,7 @@ import static org.architectdrone.java.with.antlr.JavaNode.UNARY_EXPRESSION;
 import static org.architectdrone.java.with.antlr.JavaNode.VARIABLE_DECLARATION;
 import static org.architectdrone.java.with.antlr.JavaNode.VARIABLE_DECLARATOR;
 import static org.architectdrone.java.with.antlr.JavaNode.VOID_MODIFIER_KEYWORD;
+import static org.architectdrone.java.with.antlr.JavaNode.VOLATILE_MODIFIER_KEYWORD;
 import static org.architectdrone.java.with.antlr.JavaNode.WHILE_STATEMENT;
 import static org.architectdrone.java.with.antlr.JavaNode.WILDCARD;
 import static org.architectdrone.java.with.antlr.JavaNode.WILDCARD_EXTENDS;
@@ -2677,18 +2681,37 @@ public class JavaTreePopulator {
             {
                 case "public":
                     keyword = PUBLIC_MODIFIER_KEYWORD;
+                    break;
                 case "protected":
                     keyword = PROTECTED_MODIFIER_KEYWORD;
+                    break;
                 case "private":
                     keyword = PRIVATE_MODIFIER_KEYWORD;
+                    break;
                 case "default":
                     keyword = DEFAULT_KEYWORD;
+                    break;
                 case "abstract":
                     keyword = ABSTRACT_MODIFIER_KEYWORD;
+                    break;
                 case "static":
                     keyword = STATIC_MODIFIER_KEYWORD;
+                    break;
                 case "final":
                     keyword = FINAL_MODIFIER_KEYWORD;
+                    break;
+                case "transient":
+                    keyword = TRANSIENT_MODIFIER_KEYWORD;
+                    break;
+                case "volatile":
+                    keyword = VOLATILE_MODIFIER_KEYWORD;
+                    break;
+                case "synchronized":
+                    keyword = SYNCHRONIZED_MODIFIER_KEYWORD;
+                    break;
+                case "native":
+                    keyword = NATIVE_MODIFIER_KEYWORD;
+                    break;
                 case "strictfp":
                 default:
                     keyword = STRICTFP_MODIFIER_KEYWORD;

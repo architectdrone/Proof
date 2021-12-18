@@ -30,7 +30,7 @@ public enum JavaNode {
      * - Array
      *  - Looks like "A[]"
      *
-     * Value: The non-qualified name of the type
+     * Value: None
      * Children:
      *  - TYPE_QUALIFIER_ELEMENT
      *  - DIM* (If an array type)
@@ -161,7 +161,7 @@ public enum JavaNode {
      * Children:
      *  - PACKAGE_DECLARATION?
      *  - (STATIC_IMPORT_DECLARATION | NORMAL_IMPORT_DECLARATION)*
-     *  - (CLASS_DECLARATION | INTERFACE_DECLARATION | ENUM_DECLARATION)*
+     *  - (CLASS_DECLARATION | INTERFACE_DECLARATION | ENUM_DECLARATION | ANNOTATION_DECLARATION)*
     */
     COMPILATION_UNIT,
 
@@ -347,7 +347,7 @@ public enum JavaNode {
      *   - PRIMARY?
      *   - QUALIFIER?
      *   - TYPE_ARGUMENT_LIST?
-     *   - ARGUMENT_LIST?
+     *   - ARGUMENT_LIST
      */
     SUPER_EXPLICIT_CONSTRUCTOR_INVOCATION,
 
@@ -366,7 +366,7 @@ public enum JavaNode {
      * Value: Empty String
      * Children:
      *  - TYPE_ARGUMENTS?
-     *  - ARGUMENT_LIST?
+     *  - ARGUMENT_LIST
      */
     THIS_EXPLICIT_CONSTRUCTOR_INVOCATION,
 
@@ -433,6 +433,7 @@ public enum JavaNode {
      *  - (FINAL_KEYWORD | ANNOTATION)*
      *  - TYPE
      *  - ANNOTATION*
+     *  - DIM*
     */
     METHOD_ELLIPSIS_PARAMETER,
 
@@ -520,12 +521,28 @@ public enum JavaNode {
     TRANSIENT_MODIFIER_KEYWORD,
 
     /**
+     * The keyword "native".
+     *
+     * Value: Empty String
+     * Children: None
+    */
+    NATIVE_MODIFIER_KEYWORD,
+
+    /**
      * The keyword "volatile".
      *
      * Value: Empty String
      * Children: None
      */
     VOLATILE_MODIFIER_KEYWORD,
+
+    /**
+     * The keyword "synchronized".
+     *
+     * Value: Empty String
+     * Children: None
+    */
+    SYNCHRONIZED_MODIFIER_KEYWORD,
 
     /**
      * The keyword "void".
@@ -568,12 +585,12 @@ public enum JavaNode {
      * - Marker: Annotation with no elements, like "@Foo"
      * - Single Element: Annotation with a single value, like "@Foo(bar)"
      *
-     * {value} is:
+     * {element_group} is:
      *  - CONDITIONAL_expression
      *  - ELEMENT_ARRAY
      *  - ANNOTATION (Yes, it is recursive)
      *
-     * Value: The text of the annotation (If "@Foo", then "Foo")
+     * Value:
      * Children: Depends on the annotation type.
      *  - QUALIFIER
      *  - Normal:
@@ -594,7 +611,7 @@ public enum JavaNode {
      *
      * Value: The element pair's name (In "bar=baz", it is "bar")
      * Children:
-     *  - {value}
+     *  - {element_group}
      */
     ELEMENT_PAIR,
 
@@ -615,13 +632,13 @@ public enum JavaNode {
     /**
      * Array of elements.
      *
-     * {variable} is:
+     * {array_initializer_variable} is:
      *  - expression
      *  - ARRAY_INITIALIZER
      *
      * Value: Empty String.
      * Children:
-     *  - {variable}*
+     *  - {array_initializer_variable}*
      */
     ARRAY_INITIALIZER,
 

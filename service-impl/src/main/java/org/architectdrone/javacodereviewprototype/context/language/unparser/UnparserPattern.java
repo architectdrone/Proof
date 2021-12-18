@@ -9,6 +9,6 @@ import org.architectdrone.javacodereviewprototype.context.language.display.Displ
  * Copyrights 2021. Cerner Corporation.
  * @author Pharmacy Outpatient
  */
-abstract class UnparserPattern<L> {
-    abstract List<DisplayElement> unparse(DisplayElement label, DisplayElementAccessor<L> displayElementAccessor);
+public abstract class UnparserPattern<L> {
+    public abstract List<DisplayElement> unparse(DisplayElement label, DisplayElementAccessor<L> displayElementAccessor);
 }

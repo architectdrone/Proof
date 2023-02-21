@@ -3,6 +3,7 @@ package org.architectdrone.javacodereviewprototype.tree;
 import com.github.javaparser.utils.Pair;
 import com.google.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.architectdrone.javacodereviewprototype.utils.common.CommonUtils;
@@ -53,6 +54,8 @@ public class ChangeDistillationTreeMatchImpl implements TreeMatch {
             float largeSubtreeThreshold,
             int n)
     {
+        treeA.populateAdvancedData();
+        treeB.populateAdvancedData();
         treeA.setMatch(treeB);
         matchLeafNodes(treeA,
                 treeB,
@@ -158,14 +161,40 @@ public class ChangeDistillationTreeMatchImpl implements TreeMatch {
             float minimumSimilarity,
             int n)
     {
+        List<Pair<Pair<DiffTree<L>, DiffTree<L>>, Float>> toReturn = new ArrayList<>();
+        for (DiffTree<L> leafA : leavesA)
+        {
+            for (DiffTree<L> leafB : leavesB)
+            {
+                if (leafA.getLabel().equals(leafB.getLabel())) {
+                    float similarity = stringSimilarity.getStringSimilarity(leafA.getValue(), leafB.getValue(), n);
+                    if (similarity > minimumSimilarity) {
+                        DiffTree<L> currentA = leafA;
+                        DiffTree<L> currentB = leafB;
+                        int parent_score = 0;
+                        for (int i = 0; i < 5; i++) {
+                            if (currentA == null || currentB == null) {
+                                if (currentA == currentB) {
+                                    parent_score += (5-i);
+                                }
+                                break;
+                            }
+                            if (currentA.getLabel().equals(currentB.getLabel())) {
+                                parent_score+=1;
+                                currentA = currentA.getParent();
+                                currentB = currentB.getParent();
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        toReturn.add(new Pair<>(new Pair<>(leafA, leafB), parent_score*similarity));
+                    }
 
-        return leavesA
-                .stream()
-                .flatMap(la -> leavesB.stream().map(lb -> new Pair<>(la, lb)))
-                .filter(p -> p.a.getLabel().equals(p.b.getLabel()))
-                .map(p -> new Pair<>(p, stringSimilarity.getStringSimilarity(p.a.getValue(), p.b.getValue(), n)))
-                .filter(p -> p.b > minimumSimilarity)
-                .collect(Collectors.toList());
+                }
+            }
+        }
+        return toReturn;
     }
 
     /**

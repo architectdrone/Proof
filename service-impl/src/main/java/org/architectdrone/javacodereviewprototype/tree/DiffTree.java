@@ -248,7 +248,7 @@ public class DiffTree<L> {
     {
         if (hasAdvancedDataBeenPopulated)
         {
-            throw new RuntimeException("Advanced tree data has already been populated.");
+            return; //throw new RuntimeException("Advanced tree data has already been populated.");
         }
 
         if (getChildren().size() != 0)

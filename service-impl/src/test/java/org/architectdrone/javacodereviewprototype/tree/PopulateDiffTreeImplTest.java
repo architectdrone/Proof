@@ -2659,6 +2659,54 @@ class PopulateDiffTreeImplTest {
                     assertMovedTo(b1_mt);
                     assertDeleted(c1);
                 }
+
+                /**
+                 * In A1, we have C1 and D1. C1 has B1.
+                 * In A2, we have B2 and D2.
+                 * We expect B1 to move from C1 into A1.
+                 */
+                @Test
+                void movingOutOfDeletedNodeWithSiblings()
+                {
+                    //Setup trees
+                    DiffTree<String> b1 = createBNode(true);
+                    DiffTree<String> d1 = createDNode(true);
+                    DiffTree<String> e1 = createENode(true);
+                    DiffTree<String> c1 = createCNode(true, b1);
+                    DiffTree<String> a1 = createANode(true, c1, e1, d1);
+
+                    DiffTree<String> b2 = createBNode(false);
+                    DiffTree<String> e2 = createENode(false);
+                    DiffTree<String> d2 = createDNode(false);
+                    DiffTree<String> a2 = createCNode(false, e2, b2, d2);
+
+                    //Match trees
+                    a1.setMatch(a2);
+                    b1.setMatch(b2);
+                    d1.setMatch(d2);
+                    e1.setMatch(e2);
+
+                    populateDiffTree.populateDiffTree(a1, a2);
+                    DiffTree<String> b1_mt = b1;
+                    DiffTree<String> b1_mf = getNodeWithType(a1, ReferenceType.MOVE_FROM);
+
+                    assertParent(b1_mf, a1);
+                    assertParent(c1, a1);
+                    assertChildNumber(b1_mt, 0);
+                    assertChildNumber(c1, 0);
+                    assertChildNumber(e1, 1);
+                    assertChildNumber(b1_mf, 2);
+                    assertChildNumber(d1, 3);
+
+                    assertParent(b1_mt, c1);
+
+                    assertParent(d1, a1);
+
+                    assertMovedFrom(b1_mf);
+                    assertMovedTo(b1_mt);
+                    assertDeleted(c1);
+                    assertNone(d1);
+                }
             }
         }
     }

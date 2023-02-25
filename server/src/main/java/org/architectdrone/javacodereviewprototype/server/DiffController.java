@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,26 @@ public class DiffController {
         toReturn.value = root.getValue();
         toReturn.oldValue = root.getOldValue();
         toReturn.referenceType = ReferenceTypeToString(root.getReferenceType());
-        toReturn.children = root.getChildren().stream().map(this::constructDiffASTFromDiffTree).collect(Collectors.toList());
+        toReturn.children = getSortedListOfChildren(root).stream().map(this::constructDiffASTFromDiffTree).collect(Collectors.toList());
+        return toReturn;
+    }
+
+    private List<DiffTree<String>> getSortedListOfChildren(DiffTree<String> root) {
+        if (root.getReferenceType() == ReferenceType.MOVE_FROM)
+        {
+            return getSortedListOfChildren(root.getReferenceLocation());
+        }
+        List<DiffTree<String>> toReturn = new ArrayList<>();
+        DiffTree<String> current = root.getFirst();
+        while (true) {
+            if (current != null) {
+                toReturn.add(current);
+                current = current.getNext();
+            }
+            else {
+                break;
+            }
+        }
         return toReturn;
     }
 

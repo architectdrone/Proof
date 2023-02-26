@@ -37,7 +37,8 @@ def compare_documents(a, b):
     }
     response = requests.get("http://localhost:8080/diff", json=to_send)
     result = response.json()
-    header = '\t<head>\n\t\t<link rel="stylesheet" href="proof_html_stylesheet.css">\n\t</head>'
+    
+    header = '\t<head>\n\t\t<link rel="stylesheet" href="proof_html_stylesheet.css">\n\t\t<script type="text/javascript" src="domarrow.js"></script>\n\t\t<link rel="stylesheet" href="domarrow.css">\n\t</head>'
     return f"<html>\n{header}\n\t<body>\n{display_unparsed_difftree(unparse_difftree(result, 'NONE'))}\n\t</body></html>"
     return display_unparsed_difftree(unparse_difftree(result))
 
@@ -108,19 +109,29 @@ def unparse_difftree(tree, parent_ref_type):
         raise RuntimeError
     
     if tree['referenceType'] == parent_ref_type:
-        return wrap_string(string, "NONE", tree['oldValue'])
+        return wrap_string(string, "NONE", tree['oldValue'], tree['moveId'])
     else:
-        return wrap_string(string, tree['referenceType'], tree['oldValue'])
+        return wrap_string(string, tree['referenceType'], tree['oldValue'], tree['moveId'])
 
 CREATE_STYLE_START = '<span class="create">'
 DELETE_STYLE_START = '<span class="delete">'
 MOVE_TO_STYLE_START = '<span class="move_to">'
 MOVE_FROM_STYLE_START = '<span class="move_from">'
 
+def create_move_from_arrow_anchor(move_id):
+    return f'<span id="move_from_{move_id}"/>'
+def create_move_to_arrow_anchor(move_id):
+    return f'<span id="move_to_{move_id}"/>'
+
+def arrow_start_command_to_tag(match : re.Match):
+    return create_move_from_arrow_anchor(match.group(1))
+def arrow_end_command_to_tag(match : re.Match):
+    return create_move_to_arrow_anchor(match.group(1))
 def display_unparsed_difftree(unparsed_difftree):
     lines = unparsed_difftree.split("!!NEWLINE!!")
     lines_to_return = []
     tab_level = 0
+    moves = max([int(i) for i in re.findall("!!ARROWORIGIN(.*?)!!", unparsed_difftree)])
     create_level = 0
     delete_level = 0
     move_to_level = 0
@@ -138,6 +149,8 @@ def display_unparsed_difftree(unparsed_difftree):
         line = line.replace("!!TABUP!!", "")
         line = line.replace("!!TABDOWN!!", "")
         line = line.replace("!!TABDOWNAFTER!!", "")
+        line = re.sub("!!ARROWORIGIN(.*?)!!", arrow_start_command_to_tag, line)
+        line = re.sub("!!ARROWEND(.*?)!!", arrow_end_command_to_tag, line)
         for i in re.finditer(r'!!(.*?)!!', line):
             if "END" in i.group():
                 style_list = style_list[:-1]
@@ -162,7 +175,10 @@ def display_unparsed_difftree(unparsed_difftree):
         
         lines_to_return .append(f'\t\t<p style="text-indent:{50*tab_level}px">{style_starter}{line}{style_ender}</p>') 
         tab_level-=tabdown_after
-    return "\n".join(lines_to_return)
+    document = "\n".join(lines_to_return)
+    for i in range(moves+1):
+        document += f'\n\t\t<connection to="#move_to_{i}" from="#move_from_{i}" fromX="0" toX="0" fromY="0.5" toY="0.5" tail></connection>'
+    return document
 
 BEGIN_CREATE = "!!BEGINCREATE!!"
 BEGIN_DELETE = "!!BEGINDELETE!!"
@@ -176,8 +192,10 @@ END_MOVE_TO = "!!ENDMOVETO!!"
 END_MOVE_FROM = "!!ENDMOVEFROM!!"
 END_MODIFY = "!!ENDMODIFY!!"
 END_STRIKE = "!!ENDSTRIKE!!"
+ARROW_ORIGIN = "!!ARROWORIGINXXX!!"
+ARROW_END = "!!ARROWENDXXX!!"
 
-def wrap_string(string, modifier, oldValue):
+def wrap_string(string, modifier, oldValue, move_id):
     if modifier == "NONE":
         return string
     elif modifier == "CREATE":
@@ -185,9 +203,9 @@ def wrap_string(string, modifier, oldValue):
     elif modifier == "DELETE":
         return f'{BEGIN_DELETE}{string}{END_DELETE}'
     elif modifier == "MOVE_TO":
-        return f'{BEGIN_MOVE_TO}{string}{END_MOVE_TO}'
+        return f'{ARROW_ORIGIN.replace("XXX", str(move_id))}{BEGIN_MOVE_TO}{string}{END_MOVE_TO}'
     elif modifier == "MOVE_FROM":
-        return f'{BEGIN_MOVE_FROM}{string}{END_MOVE_FROM}'
+        return f'{ARROW_END.replace("XXX", str(move_id))}{BEGIN_MOVE_FROM}{string}{END_MOVE_FROM}'
     elif modifier == "MODIFY":
         return f"{BEGIN_MODIFY}{BEGIN_STRIKE}{oldValue}{END_STRIKE}{string}{END_MODIFY}"
     raise RuntimeError

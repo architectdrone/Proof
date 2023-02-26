@@ -58,6 +58,8 @@ public class DiffTree<L> {
     @Getter @Setter
     String oldValue;
 
+    @Getter @Setter
+    int moveId = -1;
     /**
      * Constructs a {@link DiffTree} from some other tree type.
      * @param otherTree Root of other tree.

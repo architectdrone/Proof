@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 public class DiffController {
     TreeMatch treeMatch;
     PopulateDiffTree populateDiffTree;
+
+    int currentMoveId = 0;
+
     @Inject
     public DiffController() {
         CommonUtils commonUtils = new CommonUtilsImpl();
@@ -30,6 +33,7 @@ public class DiffController {
     @GetMapping("/diff")
     @ResponseBody
     public DiffAST getDiff(@RequestBody DiffRequest diffRequest) {
+        currentMoveId = 0;
         DiffTree<String> originalDiffTree = constructDiffTreeFromAST(diffRequest.original, true);
         DiffTree<String> modifiedDiffTree = constructDiffTreeFromAST(diffRequest.modified, false);
         this.treeMatch.matchTrees(originalDiffTree, modifiedDiffTree);
@@ -43,6 +47,19 @@ public class DiffController {
 
     private DiffAST constructDiffASTFromDiffTree(DiffTree<String> root) {
         DiffAST toReturn = new DiffAST();
+        if (root.getReferenceType() == ReferenceType.MOVE_FROM || root.getReferenceType() == ReferenceType.MOVE_TO) {
+            if (root.getMoveId() == -1) {
+                root.setMoveId(currentMoveId);
+                root.getReferenceLocation().setMoveId(currentMoveId);
+                toReturn.setMoveId(currentMoveId);
+                currentMoveId+=1;
+            } else {
+                toReturn.moveId = root.getMoveId();
+            }
+
+        } else {
+            toReturn.setMoveId(-1);
+        }
         toReturn.label = root.getLabel();
         toReturn.value = root.getValue();
         toReturn.oldValue = root.getOldValue();

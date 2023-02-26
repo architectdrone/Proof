@@ -11,4 +11,5 @@ public class DiffAST {
     List<DiffAST> children;
     String referenceType;
     String oldValue;
+    int moveId;
 }

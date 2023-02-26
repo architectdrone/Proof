@@ -1,3 +1,4 @@
+import re
 import sys
 from antlr4 import *
 import requests
@@ -36,18 +37,20 @@ def compare_documents(a, b):
     }
     response = requests.get("http://localhost:8080/diff", json=to_send)
     result = response.json()
+    header = '\t<head>\n\t\t<link rel="stylesheet" href="proof_html_stylesheet.css">\n\t</head>'
+    return f"<html>\n{header}\n\t<body>\n{display_unparsed_difftree(unparse_difftree(result, 'NONE'))}\n\t</body></html>"
     return display_unparsed_difftree(unparse_difftree(result))
 
-def unparse_difftrees(trees):
-    return [unparse_difftree(tree) for tree in trees]
+def unparse_difftrees(trees, parent_ref_type):
+    return [unparse_difftree(tree, parent_ref_type) for tree in trees]
 
-def unparse_difftree(tree):
+def unparse_difftree(tree, parent_ref_type):
     string = ""
     if tree['label'] == "DOCUMENT":
-        string += "!!NEWLINE!!".join(unparse_difftrees(tree['children']))
+        string += "!!NEWLINE!!".join(unparse_difftrees(tree['children'], tree['referenceType']))
     elif tree['label'] == "PROLOG":
         string += "<?xml"
-        unparsed_children = unparse_difftrees(tree['children'])
+        unparsed_children = unparse_difftrees(tree['children'], tree['referenceType'])
         if len(unparsed_children) > 0:
             string+= ' '
             string+= ' '.join(unparsed_children)
@@ -55,7 +58,7 @@ def unparse_difftree(tree):
     elif tree['label'] == "ATTRIBUTE":
         string+=tree['value']
         string+="="
-        string+=unparse_difftree(tree['children'][0])
+        string+=unparse_difftree(tree['children'][0], tree['referenceType'])
     elif tree['label'] == "ATTRIBUTE_VALUE":
         string = tree['value']
     elif tree['label'] == 'ELEMENT':
@@ -66,7 +69,7 @@ def unparse_difftree(tree):
         requires_tabdown = False
         attributes = [i for i in tree['children'] if i['label'] == 'ATTRIBUTE']
         if len(attributes) > 0:
-            all_difftrees_string = " ".join(unparse_difftrees(attributes))
+            all_difftrees_string = " ".join(unparse_difftrees(attributes, tree['referenceType']))
             if len(all_difftrees_string) < 40:
                 string += " "
                 string += all_difftrees_string
@@ -74,7 +77,7 @@ def unparse_difftree(tree):
                 string += "!!NEWLINE!!"
                 string += "!!TABUP!!"
                 string += "!!TABUP!!"
-                string += "!!NEWLINE!!".join(unparse_difftrees(attributes))
+                string += "!!NEWLINE!!".join(unparse_difftrees(attributes, tree['referenceType']))
                 string += "!!TABDOWNAFTER!!"
                 string += "!!TABDOWNAFTER!!"
         
@@ -84,11 +87,11 @@ def unparse_difftree(tree):
             if len(content) > 1:
                 string += "!!NEWLINE!!"
                 string += "!!TABUP!!"
-                string += "!!NEWLINE!!".join(unparse_difftrees(content))
+                string += "!!NEWLINE!!".join(unparse_difftrees(content, tree['referenceType']))
                 string += "!!NEWLINE!!"
                 string += "!!TABDOWN!!"
             else:
-                string += "!!NEWLINE!!".join(unparse_difftrees(content))
+                string += "!!NEWLINE!!".join(unparse_difftrees(content, tree['referenceType']))
             string += "<"
             string += "/"
             string += tag
@@ -104,37 +107,89 @@ def unparse_difftree(tree):
     else:
         raise RuntimeError
     
-    return wrap_string(string, tree['referenceType'], tree['oldValue'])
+    if tree['referenceType'] == parent_ref_type:
+        return wrap_string(string, "NONE", tree['oldValue'])
+    else:
+        return wrap_string(string, tree['referenceType'], tree['oldValue'])
+
+CREATE_STYLE_START = '<span class="create">'
+DELETE_STYLE_START = '<span class="delete">'
+MOVE_TO_STYLE_START = '<span class="move_to">'
+MOVE_FROM_STYLE_START = '<span class="move_from">'
 
 def display_unparsed_difftree(unparsed_difftree):
     lines = unparsed_difftree.split("!!NEWLINE!!")
     lines_to_return = []
     tab_level = 0
+    create_level = 0
+    delete_level = 0
+    move_to_level = 0
+    move_from_level = 0
+    style_list = []
     for line in lines:
+        style_starter = ''.join(style_list)
         tab_level+=line.count("!!TABUP!!")
         tab_level-=line.count("!!TABDOWN!!")
         tabdown_after = line.count("!!TABDOWNAFTER!!")
+        line = line.replace("&", "&amp;")
+        line = line.replace("<", "&lt;")
+        line = line.replace(">", "&gt;")
+        
         line = line.replace("!!TABUP!!", "")
         line = line.replace("!!TABDOWN!!", "")
         line = line.replace("!!TABDOWNAFTER!!", "")
-        tabs = "\t"*tab_level
-        lines_to_return .append(f"{tabs}{line}") 
+        for i in re.finditer(r'!!(.*?)!!', line):
+            if "END" in i.group():
+                style_list = style_list[:-1]
+            elif i.group() == BEGIN_CREATE:
+                style_list.append(CREATE_STYLE_START)
+            elif i.group() == BEGIN_DELETE:
+                style_list.append(DELETE_STYLE_START)
+            elif i.group() == BEGIN_MOVE_TO:
+                style_list.append(MOVE_TO_STYLE_START)
+            elif i.group() == BEGIN_MOVE_FROM:
+                style_list.append(MOVE_FROM_STYLE_START)
+        line = line.replace(BEGIN_CREATE,    CREATE_STYLE_START)
+        line = line.replace(BEGIN_DELETE,    DELETE_STYLE_START)
+        line = line.replace(BEGIN_MOVE_TO,   MOVE_TO_STYLE_START)
+        line = line.replace(BEGIN_MOVE_FROM, MOVE_FROM_STYLE_START)
+        line = line.replace(END_CREATE, '</span>')
+        line = line.replace(END_DELETE, '</span>')
+        line = line.replace(END_MOVE_TO, '</span>')
+        line = line.replace(END_MOVE_FROM, '</span>')
+        style_ender = "</span>"*len(style_list)
+        tabs = "    "*tab_level
+        
+        lines_to_return .append(f'\t\t<p style="text-indent:{50*tab_level}px">{style_starter}{line}{style_ender}</p>') 
         tab_level-=tabdown_after
     return "\n".join(lines_to_return)
+
+BEGIN_CREATE = "!!BEGINCREATE!!"
+BEGIN_DELETE = "!!BEGINDELETE!!"
+BEGIN_MOVE_TO = "!!BEGINMOVETO!!"
+BEGIN_MOVE_FROM = "!!BEGINMOVEFROM!!"
+BEGIN_MODIFY = "!!BEGINMODIFY!!"
+BEGIN_STRIKE = "!!BEGINSTRIKE!!"
+END_CREATE = "!!ENDCREATE!!"
+END_DELETE = "!!ENDDELETE!!"
+END_MOVE_TO = "!!ENDMOVETO!!"
+END_MOVE_FROM = "!!ENDMOVEFROM!!"
+END_MODIFY = "!!ENDMODIFY!!"
+END_STRIKE = "!!ENDSTRIKE!!"
 
 def wrap_string(string, modifier, oldValue):
     if modifier == "NONE":
         return string
     elif modifier == "CREATE":
-        return f"[(+) {string}]"
+        return f'{BEGIN_CREATE}{string}{END_CREATE}'
     elif modifier == "DELETE":
-        return f"[(-) {string}]"
+        return f'{BEGIN_DELETE}{string}{END_DELETE}'
     elif modifier == "MOVE_TO":
-        return f"[(MOVE_TO) {string}]"
+        return f'{BEGIN_MOVE_TO}{string}{END_MOVE_TO}'
     elif modifier == "MOVE_FROM":
-        return f"[(MOVE_FROM) {string}]"
+        return f'{BEGIN_MOVE_FROM}{string}{END_MOVE_FROM}'
     elif modifier == "MODIFY":
-        return f"[(MODIFY) {oldValue} => {string}]"
+        return f"{BEGIN_MODIFY}{BEGIN_STRIKE}{oldValue}{END_STRIKE}{string}{END_MODIFY}"
     raise RuntimeError
 
 def print_tree(tree, t = 0):
@@ -239,7 +294,7 @@ def interesting_nodes(trees):
 if __name__ == '__main__':
     with open("my_xml.xml", "r") as f1:
         with open("my_xml2.xml", "r") as f2:
-            with open("my_output.xml", "w+") as o:
+            with open("my_html_output.html", "w+") as o:
                 original = f1.read()
                 modified = f2.read()
                 o.write(compare_documents(original, modified))

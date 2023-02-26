@@ -1,0 +1,23 @@
+p {
+    line-height: 0.3;
+}
+span.delete {
+    background-color: red;
+    color: lightgrey;
+}
+span.create {
+    background-color: green;
+    color: white;
+}
+span.move_to {
+    background-color: hotpink;
+    color: lightgrey;
+}
+span.move_from {
+    background-color: blue;
+    color: white;
+}
+body {
+    font-family: monospace;
+    background-color: bisque;
+}

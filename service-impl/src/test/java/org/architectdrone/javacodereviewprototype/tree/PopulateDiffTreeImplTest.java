@@ -2581,6 +2581,69 @@ class PopulateDiffTreeImplTest {
                 assertPointsAt(d1_mt, d1_mf);
             }
 
+            /**
+             * In A1, we have B1, C1, and D1. B1 has E1, D1 has F1.
+             * In A2, we have B2, C2, and D2. C2 has E2 and F2.
+             * We expect that, under C2, we have E2 and F2 correctly organized.
+             */
+            @Test
+            void twoDifferentNodesMovingNextToEachOther() {
+                //Setup trees
+                DiffTree<String> f1 = createENode(true);
+                DiffTree<String> e1 = createENode(true);
+                DiffTree<String> d1 = createDNode(true, f1);
+                DiffTree<String> c1 = createCNode(true);
+                DiffTree<String> b1 = createCNode(true, e1);
+                DiffTree<String> a1 = createANode(true, b1, c1, d1);
+
+                DiffTree<String> f2 = createENode(false);
+                DiffTree<String> e2 = createENode(false);
+                DiffTree<String> d2 = createDNode(false);
+                DiffTree<String> c2 = createCNode(false, e2, f2);
+                DiffTree<String> b2 = createCNode(false);
+                DiffTree<String> a2 = createANode(false, b2, c2, d2);
+
+                //Match trees
+                a1.setMatch(a2);
+                b1.setMatch(b2);
+                c1.setMatch(c2);
+                d1.setMatch(d2);
+                e1.setMatch(e2);
+                f1.setMatch(f2);
+
+                populateDiffTree.populateDiffTree(a1, a2);
+                DiffTree<String> e1_mt = e1;
+                DiffTree<String> e1_mf = getSingleChild(c1, 0);
+                DiffTree<String> f1_mt = f1;
+                DiffTree<String> f1_mf = getSingleChild(c1, 1);
+
+                assertParent(b1, a1);
+                assertChildNumber(b1, 0);
+                assertParent(c1, a1);
+                assertChildNumber(c1, 1);
+                assertParent(d1, a1);
+                assertChildNumber(d1, 2);
+                assertParent(e1_mt, b1);
+                assertChildNumber(e1_mt, 0);
+                assertParent(f1_mt, d1);
+                assertChildNumber(f1_mt, 0);
+                assertParent(e1_mf, c1);
+                assertChildNumber(e1_mf, 0);
+                assertParent(f1_mf, c1);
+                assertChildNumber(f1_mf, 1);
+
+                assertNone(a1);
+                assertNone(b1);
+                assertNone(c1);
+                assertNone(d1);
+                assertMovedFrom(e1_mf);
+                assertMovedFrom(f1_mf);
+                assertMovedTo(e1_mt);
+                assertMovedTo(f1_mt);
+
+                assertPointsAt(e1_mf, e1_mt);
+                assertPointsAt(f1_mf, f1_mt);
+            }
 
             @Nested
             class Creation

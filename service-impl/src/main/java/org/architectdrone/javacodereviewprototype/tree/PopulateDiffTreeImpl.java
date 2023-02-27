@@ -267,6 +267,12 @@ public class PopulateDiffTreeImpl implements PopulateDiffTree {
         }
         else
         {
+            if (before.getParent() != parent) {
+                if (before.getReferenceLocation() != null && before.getReferenceLocation().getParent() == parent)
+                {
+                    before = before.getReferenceLocation();
+                }
+            }
             DiffTree<L> oldAfter = before.getNext();
             before.setNext(newNode);
             newNode.setNext(oldAfter);
